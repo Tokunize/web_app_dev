@@ -52,7 +52,9 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        'custom-gray': '#F2F4F7', // Puedes definir el color con un código HEX, RGB, HSL, etc.
+        'custom-gray': '#F2F4F7', 
+        "primary-green": "#A2FF28"
+        // Puedes definir el color con un código HEX, RGB, HSL, etc.
 
       },
       borderRadius: {

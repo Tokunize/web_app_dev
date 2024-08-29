@@ -9,6 +9,10 @@ django-cors = "*"
 djangorestframework = "*"
 python-jose = "*"
 whitenoise = "*"
+factory-boy = "*"
+django-cors-headers = "*"
+psycopg2-binary = "*"
+django-filter = "*"
 
 [dev-packages]
 

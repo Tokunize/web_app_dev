@@ -8,7 +8,7 @@ interface PropertyListCardProps {
   minTokenPrice: string;
   estAnnualReturn: string;
   propertyImg: string;
-  linkTo: string;
+  id: string;
 }
 
 export const PropertyListCard: React.FC<PropertyListCardProps> = ({
@@ -17,12 +17,12 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
   minTokenPrice,
   estAnnualReturn,
   propertyImg,
-  linkTo,
+  id,
 }) => {
   return (
     <article className="relative rounded-lg overflow-hidden mt-6">
       <Link
-        to={linkTo}
+        to={`property-details/${id}`}
         className="absolute top-4 right-4 transform rotate-[-45deg] bg-white bg-opacity-50 p-2 rounded-full shadow-lg"
       >
         <FaArrowRight className="text-gray-800" />

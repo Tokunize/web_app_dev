@@ -15,21 +15,15 @@ import {
 } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
-// Helper function to format numbers as currency
-const formatPrice = (price: string) => {
-  return `£${price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
-};
 
 interface FiltersProps {
   locations: string[];
-  priceRange: string[];
   onFilterChange: (key: string, value: any) => void;
   propertyTypes: string[];
 }
 
 export const PropertyFilters: React.FC<FiltersProps> = ({
   locations,
-  priceRange,
   onFilterChange,
   propertyTypes,
 }) => {
