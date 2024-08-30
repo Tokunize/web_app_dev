@@ -1,77 +1,87 @@
+# models.py
+
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
-from property.models import Property
+from django.utils import timezone
 
-# 1. Custom User Manager
-class UserProfileManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, name, password=None, rol='owner', **extra_fields):
         if not email:
-            raise ValueError("The Email field must be set")
+            raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+        user = self.model(email=email, name=name, rol=rol, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
+        self.create_profile(user, rol)
         return user
 
-    def create_superuser(self, email, password=None, **extra_fields):
+    def create_profile(self, user, rol):
+        profile_classes = {
+            'owner': PropertyOwnerProfile,
+            'investor': InvestorProfile,
+            'admin': PropertyAdminProfile,
+            'developer': DeveloperProfile,
+        }
+        profile_class = profile_classes.get(rol)
+        if profile_class:
+            profile_class.objects.get_or_create(user=user)
+
+    def create_superuser(self, email, name, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        return self.create_user(email, password, **extra_fields)
+        return self.create_user(email, name, password, rol='admin', **extra_fields)
 
-# 2. Base UserProfile
-class UserProfile(AbstractBaseUser, PermissionsMixin):
+class CustomUser(AbstractBaseUser, PermissionsMixin):
+    ROLES = [
+        ('owner', 'Property Owner'),
+        ('investor', 'Investor'),
+        ('admin', 'Property Admin'),
+        ('developer', 'Developer'),
+    ]
+
     email = models.EmailField(unique=True)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=20, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-
-    objects = UserProfileManager()
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+    rol = models.CharField(max_length=20, choices=ROLES, default='owner')
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name']
+
+    objects = CustomUserManager()
 
     def __str__(self):
         return self.email
     
 
-# 3. Roles: PropertyOwner, Investor, Developer, PropertyAdmin
-class PropertyOwner(UserProfile):
-    owned_properties = models.ManyToManyField(Property, related_name='owners')
+    # models.py (continuación)
 
-    class Meta:
-        permissions = [
-            ("view_property", "Can view properties"),
-            ("upload_property", "Can upload properties"),
+class PropertyOwnerProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='property_owner_profile')
+    number_of_properties = models.IntegerField(default=0)
 
-        ]
+    def __str__(self):
+        return f"{self.user.email} - Property Owner"
 
-class Investor(UserProfile):
-    invested_properties = models.ManyToManyField(Property, related_name='investors')
+class InvestorProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='investor_profile')
+    total_investment = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
-    class Meta:
-        permissions = [
-            ("view_investment", "Can view investments"),
-            ("add_investment", "Can add new investment"),
-            ("view_property", "Can view properties"),
+    def __str__(self):
+        return f"{self.user.email} - Investor"
 
-        ]
+class PropertyAdminProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='property_admin_profile')
 
-class PropertyAdmin(UserProfile):
-    managed_properties = models.ManyToManyField(Property, related_name='admins')
+    def __str__(self):
+        return f"{self.user.email} - Property Admin"
 
-    class Meta:
-        permissions = [
-            ("manage_property", "Can manage properties"),
-            ("delete_property", "Can delete properties"),
-        ]
+class DeveloperProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='developer_profile')
 
-
-# class Developer(UserProfile):
-#         developed_properties = models.ManyToManyField(Property, related_name='developers')
-
-#         class Meta:
-#             permissions = [
-#                 ("view_project", "Can view projects"),
-#                 ("add_project", "Can add new project"),
-#             ]    
+    def __str__(self):
+        return f"{self.user.email} - Developer"
 

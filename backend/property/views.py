@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from property.models import Property
-from .serializers import PropertySerializer, PropertyOverviewSerializer
+from .serializers import PropertySerializer, PropertyOverviewSerializer,PropertyImagesSerializer
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Max
@@ -16,6 +16,7 @@ class PropertyListView(APIView):
         properties = Property.objects.all()
         serializer = PropertySerializer(properties, many=True)
         return Response(serializer.data)
+    
 
 class PropertyDetailView(APIView):
     def get(self, request, pk):
@@ -28,6 +29,8 @@ class PropertyDetailView(APIView):
         
         if view_type == 'overview':
             serializer = PropertyOverviewSerializer(property)
+        elif view_type == 'images':
+            serializer = PropertyImagesSerializer(property)
         # elif view_type == 'additional':
         #     serializer = PropertyAdditionalDetailsSerializer(property)
         # elif view_type == 'financials':
