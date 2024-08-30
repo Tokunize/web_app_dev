@@ -21,24 +21,24 @@ export const PurchaseForm: React.FC = () => {
   };
 
   return (
-    <div className="md:mt-[200px]">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Display Values */}
+    <div className="">
+      <form onSubmit={handleSubmit} className="space-y-4 border rounded-lg p-4" style={{ boxShadow: "0px 0px 13px 0px #00000014" }}>
         <div className="space-y-2">
           <div className="flex items-center">
-            <span className="text-3xl  w-[15%]">${formValues.pricePerToken}</span>
-            <span className="font-xs text-gray-700 ml-5">Price Per Token</span>
+            <span className="text-3xl  w-[35%]">${formValues.pricePerToken}</span>
+            <span className="font-xs text-gray-700">Price Per Token</span>
 
           </div>
           <div className="flex items-center">
-            <span className="text-3xl w-[15%]">{formValues.annualReturn}%</span>
-            <span className="font-xs text-gray-700 ml-5">Est. annual return</span>
+            <span className="text-3xl w-[35%]">{formValues.annualReturn}%</span>
+            <span className="font-xs text-gray-700 ">Est. annual return</span>
           </div>
         </div>
 
+
         {/* Submit Button */}
         <Button
-            className=' w-full bg-primary-green text-black py-2 px-4 rounded-md shadow-md '
+            className=' w-full bg-[#C8E870] text-black py-2 px-4 hover:bg-[#A0CC29] rounded-md shadow-md '
         >Buy Now</Button>
       </form>
 

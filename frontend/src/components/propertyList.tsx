@@ -33,9 +33,11 @@ export const PropertyList: React.FC = () => {
   });
 
   useEffect(() => {
+    const backendUrl = import.meta.env.VITE_APP_BACKEND_URL
+
     const fetchProperties = async () => {
       try {
-        const apiUrl = 'http://127.0.0.1:8000/property/properties/';
+        const apiUrl = `${backendUrl}property/properties/`;
         const response = await axios.get(apiUrl);
         setProperties(response.data);
         console.log(response.data);
@@ -85,9 +87,11 @@ export const PropertyList: React.FC = () => {
               title={property.title}
               location={property.location}
               minTokenPrice={property.token_price}
-              estAnnualReturn={property.annual_gross_rents}
-              propertyImg={property.image[1]}  // Use only the second image
+              estAnnualReturn={property.projected_annual_return}
+              propertyImgs={property.image.slice(1,5)}  // Use only the second image
               id={property.id}  // Adjust linkTo based on the  routing
+              tokensSold={property.tokensSold}
+              totalTokens={property.total_tokens}
             />
           ))}
         </div>
