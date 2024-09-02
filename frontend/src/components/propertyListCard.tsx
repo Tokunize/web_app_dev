@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaArrowRight } from 'react-icons/fa';
 import { Carousel } from "flowbite-react";
+// import { Progress } from "@/components/ui/progress"
 
 interface PropertyListCardProps {
   title: string;
@@ -29,6 +30,9 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
   const [tokensLeft, setTokensLeft] = useState(0);
   const [isNew, setIsNew] = useState(false);
   const [isAlmostDone, setIsAlmostDone] = useState(false);
+  // const [fundingPorcentage,setFundingPorcentage] = useState();
+  // const [progress, setProgress] = React.useState(13)
+
 
   useEffect(() => {
     // Calculate remaining tokens
@@ -82,7 +86,8 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
       <div className="h-64 relative">
         <Carousel
           indicators={true}  // Show indicators for slides
-          slide={false} // Disable automatic sliding
+          slide={false}
+          className="custom-landing-carousel"
         >
           {propertyImgs.map((img, index) => (
             <img
@@ -94,8 +99,11 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
           ))}
         </Carousel>
       </div>
-      <div className="p-4">
-        <p className="float-right text-gray-500">{tokensLeft} Tokens left</p>
+      <div className="py-3">
+        <div className="flex items-center justify-end">
+          {/* <Progress value={progress} className="w-[60%]" /> */}
+          <p className="float-right text-sm text-gray-500">{tokensLeft} Tokens Left</p>
+        </div>
         <h2 className="text-xl font-semibold mb-2">{title}</h2>
         <p className="text-gray-600 mb-4">{location}</p>
         <div className="flex justify-between mb-2">
