@@ -13,7 +13,7 @@ export const PropertyModal = () =>{
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Lear More</Button>
+        <Button variant="outline" className="max-w-[100px]">Learn More</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

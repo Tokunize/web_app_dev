@@ -44,7 +44,9 @@ export const Navbar = () =>{
           {!isAuthenticated && (
             <>
             <LoginButton />
-            <SignUpButton />
+
+            <SignUpButton role="Investor" />
+            <SignUpButton role="Property Owner" />
             </>
           )}
         </ul>

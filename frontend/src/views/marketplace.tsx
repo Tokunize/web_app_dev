@@ -1,12 +1,15 @@
 import { Navbar } from "@/components/navbar";
 import { Herobanner } from "@/components/heroBanner";
 import { PropertyList } from "@/components/propertyList";
+import AuthProfile from "@/components/authProfile";
 
 export const Marketplace = () =>{
+
     return(
         <section className="px-[50px]">
             <Navbar/>
             <Herobanner/>
+            <AuthProfile/>
             <PropertyList/>
         </section>
     )

@@ -2,6 +2,7 @@ import factory
 from factory import fuzzy
 from django.utils import timezone
 import random
+from datetime import timedelta
 from .models import Property
 
 class PropertyFactory(factory.django.DjangoModelFactory):
@@ -9,8 +10,8 @@ class PropertyFactory(factory.django.DjangoModelFactory):
         model = Property
 
     title = factory.Sequence(lambda n: f"Property {n+1}")
-    description = fuzzy.FuzzyText(length=100)  # Agrega una descripción aleatoria
-    details = fuzzy.FuzzyText(length=200)  # Agrega detalles aleatorios
+    description = fuzzy.FuzzyText(length=150)
+    details = fuzzy.FuzzyText(length=200)
     projected_annual_return = fuzzy.FuzzyChoice([x * 0.01 for x in range(100, 1500)])
     price = fuzzy.FuzzyInteger(100000, 5000000, step=10)
     location = fuzzy.FuzzyChoice([
@@ -42,9 +43,9 @@ class PropertyFactory(factory.django.DjangoModelFactory):
             'Fireplace', 'Garden', 'Roof Deck'
         ], random.randint(0, 10))}
     )
-    bedrooms = fuzzy.FuzzyInteger(1, 10)  # Agrega valores para el campo 'bedrooms'
-    bathrooms = fuzzy.FuzzyDecimal(1.0, 5.0, precision=1)  # Agrega valores para el campo 'bathrooms'
-    tokensSold = fuzzy.FuzzyInteger(0, 10000)  # Agrega valores para el campo 'tokensSold'
+    bedrooms = fuzzy.FuzzyInteger(1, 10)
+    bathrooms = fuzzy.FuzzyDecimal(1.0, 5.0, precision=1)
+    tokensSold = fuzzy.FuzzyInteger(0, 10000)
     
     total_investment_value = fuzzy.FuzzyInteger(100000, 7000000, step=10)
     underlying_asset_price = fuzzy.FuzzyInteger(100000, 5000000, step=10)
@@ -67,3 +68,7 @@ class PropertyFactory(factory.django.DjangoModelFactory):
     token_price = fuzzy.FuzzyInteger(10, 500, step=10)
     blockchain_address = factory.LazyAttribute(lambda x: "0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe")
     legal_documents_url = factory.LazyAttribute(lambda _: "https://example.com/")
+
+    # Add random timestamps
+    created_at = factory.LazyFunction(lambda: timezone.now() - timedelta(days=random.randint(1, 365)))
+    updated_at = factory.LazyAttribute(lambda o: o.created_at + timedelta(days=random.randint(0, (timezone.now() - o.created_at).days)))

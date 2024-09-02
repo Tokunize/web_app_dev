@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from datetime import datetime, timedelta
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +28,8 @@ SECRET_KEY = 'django-insecure-7rd+ggxl@zmwna&zce-n20qv!s-&jacl9eu8ivyo-#d*$kk9me
 DEBUG = True
 
 ALLOWED_HOSTS = [
-   'seahorse-app-nbf4g.ondigitalocean.app'
+   'seahorse-app-nbf4g.ondigitalocean.app',
+   '127.0.0.1'
 ]
 
 
@@ -43,7 +46,10 @@ INSTALLED_APPS = [
     'rest_framework', #Django REST Framework
     'corsheaders', #CORS]
     'django_filters',
+    'users'
 ]
+
+
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000", 
@@ -129,6 +135,8 @@ USE_I18N = True
 
 USE_TZ = True
 
+AUTH_USER_MODEL = 'users.customuser'
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
@@ -141,3 +149,13 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SECRET_KEY = 'your-secret-key'  # Asegúrate de tener una clave secreta
+ALGORITHM = 'HS256'
+
+# settings.py
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'users.authentication.JWTAuthentication',
+    ),
+}

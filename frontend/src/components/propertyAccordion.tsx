@@ -5,41 +5,39 @@ import { Finantial } from './finantial';
 import { Overview } from './overview';
 
 export const PropertyAccordion: React.FC = () => {
-  // Define type for the index state
   const [activeIndex, setActiveIndex] = useState<number | null>(0);
 
-  // Handle click event
   const handleClick = (index: number) => {
     setActiveIndex(index === activeIndex ? null : index);
   };
 
   return (
-    <div className="p-4">
+    <div>
       {/* Accordion Header */}
       <div className="flex space-x-4 mb-4">
         <button
-          className={`p-2 border rounded ${activeIndex === 0 ? 'bg-blue-500 text-white' : 'bg-white'}`}
+          className={`p-2 border-b-2 transition-all ease-in-out duration-300 ${activeIndex === 0 ? 'border-black' : 'border-transparent'}`}
           onClick={() => handleClick(0)}
+        >
+          Overview
+        </button>
+        <button
+          className={`p-2 border-b-2 transition-all ease-in-out duration-300 ${activeIndex === 1 ? 'border-black' : 'border-transparent'}`}
+          onClick={() => handleClick(1)}
         >
           Activity
         </button>
         <button
-          className={`p-2 border rounded ${activeIndex === 1 ? 'bg-blue-500 text-white' : 'bg-white'}`}
-          onClick={() => handleClick(1)}
-        >
-          Component 2
-        </button>
-        <button
-          className={`p-2 border rounded ${activeIndex === 2 ? 'bg-blue-500 text-white' : 'bg-white'}`}
+          className={`p-2 border-b-2 transition-all ease-in-out duration-300 ${activeIndex === 2 ? 'border-black' : 'border-transparent'}`}
           onClick={() => handleClick(2)}
         >
-          Component 3
+          Finantial
         </button>
         <button
-          className={`p-2 border rounded ${activeIndex === 3 ? 'bg-blue-500 text-white' : 'bg-white'}`}
+          className={`p-2 border-b-2 transition-all ease-in-out duration-300 ${activeIndex === 3 ? 'border-black' : 'border-transparent'}`}
           onClick={() => handleClick(3)}
         >
-          Component 4
+          Documents
         </button>
       </div>
 

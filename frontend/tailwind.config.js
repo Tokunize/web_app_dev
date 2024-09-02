@@ -1,13 +1,15 @@
+const flowbite = require("flowbite-react/tailwind");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: ["class"],
   content: [
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
+    'node_modules/flowbite/**/*.js', // Incluir Flowbite
+    flowbite.content(), // Agregar el contenido de Flowbite React
   ],
-  prefix: "",
   theme: {
     container: {
       center: true,
@@ -27,7 +29,6 @@ module.exports = {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
         },
-        
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
@@ -52,10 +53,8 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        'custom-gray': '#F2F4F7', 
-        "primary-green": "#A2FF28"
-        // Puedes definir el color con un código HEX, RGB, HSL, etc.
-
+        'custom-gray': '#F2F4F7',
+        "primary-green": "#A2FF28",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -78,5 +77,9 @@ module.exports = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
-}
+  plugins: [
+    require("tailwindcss-animate"),
+    require('flowbite/plugin'), // Plugin de Flowbite
+    flowbite.plugin(), // Plugin de Flowbite React
+  ],
+};
