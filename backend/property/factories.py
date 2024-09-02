@@ -1,17 +1,20 @@
 import factory
 from factory import fuzzy
+from faker import Faker
 from django.utils import timezone
 import random
 from datetime import timedelta
 from .models import Property
+
+fake = Faker()
 
 class PropertyFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Property
 
     title = factory.Sequence(lambda n: f"Property {n+1}")
-    description = fuzzy.FuzzyText(length=150)
-    details = fuzzy.FuzzyText(length=200)
+    description = factory.LazyAttribute(lambda _: fake.text(max_nb_chars=450))
+    details = factory.LazyAttribute(lambda _: fake.text(max_nb_chars=200))
     projected_annual_return = fuzzy.FuzzyChoice([x * 0.01 for x in range(100, 1500)])
     price = fuzzy.FuzzyInteger(100000, 5000000, step=10)
     location = fuzzy.FuzzyChoice([

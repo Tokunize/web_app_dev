@@ -4,8 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { PropertyModal } from './modal';
 import "../styles/singleProperty.css";
 import { MapView } from "@/components/mapView";
-import graph from "../assets/img/graph.png"
-
+import { Graphic } from './graph';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
@@ -20,20 +19,20 @@ interface PropertyData {
   size?: string;
   description?: string;
   details?: string;
-  amenities?: string[];
+  amenities?: { amenities: string[] };
   video_urls?: string[];
 }
 
 export const Overview: React.FC = () => {
   const [property, setProperty] = useState<PropertyData | null>(null);
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState<number>(0);
   const { id } = useParams<{ id: string }>();
 
   useEffect(() => {
     const fetchProperty = async () => {
       try {
         const apiUrl = `http://127.0.0.1:8000/property/properties/${id}/?view=overview`;
-        const response = await axios.get(apiUrl);
+        const response = await axios.get<PropertyData>(apiUrl);
         console.log(response.data);
         
         setProperty(response.data);
@@ -53,7 +52,6 @@ export const Overview: React.FC = () => {
       <h4 className="propertyHeading mb-2">{property.title}</h4>
       <p className="text-lg text-gray-600">{property.location}</p>
 
-
       <div className="mt-6 space-y-6">
         <div className="flex items-center space-x-3">
           <FaBath className="text-gray-600 text-2xl" />
@@ -70,7 +68,6 @@ export const Overview: React.FC = () => {
           <span className="text-lg">{property.size || 'N/A'} sq ft</span>
         </div>
       </div>
-
 
       <div className="mt-[40px] featureContainer">
         <h4 className="propertyHeading mb-2">Estimated Value</h4>
@@ -91,7 +88,6 @@ export const Overview: React.FC = () => {
         </div>
       </div>
 
-
       <div className="featureContainer break-words">
         <h4 className="propertyHeading mb-4">Description</h4>
         <p className="text-gray-700 mb-5">
@@ -99,7 +95,6 @@ export const Overview: React.FC = () => {
         </p>
         <PropertyModal />
       </div>
-
 
       <div className="mt-[40px] featureContainer">
         <h2 className="propertyHeading mb-4">Key Features</h2>
@@ -114,22 +109,21 @@ export const Overview: React.FC = () => {
         </ul>
       </div>
 
-
       <div className="my-8 featureContainer">
         <h2 className="propertyHeading mb-4">Neighborhood Highlight</h2>
         <p className="text-gray-700 mb-4">
-          Neighborhood information not available.
+          {property.details || 'Description not available'}
         </p>
         <PropertyModal />
       </div>
 
-      <div className="my-[40px] ">
+      <div className="my-[40px]">
         <MapView location={property.location} />
       </div>
 
-      <div className='featureContainer'>
-          <h4 className="propertyHeading"> Historical sold prices in {property.location}</h4>
-          <img alt="historical-price" src={graph} />
+      <div className="featureContainer">
+        <h4 className="propertyHeading">Historical sold prices in {property.location}</h4>
+        <Graphic />
       </div>
     </section>
   );
