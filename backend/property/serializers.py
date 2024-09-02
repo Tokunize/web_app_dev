@@ -5,7 +5,7 @@ from property.models import Property
 class PropertySerializer(serializers.ModelSerializer):
     class Meta:
         model = Property
-        fields = ['id','title', 'location', 'image', 'token_price', 'total_tokens','tokensSold',  'projected_annual_return','property_type']
+        fields = ['id','title', 'location', 'image', 'token_price', 'total_tokens','tokensSold',  'projected_annual_return','property_type', "created_at"]
 
 class PropertyImagesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,7 +35,6 @@ class PropertyOverviewSerializer(serializers.ModelSerializer):
             'total_tokens',
             'tokensSold'
         ]
-
 
 
 

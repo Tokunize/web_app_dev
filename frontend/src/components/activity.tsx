@@ -1,5 +1,33 @@
 
 export const Activity = () => {
-    return <div className="p-4 bg-gray-400">Content for Component 3</div>;
-  };
-  
+  return (
+    <section>
+      <h2 className="text-2xl font-bold mb-6">Activity Overview</h2>
+      
+      <div className="space-y-6">
+        <div className="bg-white py-4 border-b">
+          <h4 className="text-xl font-semibold mb-2">Trade Volume</h4>
+          <p className="text-gray-700 mb-2">
+            The number of tokens traded over the past month. You can check the liquidity and activity level of this property.
+          </p>
+          <span className="text-2xl font-bold">£78,204</span>
+        </div>
+
+        <div className="bg-white py-4 border-b">
+          <h4 className="text-xl font-semibold mb-2">Market Cap</h4>
+          <p className="text-gray-700 mb-2">
+            Current Token Price x Circulating Supply. It refers to the total market value of a token’s circulating supply.
+          </p>
+          <span className="text-2xl font-bold">£6,299,912</span>
+        </div>
+
+        <div className="bg-white py-4 border-b">
+          <h4 className="text-xl font-semibold mb-2">Recent Transactions</h4>
+          <p className="text-gray-700">
+            Details of recent transactions for this token.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+};

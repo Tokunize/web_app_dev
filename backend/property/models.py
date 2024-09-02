@@ -1,7 +1,16 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField, JSONField
+from django.utils import timezone
 
-class Property(models.Model):
+
+class TimeStampedModel(models.Model):
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+class Property(TimeStampedModel): 
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     details = models.JSONField(blank=True, null=True, help_text="Detailed description and specifics of the property.")  # Updated
@@ -40,6 +49,7 @@ class Property(models.Model):
     # Tokenization specifics
     total_tokens = models.BigIntegerField(help_text="Total number of tokens issued for the property, representing ownership shares.")
     tokensSold = models.BigIntegerField(default=0, help_text="Current number of tokens sold.")
+    # funding = models.BigIntegerField(default=0, max_digits=12, deciml_places=2, help_text="Funding added, just for prototype purpose, should be calculated on the frontend side" )
     token_price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Price per token, reflecting the value of a fractional ownership share.")
     blockchain_address = models.CharField(max_length=255, default="0xINVALID_DEFAULT_ADDRESS", help_text="Blockchain address where the property's tokens are managed and transactions are recorded.")
     legal_documents_url = models.URLField(max_length=500, null=True, blank=True, help_text="URL to access legal documents related to this property.")

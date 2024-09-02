@@ -12,6 +12,7 @@ interface PropertyListCardProps {
   id: string;
   tokensSold: number;
   totalTokens: number;
+  createdDay: string;  // ISO 8601 format
 }
 
 export const PropertyListCard: React.FC<PropertyListCardProps> = ({
@@ -23,20 +24,53 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
   id,
   tokensSold,
   totalTokens,
+  createdDay
 }) => {
   const [tokensLeft, setTokensLeft] = useState(0);
+  const [isNew, setIsNew] = useState(false);
+  const [isAlmostDone, setIsAlmostDone] = useState(false);
 
   useEffect(() => {
+    // Calculate remaining tokens
     const remainingTokens = totalTokens - tokensSold;
     setTokensLeft(remainingTokens);
-  }, [tokensSold, totalTokens]);
+
+    // Check if the property is new (within the last 6 months)
+    const createdDate = new Date(createdDay);
+    const now = new Date();
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(now.getMonth() - 6);
+
+    if (createdDate >= sixMonthsAgo) {
+      setIsNew(true);
+    } else {
+      setIsNew(false);
+    }
+
+    // Check if the property is almost done (80% or more tokens sold)
+    const percentageSold = (tokensSold / totalTokens) * 100;
+    if (percentageSold >= 1) {
+      setIsAlmostDone(true);
+    } else {
+      setIsAlmostDone(false);
+    }
+  }, [tokensSold, totalTokens, createdDay]);
 
   return (
     <article className="relative rounded-lg overflow-hidden mt-6">
-      {/* Badge */}
-      <div className="absolute top-4 left-4 bg-red-500 text-white text-xs font-semibold py-1 px-2 rounded-full z-20">
-        New
-      </div>
+      {/* Badge for New */}
+      {isNew && (
+        <div className="absolute top-4 left-4 bg-[#FFFAEA] border-2 border-[#FDB122] text-[#B54707] text-xs font-semibold py-1 px-2 rounded-full z-20">
+          New
+        </div>
+      )}
+
+      {/* Badge for Almost Done */}
+      {isAlmostDone && (
+        <div className="absolute top-4 left-16 border-2 border-[#F97066] bg-[#FEF4F3] text-[#B42217] text-xs font-semibold py-1 px-2 rounded-full z-20">
+          Almost Gone! 
+        </div>
+      )}
 
       <Link
         to={`property-details/${id}`}

@@ -19,19 +19,19 @@ export const PropertyAccordion: React.FC = () => {
           className={`p-2 border-b-2 transition-all ease-in-out duration-300 ${activeIndex === 0 ? 'border-black' : 'border-transparent'}`}
           onClick={() => handleClick(0)}
         >
-          Activity
+          Overview
         </button>
         <button
           className={`p-2 border-b-2 transition-all ease-in-out duration-300 ${activeIndex === 1 ? 'border-black' : 'border-transparent'}`}
           onClick={() => handleClick(1)}
         >
-          Finantial
+          Activity
         </button>
         <button
           className={`p-2 border-b-2 transition-all ease-in-out duration-300 ${activeIndex === 2 ? 'border-black' : 'border-transparent'}`}
           onClick={() => handleClick(2)}
         >
-          Activity
+          Finantial
         </button>
         <button
           className={`p-2 border-b-2 transition-all ease-in-out duration-300 ${activeIndex === 3 ? 'border-black' : 'border-transparent'}`}

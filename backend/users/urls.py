@@ -8,5 +8,4 @@ urlpatterns = [
     path('profile/', UserProfileView.as_view(), name='user-profile'),
     path('login/', LoginView.as_view(), name='login'),  # Añade esta línea
     path('refresh-token/', RefreshTokenView.as_view(), name='refresh_token'),
-
 ]

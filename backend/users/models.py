@@ -57,7 +57,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return self.email
     
 
-    # models.py (continuación)
+# models.py 
 
 class PropertyOwnerProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='property_owner_profile')

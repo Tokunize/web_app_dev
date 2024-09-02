@@ -88,10 +88,11 @@ export const PropertyList: React.FC = () => {
               location={property.location}
               minTokenPrice={property.token_price}
               estAnnualReturn={property.projected_annual_return}
-              propertyImgs={property.image.slice(1,5)}  // Use only the second image
-              id={property.id}  // Adjust linkTo based on the  routing
+              propertyImgs={property.image.slice(1,5)}  
+              id={property.id}  
               tokensSold={property.tokensSold}
               totalTokens={property.total_tokens}
+              createdDay = {property.created_at}
             />
           ))}
         </div>
