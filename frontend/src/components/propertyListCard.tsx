@@ -13,7 +13,8 @@ interface PropertyListCardProps {
   id: string;
   tokensSold: number;
   totalTokens: number;
-  createdDay: string;  // ISO 8601 format
+  createdDay: string;
+  active: boolean;  // ISO 8601 format
 }
 
 export const PropertyListCard: React.FC<PropertyListCardProps> = ({
@@ -25,14 +26,11 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
   id,
   tokensSold,
   totalTokens,
-  createdDay
+  createdDay,
+  active
 }) => {
   const [tokensLeft, setTokensLeft] = useState(0);
-  const [isNew, setIsNew] = useState(false);
-  const [isAlmostDone, setIsAlmostDone] = useState(false);
-  // const [fundingPorcentage,setFundingPorcentage] = useState();
-  // const [progress, setProgress] = React.useState(13)
-
+  const [badgeType, setBadgeType] = useState<string | null>(null);
 
   useEffect(() => {
     // Calculate remaining tokens
@@ -43,45 +41,50 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
     const createdDate = new Date(createdDay);
     const now = new Date();
     const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(now.getMonth() - 6);
+    sixMonthsAgo.setMonth(now.getMonth() - 1);
 
     if (createdDate >= sixMonthsAgo) {
-      setIsNew(true);
+      setBadgeType('New');
+    } else if (!active) {
+      setBadgeType('Coming Soon');
+    } else if ((tokensSold / totalTokens) * 100 >= 80) {
+      setBadgeType('Almost Gone!');
     } else {
-      setIsNew(false);
+      setBadgeType(null);
     }
-
-    // Check if the property is almost done (80% or more tokens sold)
-    const percentageSold = (tokensSold / totalTokens) * 100;
-    if (percentageSold >= 1) {
-      setIsAlmostDone(true);
-    } else {
-      setIsAlmostDone(false);
-    }
-  }, [tokensSold, totalTokens, createdDay]);
+  }, [tokensSold, totalTokens, createdDay, active]);
 
   return (
     <article className="relative rounded-lg overflow-hidden mt-6">
       {/* Badge for New */}
-      {isNew && (
+      {badgeType === 'New' && (
         <div className="absolute top-4 left-4 bg-[#FFFAEA] border-2 border-[#FDB122] text-[#B54707] text-xs font-semibold py-1 px-2 rounded-full z-20">
           New
         </div>
       )}
 
       {/* Badge for Almost Done */}
-      {isAlmostDone && (
-        <div className="absolute top-4 left-16 border-2 border-[#F97066] bg-[#FEF4F3] text-[#B42217] text-xs font-semibold py-1 px-2 rounded-full z-20">
-          Almost Gone! 
+      {badgeType === 'Almost Gone!' && (
+        <div className="absolute top-4 left-4 border-2 border-[#F97066] bg-[#FEF4F3] text-[#B42217] text-xs font-semibold py-1 px-2 rounded-full z-20">
+          Almost Gone!
         </div>
       )}
 
-      <Link
-        to={`property-details/${id}`}
-        className="absolute top-4 right-4 transform rotate-[-45deg] bg-white bg-opacity-50 p-2 rounded-full shadow-lg z-10"
-      >
-        <FaArrowRight className="text-gray-800" />
-      </Link>
+      {/* Badge for Coming Soon */}
+      {badgeType === 'Coming Soon' && (
+        <div className="absolute top-4 left-4 bg-[lightgray] border-2 border-[gray] text-black text-xs font-semibold py-1 px-2 rounded-full z-20">
+          Coming Soon
+        </div>
+      )}
+      {active && (
+        <Link
+          to={`property-details/${id}`}
+          className="absolute top-4 right-4 transform rotate-[-45deg] bg-white bg-opacity-50 p-2 rounded-full shadow-lg z-10"
+        >
+          <FaArrowRight className="text-gray-800" />
+        </Link>
+      )}
+      
 
       <div className="h-64 relative">
         <Carousel
@@ -102,7 +105,10 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
       <div className="py-3">
         <div className="flex items-center justify-end">
           {/* <Progress value={progress} className="w-[60%]" /> */}
-          <p className="float-right text-sm text-gray-500">{tokensLeft} Tokens Left</p>
+          <p className="float-right text-sm text-gray-500">
+              {active ? `${tokensLeft} Tokens Left` : 'Coming Soon'}
+          </p>
+
         </div>
         <h2 className="text-xl font-semibold mb-2">{title}</h2>
         <p className="text-gray-600 mb-4">{location}</p>

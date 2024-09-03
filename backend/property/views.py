@@ -1,8 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render,get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from property.models import Property
-from .serializers import PropertySerializer, PropertyOverviewSerializer,PropertyImagesSerializer
+from property.models import Property, TokensTransaction
+from .serializers import PropertySerializer, PropertyOverviewSerializer,PropertyImagesSerializer,TokenTransactionSerializer
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Max
@@ -75,9 +75,22 @@ class YieldRangeView(APIView):
             "max_rental_yield": max_rental_yield
         })
 
-
 class PropertyTypeListView(APIView):
     def get(self, request):
         property_types = Property.objects.order_by('property_type').values_list('property_type', flat=True).distinct()
         return JsonResponse(list(property_types), safe=False)
     
+
+
+class TokensTransactionListCreateView(generics.ListCreateAPIView):
+    queryset = TokensTransaction.objects.all()
+    serializer_class = TokenTransactionSerializer
+
+    def get_queryset(self):
+        property_id = self.kwargs['property_id']
+        property = get_object_or_404(Property, id=property_id)
+        return TokensTransaction.objects.filter(property=property)
+
+class TokensTransactionDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = TokensTransaction.objects.all()
+    serializer_class = TokenTransactionSerializer

@@ -7,7 +7,6 @@ import { CartesianGrid, Line, LineChart, XAxis, Brush, Tooltip } from "recharts"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
 } from "@/components/ui/card"
@@ -17,18 +16,15 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-// Define the structure of your chart data
 interface ChartData {
   month: string
   desktop: number
 }
 
-// Define the structure of the props for your component
 interface TokenPriceGraphProps {
   tokenPrice: number
 }
 
-// Define the configuration structure for the chart
 const chartConfig: ChartConfig = {
   desktop: {
     label: "Token Price",
@@ -54,13 +50,12 @@ export const TokenPriceGraph: FC<TokenPriceGraphProps> = ({ tokenPrice }) => {
   return (
     <Card style={{ boxShadow: "0px 0px 13px 0px #00000014" }}>
       <CardHeader>
-        <CardDescription className="flex flex-col space-y-4">
-          <div className="flex justify-between">
-            <span>Token Price</span>
-            <span>Past Month</span>
-          </div>
-          <h3 className="text-[36px] font-bold text-black">£{tokenPrice}</h3>
-        </CardDescription>
+        {/* Adjusted to remove <div> inside <p> */}
+        <span className="flex justify-between">
+          <span>Token Price</span>
+          <span>Past Month</span>
+        </span>
+        <h3 className="text-[36px] font-bold text-black">£{tokenPrice}</h3>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -71,7 +66,7 @@ export const TokenPriceGraph: FC<TokenPriceGraphProps> = ({ tokenPrice }) => {
               left: 12,
               right: 12,
             }}
-            width={600} 
+            width={600}
           >
             <CartesianGrid vertical={false} />
             <XAxis
@@ -102,7 +97,7 @@ export const TokenPriceGraph: FC<TokenPriceGraphProps> = ({ tokenPrice }) => {
           Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">
-          Last updated: {timeNow.toLocaleString()} 
+          Last updated: {timeNow.toLocaleString()}
         </div>
       </CardFooter>
     </Card>

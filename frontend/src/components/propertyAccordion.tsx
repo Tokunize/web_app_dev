@@ -4,7 +4,11 @@ import { Activity } from './activity';
 import { Finantial } from './finantial';
 import { Overview } from './overview';
 
-export const PropertyAccordion: React.FC = () => {
+interface PropertyAccordionProps {
+  property_id: string;
+}
+
+export const PropertyAccordion: React.FC<PropertyAccordionProps> = ({ property_id }) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(0);
 
   const handleClick = (index: number) => {
@@ -31,7 +35,7 @@ export const PropertyAccordion: React.FC = () => {
           className={`p-2 border-b-2 transition-all ease-in-out duration-300 ${activeIndex === 2 ? 'border-black' : 'border-transparent'}`}
           onClick={() => handleClick(2)}
         >
-          Finantial
+          Financial
         </button>
         <button
           className={`p-2 border-b-2 transition-all ease-in-out duration-300 ${activeIndex === 3 ? 'border-black' : 'border-transparent'}`}
@@ -44,7 +48,7 @@ export const PropertyAccordion: React.FC = () => {
       {/* Accordion Content */}
       <div>
         {activeIndex === 0 && <Overview />}
-        {activeIndex === 1 && <Activity />}
+        {activeIndex === 1 && <Activity property_id={property_id} />}
         {activeIndex === 2 && <Finantial />}
         {activeIndex === 3 && <Documents />}
       </div>

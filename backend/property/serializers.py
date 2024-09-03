@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from property.models import Property
+from property.models import Property,TokensTransaction
 
 
 class PropertySerializer(serializers.ModelSerializer):
     class Meta:
         model = Property
-        fields = ['id','title', 'location', 'image', 'token_price', 'total_tokens','tokensSold',  'projected_annual_return','property_type', "created_at"]
+        fields = ['id','title', 'location', 'image', 'token_price','active', 'total_tokens','tokensSold',  'projected_annual_return','property_type', "created_at"]
 
 class PropertyImagesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -33,12 +33,14 @@ class PropertyOverviewSerializer(serializers.ModelSerializer):
             'video_urls',
             'property_type',
             'total_tokens',
-            'tokensSold'
+            'tokensSold',
+            'projected_annual_return'
         ]
 
 
 
-# class PropertyFinalcialSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Property
-#         fields = []
+
+class TokenTransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model =  TokensTransaction
+        fields = '__all__' 

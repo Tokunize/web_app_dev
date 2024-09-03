@@ -18,7 +18,8 @@ export const SingleProperty: React.FC = () => {
   const [propertyVideos, setPropertyVideos] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [tokenPrice, setTokenPrice] = useState<number | null>(null); // Updated to handle numbers or null
+  const [tokenPrice, setTokenPrice] = useState<number>(0); //
+  const [anuReturns, setAnuReturns] = useState<number>(0);
 
   const { id } = useParams<{ id: string }>();
 
@@ -40,22 +41,28 @@ export const SingleProperty: React.FC = () => {
       }
     };
 
-    fetchPropertyData();
+    if (id) {
+      fetchPropertyData();
+    }
   }, [id]);
 
   useEffect(() => {
     const fetchPropertyOverview = async () => {
       try {
         const apiUrl = `http://127.0.0.1:8000/property/properties/${id}/?view=overview`;
-        const response = await axios.get<{ token_price: number }>(apiUrl);
+        const response = await axios.get<{ token_price: number, projected_annual_return:number }>(apiUrl);
+        
         setTokenPrice(response.data.token_price);
+        setAnuReturns(response.data.projected_annual_return)
       } catch (error) {
         console.error('Failed to fetch property overview:', error);
         setError('Failed to fetch property overview');
       }
     };
 
-    fetchPropertyOverview();
+    if (id) {
+      fetchPropertyOverview();
+    }
   }, [id]);
 
   const getEmbedUrl = (videoUrl: string): string => {
@@ -125,10 +132,10 @@ export const SingleProperty: React.FC = () => {
 
       <div className="flex justify-between mt-8">
         <div className="md:w-[65%]">
-          <PropertyAccordion />
+          {id && <PropertyAccordion property_id={id} />}
         </div>
         <div className="md:w-[30%]">
-          <PurchaseForm tokenPrice={tokenPrice} />
+          <PurchaseForm tokenPrice={tokenPrice} projected_annual_return={anuReturns} />
         </div>
       </div>
     </section>

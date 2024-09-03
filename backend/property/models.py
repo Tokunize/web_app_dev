@@ -26,7 +26,7 @@ class Property(TimeStampedModel):
     image = ArrayField(models.URLField(max_length=500), blank=True, null=True, help_text="A list of URLs pointing to images of the property.")
     video_urls = ArrayField(models.URLField(max_length=500), blank=True, null=True, help_text="A list of URLs pointing to videos of the property.")
     amenities = models.JSONField(blank=True, null=True, help_text="JSON formatted list of property amenities such as pool, gym, pet-friendly, etc.")
-
+    active = models.BooleanField(null=True, blank=True, help_text="A boolean to control if the property is listed or if it's a comming soon property")
     # Financial details
     total_investment_value = models.DecimalField(max_digits=12, decimal_places=2, help_text="Total amount of money invested in the property, including purchase and renovation costs.")
     underlying_asset_price = models.DecimalField(max_digits=12, decimal_places=2, help_text="The base price of the property without additional fees or expenses.")
@@ -56,3 +56,29 @@ class Property(TimeStampedModel):
 
     def __str__(self):
         return self.title
+
+
+
+class TokensTransaction(TimeStampedModel):
+    property = models.ForeignKey(Property, blank=True, null=True, related_name='transactions', on_delete=models.CASCADE)
+
+    class Event(models.TextChoices):
+        BUY = 'BUY', ('Buy')
+        SELL = 'SELL', ('Sell')
+        CANCELLATION = 'CANCELLATION', ('Cancellation')
+
+    # Fields
+    event = models.CharField(
+        max_length=20,
+        choices=Event.choices,
+    )
+    transaction_price = models.DecimalField( max_digits=10, decimal_places=2, help_text="the price of the transaction, the sum of all the tokens price involved ")
+    tokens_quantity = models.PositiveIntegerField(help_text="number of tokens per transaction")
+    transaction_owner = models.CharField(max_length=255, default="0x358V948499shd7smw424dcg", help_text="Blockchain address of the user who made the transaction.")
+
+    def __str__(self):
+        return f"{self.event} - {self.tokens_quantity} tokens at {self.transaction_price} price"
+
+    class Meta:
+        verbose_name = "Token Transaction"
+        verbose_name_plural = "Token Transactions"
