@@ -2,21 +2,14 @@ import React from 'react';
 import { Button } from './ui/button';
 import { TokenPriceGraph } from './tokenPriceGraph';
 
-interface FormValues {
-  pricePerToken: number;
-  annualReturn: number;
-}
 
 interface PurchaseFormProps {
-  tokenPrice: number; 
+  tokenPrice: number ; 
+  projected_annual_return: number;
 }
 
-export const PurchaseForm: React.FC<PurchaseFormProps> = ({ tokenPrice }) => {
-  const formValues: FormValues = {
-    pricePerToken: 76,
-    annualReturn: 5,
-  };
-
+export const PurchaseForm: React.FC<PurchaseFormProps> = ({ tokenPrice, projected_annual_return }) => {
+ 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Lógica para el envío del formulario
@@ -32,11 +25,11 @@ export const PurchaseForm: React.FC<PurchaseFormProps> = ({ tokenPrice }) => {
       >
         <div className="space-y-2">
           <div className="flex items-center">
-            <span className="text-3xl w-[35%]">${formValues.pricePerToken}</span>
+            <span className="text-2xl w-[45%]">£{tokenPrice}</span>
             <span className="font-xs text-gray-700">Price Per Token</span>
           </div>
           <div className="flex items-center">
-            <span className="text-3xl w-[35%]">{formValues.annualReturn}%</span>
+            <span className="text-2xl w-[45%]">{projected_annual_return}%</span>
             <span className="font-xs text-gray-700">Est. annual return</span>
           </div>
         </div>

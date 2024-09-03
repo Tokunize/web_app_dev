@@ -3,8 +3,9 @@ from factory import fuzzy
 from faker import Faker
 from django.utils import timezone
 import random
+from django.db import models
 from datetime import timedelta
-from .models import Property
+from .models import Property, TokensTransaction
 
 fake = Faker()
 
@@ -17,6 +18,7 @@ class PropertyFactory(factory.django.DjangoModelFactory):
     details = factory.LazyAttribute(lambda _: fake.text(max_nb_chars=200))
     projected_annual_return = fuzzy.FuzzyChoice([x * 0.01 for x in range(100, 1500)])
     price = fuzzy.FuzzyInteger(100000, 5000000, step=10)
+    active = fuzzy.FuzzyChoice([True, False])
     location = fuzzy.FuzzyChoice([
         'Tokyo', 'London', 'Paris', 'Berlin', 'Washington D.C.', 
         'Canberra', 'Ottawa', 'Beijing', 'Moscow', 'Brasília'
@@ -75,3 +77,20 @@ class PropertyFactory(factory.django.DjangoModelFactory):
     # Add random timestamps
     created_at = factory.LazyFunction(lambda: timezone.now() - timedelta(days=random.randint(1, 365)))
     updated_at = factory.LazyAttribute(lambda o: o.created_at + timedelta(days=random.randint(0, (timezone.now() - o.created_at).days)))
+
+
+class TokensTransactionFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = TokensTransaction
+
+    property = factory.SubFactory('property.factories.PropertyFactory')  # Ajusta el path según tu estructura
+    event = fuzzy.FuzzyChoice([event[0] for event in TokensTransaction.Event.choices])
+    transaction_price = fuzzy.FuzzyDecimal(1000.00, 100000.00, precision=2)
+    tokens_quantity = fuzzy.FuzzyInteger(1, 1000)
+    transaction_owner = factory.LazyAttribute(lambda _: "0x" + ''.join(random.choices('abcdef0123456789', k=40)))
+
+    created_at = factory.LazyFunction(lambda: timezone.now() - timedelta(days=random.randint(1, 365)))
+    updated_at = factory.LazyAttribute(lambda o: o.created_at + timedelta(days=random.randint(0, (timezone.now() - o.created_at).days)))
+
+    def __str__(self):
+        return f"{self.event} - {self.tokens_quantity} tokens at {self.transaction_price} price"
