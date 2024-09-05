@@ -27,6 +27,7 @@ class Property(TimeStampedModel):
     video_urls = ArrayField(models.URLField(max_length=500), blank=True, null=True, help_text="A list of URLs pointing to videos of the property.")
     amenities = models.JSONField(blank=True, null=True, help_text="JSON formatted list of property amenities such as pool, gym, pet-friendly, etc.")
     active = models.BooleanField(null=True, blank=True, help_text="A boolean to control if the property is listed or if it's a comming soon property")
+    
     # Financial details
     total_investment_value = models.DecimalField(max_digits=12, decimal_places=2, help_text="Total amount of money invested in the property, including purchase and renovation costs.")
     underlying_asset_price = models.DecimalField(max_digits=12, decimal_places=2, help_text="The base price of the property without additional fees or expenses.")

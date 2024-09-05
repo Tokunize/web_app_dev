@@ -2,70 +2,75 @@ from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-
-from .models import CustomUser
+from .models import CustomUser,InvestorProfile,PropertyOwnerProfile
 from .serializers import CustomUserSerializer
-from django.contrib.auth import authenticate
-from .jwt_utils import create_jwt_token, create_refresh_token,decode_jwt_token
 from rest_framework import status
+from .authentication import Auth0JWTAuthentication
 
-class LoginView(APIView):
+
+#CREATE OR UPDATE A USER COMING FROM AUTH0 AND ASSING  A PROFILE BASE ON THE ROLE 
+class SyncUserView(APIView):
+    authentication_classes = [Auth0JWTAuthentication]
+
     def post(self, request):
-        username = request.data.get('email')
-        password = request.data.get('password')
+        # OBTAIN THE PAYLOAD FROM THE AUTH0 
+        user_sub = request.user.get('sub', None)  # GET THE SUB FROM THE PAYLOAD
 
-        # Autenticación del usuario
-        user = authenticate(username=username, password=password)
-        if user is None:
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        if not user_sub:
+            return Response({'error': 'Sub claim missing from authenticated user'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Crear JWT y refresh token para el usuario
-        jwt_token = create_jwt_token(user.id)
-        refresh_token = create_refresh_token(user.id)
-        return Response({'jwt_token': jwt_token, 'refresh_token': refresh_token}, status=status.HTTP_200_OK)
+        # GET THE ATRIBUTES FROM THE FRONTEND
+        email = request.data.get('email')
+        name = request.data.get('name')
+        role = request.data.get('role', 'investor')  #By defult will be a investor
 
-class RefreshTokenView(APIView):
-    def post(self, request):
-        refresh_token = request.data.get('refresh_token')
+        if not email or not name:
+            return Response({'error': 'Missing user information in request body'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if refresh_token is None:
-            return Response({'error': 'Refresh token is required'}, status=status.HTTP_400_BAD_REQUEST)
+        # CREATE OR UPDATE A USER COMING FROM AUTH0 IN OUR CUSTOMER MODEL
+        user, created = CustomUser.objects.update_or_create(
+            sub=user_sub,  # we use the unique auth0 sub to link with our model
+            defaults={
+                'email': email,
+                'name': name,
+                'rol': role,
+            }
+        )
 
-        try:
-            payload = decode_jwt_token(refresh_token)
-            user_id = payload['user_id']
-            # Crear un nuevo JWT para el usuario
-            jwt_token = create_jwt_token(user_id)
-            return Response({'jwt_token': jwt_token}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
-#CREATE A NEW USER AND BASED ON THE ROLE CREATE A PROFILE WITH THE SPECIFICATIONS
-class CreateUserView(generics.CreateAPIView):
-    queryset = CustomUser.objects.all()
-    serializer_class = CustomUserSerializer
-    permission_classes = [IsAuthenticated]
+        # CREATE A PROFILE BASED ON THE ROLE THEY HAVE
+        if role == 'owner':
+            PropertyOwnerProfile.objects.get_or_create(user=user)
+        elif role == 'investor':
+            InvestorProfile.objects.get_or_create(user=user)
+        # elif role == 'property_admin':
+        #     PropertyOwner.objects.get_or_create(user=user)
 
+        serializer = CustomUserSerializer(user)
+        status_code = status.HTTP_201_CREATED if created else status.HTTP_200_OK
+        return Response(serializer.data, status=status_code)
+        
+        
 
-#PUT,GET,DELETE A USER
+# GET, UPDATE, DELETE USER FROM OUR DATABASE
 class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = [IsAuthenticated]
 
 
-#TO FETCH ALL THE USERS
+# Para listar todos los usuarios
 class UserListView(generics.ListAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = [IsAuthenticated]
 
 
-#maybe not necessary just to fetch the indifividual profile
+# Vista para obtener el perfil del usuario autenticado
 class UserProfileView(APIView):
-    # authentication_classes = [SessionAuthentication]
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
         serializer = CustomUserSerializer(user)
         return Response(serializer.data)
+
