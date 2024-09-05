@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser, PropertyOwnerProfile, InvestorProfile, PropertyAdminProfile, DeveloperProfile
+from .models import CustomUser, PropertyOwnerProfile, InvestorProfile
 
 # Serializadores para perfiles
 class PropertyOwnerProfileSerializer(serializers.ModelSerializer):
@@ -12,22 +12,10 @@ class InvestorProfileSerializer(serializers.ModelSerializer):
         model = InvestorProfile
         fields = ['total_investment']
 
-class PropertyAdminProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PropertyAdminProfile
-        fields = []  # Añadir campos si es necesario
-
-class DeveloperProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DeveloperProfile
-        fields = []  # Añadir campos si es necesario
-
 # Diccionario de mapeo de roles a perfiles
 ROLE_PROFILE_MAPPING = {
     'owner': PropertyOwnerProfileSerializer,
     'investor': InvestorProfileSerializer,
-    'admin': PropertyAdminProfileSerializer,
-    'developer': DeveloperProfileSerializer,
 }
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -36,7 +24,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'name', 'phone_number', 'is_active', 'is_staff', 'rol', 'password', 'profile']
+        fields = ['id', 'email', 'name', 'is_active', 'is_staff', 'rol', 'password', 'profile']
 
     def validate_email(self, value):
         """
@@ -52,25 +40,28 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         password = validated_data.pop('password', None)
+
+        # Crea el usuario con los datos validados
         user = CustomUser.objects.create_user(**validated_data)
         
+        # Establece la contraseña solo si se proporciona
         if password:
             user.set_password(password)
             user.save()
-        
-        # Crear el perfil asociado al usuario
-        profile_class = ROLE_PROFILE_MAPPING.get(user.rol)
-        if profile_class:
-            profile_class.Meta.model.objects.get_or_create(user=user)
         
         return user
 
     def update(self, instance, validated_data):
         password = validated_data.pop('password', None)
+        
+        # Actualiza los campos del usuario
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+        
+        # Establece la contraseña solo si se proporciona
         if password:
             instance.set_password(password)
+        
         instance.save()
         return instance
 

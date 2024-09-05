@@ -29,7 +29,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
    'seahorse-app-nbf4g.ondigitalocean.app',
-   '127.0.0.1'
+   '127.0.0.1',
+   'localhost'
 ]
 
 
@@ -124,6 +125,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -151,11 +153,109 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SECRET_KEY = 'your-secret-key'  # Asegúrate de tener una clave secreta
-ALGORITHM = 'HS256'
+ALGORITHM = 'RS256'
 
-# settings.py
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'users.authentication.JWTAuthentication',
+        'users.authentication.Auth0JWTAuthentication',
     ),
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# import requests
+# import base64
+# import json
+# from jose import jwk, JWTError, jwt
+
+# # Configuración
+# AUTH0_DOMAIN = 'dev-2l2jjwfm5ekzae3u.us.auth0.com'
+# jwks_url = f'https://{AUTH0_DOMAIN}/.well-known/jwks.json'
+
+# def get_jwks():
+#     """Obtiene el JWKS desde Auth0"""
+#     response = requests.get(jwks_url)
+#     response.raise_for_status()  # Lanza un error si la solicitud falla
+#     return response.json()
+
+# def get_public_key(jwks, kid):
+#     """Encuentra la clave pública en el JWKS usando el kid del token"""
+#     if isinstance(jwks, dict) and 'keys' in jwks:
+#         keys = jwks['keys']
+#     else:
+#         raise Exception("Invalid JWKS format.")
+    
+#     for key in keys:
+#         if key['kid'] == kid:
+#             # Convertir la clave JWK a un formato que jose pueda usar
+#             return jwk.construct(key)
+    
+#     raise Exception("Public key not found.")
+
+# def decode_jwt_header(token):
+#     """Decodifica el encabezado del JWT para extraer el kid"""
+#     try:
+#         header_segment = token.split('.')[0]
+#         header_data = base64.urlsafe_b64decode(header_segment + '==')  # Añadir '=' para hacer el padding correcto
+#         header_json = header_data.decode('utf-8')
+#         return json.loads(header_json)
+#     except Exception as e:
+#         raise Exception(f"Error decoding JWT header: {str(e)}")
+
+# def validate_jwt(token, public_key):
+#     """Valida el JWT usando la clave pública"""
+#     try:
+#         decoded_token = jwt.decode(token, public_key, algorithms=['RS256'], audience='https://my-endpoints/users')
+#         return decoded_token
+#     except JWTError as e:
+#         raise Exception(f"Token validation failed: {str(e)}")
+
+# def main():
+#     # Obtener el JWKS
+#     jwks = get_jwks()
+    
+#     # Suponiendo que ya tienes el JWT
+#     jwt_token = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InpzbUNEeUExLXByclhmeExTalB1bCJ9.eyJpc3MiOiJodHRwczovL2Rldi0ybDJqandmbTVla3phZTN1LnVzLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw2NmQ5NzdjN2UyNDU4ZWIxNzUzNzMzNGEiLCJhdWQiOlsiaHR0cHM6Ly9teS1lbmRwb2ludHMvdXNlcnMiLCJodHRwczovL2Rldi0ybDJqandmbTVla3phZTN1LnVzLmF1dGgwLmNvbS91c2VyaW5mbyJdLCJpYXQiOjE3MjU1MzQ4NzgsImV4cCI6MTcyNTYyMTI3OCwic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBlbWFpbCIsImF6cCI6IlJrREszOG4wVlBOWkVtdXYwWmdReDlQOTNyTFBBT1RLIiwicGVybWlzc2lvbnMiOlsiaW52ZXN0b3IiXX0.NCgjm0IJse2-IIds93MSi3gPvR_oyKcCvz1WI8_BgBbHCe9jFSEnqEf1wdwwFppiIV1D7nFduQ4DkkB0aCioeAD4aWFzh9q4LwH8W4IMK3gH5TszooMmjyq83iipxJ6EKbpZ3TZpDvX68gQ6vGNpc3iuQ_MOrLDAqIXjuh4ydmY1PCgkiqqy194gt-5IecIna-aUSkMs2b2YBdouCKaZw_upy1zKUZZatHuWB1UCdgrYqxtTEp4VQ9rwLB3MfMjs8Ar0PjquWGQ2q5KS0ulh9J4zyjy5vrNd766ZgWbUOnCZbBkdaxgtD6JFEkYkHyln5jM5xTKvxZ9JAI1lJRWAOw'  # Reemplaza con tu JWT
+    
+#     # Decodificar el encabezado del JWT para obtener el kid
+#     try:
+#         header_data = decode_jwt_header(jwt_token)
+#         kid = header_data.get('kid')
+#         if not kid:
+#             raise Exception("Kid not found in JWT header.")
+#         print(f"Extracted kid: {kid}")
+#     except Exception as e:
+#         print(f"Error extracting kid: {str(e)}")
+#         return
+    
+#     # Obtener la clave pública
+#     try:
+#         public_key = get_public_key(jwks, kid)
+#         print("Public Key:", public_key)
+#     except Exception as e:
+#         print(f"Error getting public key: {str(e)}")
+#         return
+    
+#     # Validar el JWT
+#     try:
+#         decoded_token = validate_jwt(jwt_token, public_key)
+#         print("Decoded Token:", decoded_token)
+#     except Exception as e:
+#         print(f"Error: {str(e)}")
+
+# main()
