@@ -3,12 +3,18 @@ import { Button } from '../ui/button';
 
 export const LogoutButton = () => {
   const { logout } = useAuth0();
+  const removeLocalStorage = () =>{
+    localStorage.removeItem("user_role")
+    localStorage.removeItem("accessToken")
+  }
 
   return (
     <Button
       className='bg-black hover:bg-red-600 duration-300 w-full'
-      onClick={() => logout()}
-    >
+      onClick={()=>{
+        removeLocalStorage()
+        logout()
+      }}>
       Log Out
     </Button>
   );

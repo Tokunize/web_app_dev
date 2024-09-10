@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaArrowRight } from 'react-icons/fa';
 import { Carousel } from "flowbite-react";
-// import { Progress } from "@/components/ui/progress"
+import token from "../assets/img/token.svg"
 
 interface PropertyListCardProps {
   title: string;
@@ -105,9 +105,16 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
       <div className="py-3">
         <div className="flex items-center justify-end">
           {/* <Progress value={progress} className="w-[60%]" /> */}
-          <p className="float-right text-sm text-gray-500">
-              {active ? `${tokensLeft} Tokens Left` : 'Coming Soon'}
-          </p>
+          <div className="float-right text-sm text-gray-500 flex items-center ">
+            {active ? (
+              <>
+                 <span><img src={token} alt="token" className="inline-block h-[20px] w-[20px] mr-2" /></span>  {tokensLeft} Tokens Left
+              </>
+            ) : (
+              'Coming Soon'
+            )}
+          </div>
+
 
         </div>
         <h2 className="text-xl font-semibold mb-2">{title}</h2>

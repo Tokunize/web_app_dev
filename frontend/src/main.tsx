@@ -1,21 +1,26 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 import { Auth0Provider } from '@auth0/auth0-react';
-import './index.css'
+import { UserProvider } from './context/userProvider';
+
+import './index.css';
 import 'leaflet/dist/leaflet.css';
 import Layout from './layout';
-
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Auth0Provider
       domain="dev-2l2jjwfm5ekzae3u.us.auth0.com"
-      clientId="yhgbzvH10eKNhxMaN4jf7kLEoDXkYkDO"
+      clientId="RkDK38n0VPNZEmuv0ZgQx9P93rLPAOTK"
       authorizationParams={{
-        redirect_uri: window.location.origin
+        redirect_uri: window.location.origin,
+        audience: "https://my-endpoints/users",
+        scope: "openid profile email read:users write:users" 
       }}
     >
-      <Layout />
+      <UserProvider> 
+        <Layout />
+      </UserProvider>
     </Auth0Provider>
   </React.StrictMode>,
-)
+);

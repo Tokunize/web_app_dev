@@ -158,8 +158,11 @@ ALGORITHM = 'RS256'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'users.authentication.Auth0JWTAuthentication',
+        'users.authentication.Auth0JWTAuthentication',  # Reemplaza esto con la ruta correcta
     ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
 }
 
 

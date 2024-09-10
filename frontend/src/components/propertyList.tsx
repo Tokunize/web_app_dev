@@ -4,7 +4,7 @@ import axios from 'axios';
 import { PropertyFilters } from './propertyFilters';
 import { PropertyListCard } from './propertyListCard';
 
-// Utiliza una función de clasificación para aplicar el ordenamiento basado en el parámetro
+
 const sortProperties = (properties: any[], sortBy: string) => {
   return properties.sort((a, b) => {
     switch (sortBy) {
@@ -37,10 +37,11 @@ export const PropertyList: React.FC = () => {
 
     const fetchProperties = async () => {
       try {
-        const apiUrl = `${backendUrl}property/properties/`;
+        const apiUrl = `${backendUrl}property/properties/public/`;
         const response = await axios.get(apiUrl);
-        setProperties(response.data);
         console.log(response.data);
+        
+        setProperties(response.data);
         
       } catch (err) {
         setError('Failed to fetch properties');

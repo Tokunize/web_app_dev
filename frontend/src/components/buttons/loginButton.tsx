@@ -4,10 +4,14 @@ import { Button } from '../ui/button';
 export const LoginButton = () => {
   const { loginWithRedirect } = useAuth0();
 
+  const handleLogin = () => {
+    console.log('Login button clicked');
+    loginWithRedirect();
+  };
+
   return (
-    <Button onClick={() => loginWithRedirect()}>
+    <Button onClick={handleLogin}>
       Log In
     </Button>
   );
 };
-
