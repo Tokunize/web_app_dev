@@ -2,8 +2,11 @@ import externalLink from "../assets/external-link.svg"
 import download from "../assets/download.svg"
 
 export const Documents = () => {
+  const accessToken = localStorage.getItem("accessToken")
+
   return (
-    <div className="p-4">
+    <div className="glass-container">
+    <section className="p-4">
       <h4 className="font-bold text-[30px] mb-4">Projected Annual Returns</h4>
       <ul className="space-y-4">
         <li className="flex items-center space-x-2">
@@ -37,6 +40,8 @@ export const Documents = () => {
           <img src={externalLink} alt="external-link" />
         </li>
       </ul>
+    </section>
+    {!accessToken  && <div className="preview-panel-wrap"></div>}
     </div>
   );
 };

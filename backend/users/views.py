@@ -2,52 +2,41 @@ from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from .models import CustomUser,InvestorProfile,PropertyOwnerProfile
+from .models import CustomUser, InvestorProfile, PropertyOwnerProfile
 from .serializers import CustomUserSerializer
 from rest_framework import status
 from .authentication import Auth0JWTAuthentication
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 
-#CREATE OR UPDATE A USER COMING FROM AUTH0 AND ASSING  A PROFILE BASE ON THE ROLE 
 class SyncUserView(APIView):
     authentication_classes = [Auth0JWTAuthentication]
 
     def post(self, request):
-        # OBTAIN THE PAYLOAD FROM THE AUTH0 
-        user_sub = request.user.get('sub', None)  # GET THE SUB FROM THE PAYLOAD
+        # The user is already authenticated by the time we reach this point
+        user = request.user  # This is the CustomUser that was either created or fetched
+        print(user.id, "ussserr")
 
-        if not user_sub:
-            return Response({'error': 'Sub claim missing from authenticated user'}, status=status.HTTP_400_BAD_REQUEST)
+        # Get additional data from the frontend
+        email = request.data.get('email', user.email)
+        name = request.data.get('name', user.name)
+        role = request.data.get('role', 'investor')  # Default role is 'investor'
 
-        # GET THE ATRIBUTES FROM THE FRONTEND
-        email = request.data.get('email')
-        name = request.data.get('name')
-        role = request.data.get('role', 'investor')  #By defult will be a investor
+        # Update the user's email and name if they were passed from the frontend
+        user.email = email
+        user.name = name
+        user.rol = role
+        user.save()
 
-        if not email or not name:
-            return Response({'error': 'Missing user information in request body'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # CREATE OR UPDATE A USER COMING FROM AUTH0 IN OUR CUSTOMER MODEL
-        user, created = CustomUser.objects.update_or_create(
-            sub=user_sub,  # we use the unique auth0 sub to link with our model
-            defaults={
-                'email': email,
-                'name': name,
-                'rol': role,
-            }
-        )
-
-        # CREATE A PROFILE BASED ON THE ROLE THEY HAVE
+        # Create a profile based on the role if it doesn't already exist
         if role == 'owner':
             PropertyOwnerProfile.objects.get_or_create(user=user)
         elif role == 'investor':
             InvestorProfile.objects.get_or_create(user=user)
-        # elif role == 'property_admin':
-        #     PropertyOwner.objects.get_or_create(user=user)
 
+        # Serialize and return the user data
         serializer = CustomUserSerializer(user)
-        status_code = status.HTTP_201_CREATED if created else status.HTTP_200_OK
-        return Response(serializer.data, status=status_code)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         
 

@@ -1,87 +1,157 @@
+import React, { useEffect, useState } from 'react';
+import ClipLoader from 'react-spinners/ClipLoader'; // Importa el spinner
+import { SmallSignUpForm } from './property/smallSignUp';
 
-export const Finantial = () => {
+interface FinantialProps {
+  data: {
+    annual_cash_flow: string;
+    annual_gross_rents: string;
+    blockchain_address: string;
+    closing_costs: string;
+    dao_administration_fees: string;
+    homeowners_insurance: string;
+    legal_documents_url: string;
+    monthly_cash_flow: string;
+    operating_reserve: string;
+    projected_annual_cash_flow: string;
+    projected_annual_return: string | null;
+    projected_annual_yield: string;
+    projected_rental_yield: string;
+    property_management: string;
+    property_taxes: string;
+    token_price: string;
+    tokensSold: number;
+    total_investment_value: string;
+    total_tokens: number;
+    underlying_asset_price: string;
+    upfront_fees: string;
+  };
+  loading: boolean;
+  error: string | null;
+}
+
+export const Finantial: React.FC<FinantialProps> = ({ data, loading, error }) => {
+  const [financialData, setFinancialData] = useState<FinantialProps['data'] | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    setFinancialData(data);
+    setAccessToken(localStorage.getItem("accessToken"));
+  }, [data]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <ClipLoader size={50} color="#4A90E2" />
+      </div>
+    );
+  }
+
+  if (!accessToken) {
+    return <div className="flex items-center justify-center h-[50vh]"><SmallSignUpForm /></div>
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-red-500 text-lg">{error}</p>
+      </div>
+    );
+  }
+
+  if (!financialData) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-gray-500 text-lg">No financial data available.</p>
+      </div>
+    );
+  }
+
   return (
-    <section>
+    <section className="px-3">
       <div className="space-y-6">
-        <div className="bg-white py-4   border-b">
+        {/* Projected Annual Returns Section */}
+        <div className="bg-white py-4 border-b">
           <h3 className="text-xl font-semibold mb-2">Projected Annual Returns</h3>
           <ul className="space-y-2">
             <li className="flex justify-between">
-              <span className="font-bold text-2xl">14.60%</span>
+              <span className="font-bold text-2xl">{financialData.projected_annual_yield}%</span>
             </li>
             <li className="flex justify-between">
               <span>Projected Appreciation</span>
-              <span className="font-bold">13.90%</span>
+              <span className="font-bold">{financialData.projected_annual_return ?? 'N/A'}</span>
             </li>
             <li className="flex justify-between">
               <span>Rental Yield</span>
-              <span className="font-bold">0.70%</span>
+              <span className="font-bold">{financialData.projected_rental_yield}%</span>
             </li>
             <li className="flex justify-between">
               <span>Total Investment Value</span>
-              <span className="font-bold">0,40%</span>
+              <span className="font-bold">{financialData.total_investment_value}</span>
             </li>
           </ul>
         </div>
 
-        <div className="bg-white py-4  border-b">
+        {/* Costs and Fees Section */}
+        <div className="bg-white py-4 border-b">
           <h3 className="text-xl font-semibold mb-2">Costs and Fees</h3>
           <ul className="space-y-2">
             <li className="flex justify-between">
-              <span className="font-bold text-2xl">£243,346</span>
+              <span className="font-bold text-2xl">{financialData.total_investment_value}</span>
             </li>
             <li className="flex justify-between">
-              <span>Closing costs</span>
-              <span className="font-bold">£2,500</span>
+              <span>Closing Costs</span>
+              <span className="font-bold">{financialData.closing_costs}</span>
             </li>
             <li className="flex justify-between">
               <span>City Transfer Tax</span>
-              <span className="font-bold">£1,943</span>
+              <span className="font-bold">{financialData.dao_administration_fees}</span>
             </li>
             <li className="flex justify-between">
-              <span>Upfront LLC fees</span>
-              <span className="font-bold">£480</span>
+              <span>Upfront LLC Fees</span>
+              <span className="font-bold">{financialData.upfront_fees}</span>
             </li>
             <li className="flex justify-between">
-              <span>Operating reserve</span>
-              <span className="font-bold">£???????</span>
+              <span>Operating Reserve</span>
+              <span className="font-bold">{financialData.operating_reserve}</span>
             </li>
           </ul>
         </div>
 
-        <div className="bg-white py-4 ">
+        {/* Annual and Monthly Expenses Section */}
+        <div className="bg-white py-4">
           <h3 className="text-xl font-semibold mb-2">Annual and Monthly Expenses</h3>
           <ul className="space-y-2">
             <li className="flex justify-between">
-              <span className="font-bold text-2xl">£243,346</span>
+              <span className="font-bold text-2xl">{financialData.annual_cash_flow}</span>
             </li>
             <li className="flex justify-between">
-              <span>Homeowners insurance</span>
-              <span className="font-bold">£2,500</span>
+              <span>Homeowners Insurance</span>
+              <span className="font-bold">{financialData.homeowners_insurance}</span>
             </li>
             <li className="flex justify-between">
-              <span>Property management</span>
-              <span className="font-bold">£1,943</span>
+              <span>Property Management</span>
+              <span className="font-bold">{financialData.property_management}</span>
             </li>
             <li className="flex justify-between">
-              <span>Annual LLC administration and filing fees</span>
-              <span className="font-bold">£480</span>
+              <span>Annual LLC Administration and Filing Fees</span>
+              <span className="font-bold">{financialData.dao_administration_fees}</span>
             </li>
             <li className="flex justify-between">
-              <span>Operating Reserve replenishment</span>
-              <span className="font-bold">£???????</span>
+              <span>Operating Reserve Replenishment</span>
+              <span className="font-bold">{financialData.operating_reserve}</span>
             </li>
             <li className="flex justify-between">
-              <span>Annual cash flow</span>
-              <span className="font-bold">£???????</span>
+              <span>Annual Cash Flow</span>
+              <span className="font-bold">{financialData.annual_cash_flow}</span>
             </li>
             <li className="flex justify-between">
-              <span>Monthly cash flow</span>
-              <span className="font-bold">£???????</span>
+              <span>Monthly Cash Flow</span>
+              <span className="font-bold">{financialData.monthly_cash_flow}</span>
             </li>
             <li className="flex justify-between">
               <span>Projected Annual Cash Flow</span>
-              <span className="font-bold">£???????</span>
+              <span className="font-bold">{financialData.projected_annual_cash_flow}</span>
             </li>
           </ul>
         </div>

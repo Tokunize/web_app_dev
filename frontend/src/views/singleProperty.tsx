@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FaArrowLeft, FaShare } from 'react-icons/fa';
 import { Button } from "@/components/ui/button";
 import { PropertyAccordion } from "@/components/propertyAccordion";
@@ -20,6 +20,7 @@ export const SingleProperty: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [tokenPrice, setTokenPrice] = useState<number>(0); //
   const [anuReturns, setAnuReturns] = useState<number>(0);
+  const navigate = useNavigate()
 
   const { id } = useParams<{ id: string }>();
 
@@ -28,7 +29,7 @@ export const SingleProperty: React.FC = () => {
 
     const fetchPropertyData = async () => {
       try {
-        const apiUrl = `${backendUrl}property/properties/${id}/?view=images`;
+        const apiUrl = `${backendUrl}property/${id}/?view=images`;
         const response = await axios.get<PropertyResponse>(apiUrl);
 
         setPropertyImages(response.data.image);
@@ -49,7 +50,7 @@ export const SingleProperty: React.FC = () => {
   useEffect(() => {
     const fetchPropertyOverview = async () => {
       try {
-        const apiUrl = `http://127.0.0.1:8000/property/properties/${id}/?view=overview`;
+        const apiUrl = `http://127.0.0.1:8000/property/${id}/?view=overview`;
         const response = await axios.get<{ token_price: number, projected_annual_return:number }>(apiUrl);
         
         setTokenPrice(response.data.token_price);
@@ -94,9 +95,11 @@ export const SingleProperty: React.FC = () => {
     <section className="md:px-[80px]">
       <div className="flex justify-between items-center md:py-[20px]">
         <div className="flex items-center space-x-2">
-          <a href="/" className="bg-[#A0CC29] rounded-full p-1">
+          <span className="bg-[#A0CC29] rounded-full p-1" onClick={()=>{
+            navigate("/")
+          }}>
             <FaArrowLeft className="text-white" />
-          </a>
+          </span>
           <span className="text-normal cursor-pointer">Back to Marketplace</span>
         </div>
 
