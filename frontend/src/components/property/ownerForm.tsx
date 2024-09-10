@@ -21,7 +21,7 @@ type FormData = {
   country: string;
 };
 
-const OwnerPropertyForm: React.FC<{ userId: string }> = ({ userId }) => {
+const OwnerPropertyForm: React.FC<{}> = () => {
   const {
     register,
     handleSubmit,
@@ -30,9 +30,8 @@ const OwnerPropertyForm: React.FC<{ userId: string }> = ({ userId }) => {
   } = useForm<FormData>();
 
   const [details, setDetails] = useState([{ key: "", value: "" }]);
-  const { toast } = useToast(); // Hook de toast de ShadCN
+  const { toast } = useToast()
 
-  // Función para añadir más detalles dinámicamente
   const addDetailField = () => {
     setDetails([...details, { key: "", value: "" }]);
   };
@@ -62,22 +61,20 @@ const OwnerPropertyForm: React.FC<{ userId: string }> = ({ userId }) => {
         },
       };
 
-      // Combina el JSON de `details` en el envío del formulario
-      const finalData = { ...data, details, owner_profile: userId, status: "under_review" };
+      const finalData = { ...data, details, status: "under_review" };
 
       await axios.post(
-        "http://127.0.0.1:8000/property/create/",
+        `${import.meta.env.VITE_APP_BACKEND_URL}property/create/`,
         finalData,
         config
       );
 
-      // Mostrar el toast de éxito
       toast({
         title: "Property submitted!",
         description: "Your property has been successfully submitted.",
+        variant: "default"
       });
 
-      // Limpiar todos los campos
       reset();
       setDetails([{ key: "", value: "" }]);
     } catch (error) {

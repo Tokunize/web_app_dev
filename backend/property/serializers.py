@@ -6,8 +6,13 @@ from property.models import Property,TokensTransaction
 class PropertySerializerList(serializers.ModelSerializer):
     class Meta:
         model = Property
-        fields = ['id','title','status', 'location', 'image', 'token_price','active', 'total_tokens','tokensSold',  'projected_annual_return','property_type', "created_at"]
-
+        fields = [
+                    'id', 'title', 'status', 'location', 'image', 
+                    'token_price', 'active', 'total_tokens', 'tokensSold',
+                    'projected_annual_return', 'property_type', 'created_at',
+                    'bedrooms', 'bathrooms', 'price', 'size', 'year_built',
+                    'country', 'description','details' 
+                ]
 #SERIALZIZERS FOR SINGLE PORPERTY PAGE AND OVERVIEW, FINATIAL, DOCUMENTS, ACTIVITY AND IMAEGES
 class PropertyImagesSerializer(serializers.ModelSerializer):
     class Meta:

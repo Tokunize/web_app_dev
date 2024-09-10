@@ -100,10 +100,8 @@ class PropertyCreateUpdateView(APIView):
     def post(self, request):
         # Get the data from the request
         data = request.data
-        user_id = data.get('owner_profile')  # This 'owner_profile' refers to the CustomUser ID
-        if not user_id:
-            return Response({'error': 'Owner profile (user_id) not provided.'}, status=400)
         
+        user_id = request.user.id
         # Now, find the PropertyOwnerProfile using the user_id
         try:
             owner_profile = PropertyOwnerProfile.objects.get(user_id=user_id)
