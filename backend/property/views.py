@@ -1,15 +1,24 @@
 from django.shortcuts import render,get_object_or_404
 from rest_framework.response import Response
+from rest_framework import status
+
 from rest_framework.views import APIView
-from property.models import Property
-from .serializers import PropertySerializerList,AllDetailsPropertySerializer, PropertyOverviewSerializer,PropertyImagesSerializer, CreatePropertySerializer,PropertyFinancialsSerializer
+from property.models import Property,Token
+from .serializers import (
+    PropertySerializerList,
+    AllDetailsPropertySerializer,
+    PropertyOverviewSerializer,
+    PropertyImagesSerializer, 
+    CreatePropertySerializer,
+    PropertyFinancialsSerializer,
+    TokenSerializer
+
+)
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Max
 from users.models import PropertyOwnerProfile
-
 from django.http import JsonResponse
-import math
 from .filters import PropertyFilter
 from users.authentication import Auth0JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny,BasePermission
@@ -50,7 +59,7 @@ class PublicPropertyList(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        properties = Property.objects.exclude()        
+        properties = Property.objects.exclude(status="under_review")        
         serializer = PropertySerializerList(properties, many=True)        
         return Response(serializer.data)
     
@@ -81,6 +90,8 @@ class PropertyDetailView(ConditionalPermissionMixin, APIView):
             serializer = PropertyFinancialsSerializer(property)
         elif view_type == 'all':
             serializer = AllDetailsPropertySerializer(property)
+        elif view_type == 'activity':
+            serializer = PropertyFinancialsSerializer(property)
         else:
             return Response({'detail': 'Invalid view type'}, status=400)
         
@@ -167,3 +178,21 @@ class PropertyCreateUpdateView(APIView):
 
         return Response({'error': 'Only admins or owners can update properties.'}, status=403)
 
+
+class TokenListView(APIView):
+    authentication_classes = [Auth0JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = TokenSerializer 
+
+    def get(self, request):
+        tokens = Token.objects.all()  # Ejemplo de obtener datos
+        serializer = self.serializer_class(tokens, many=True)  # Serializamos los datos
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        # Aquí validamos y procesamos los datos enviados en la solicitud POST
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()  # Guarda el nuevo token si los datos son válidos
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

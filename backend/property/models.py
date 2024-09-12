@@ -16,6 +16,8 @@ class Property(TimeStampedModel):
     DRAFT = 'draft'
     COMING_SOON = 'coming_soon'
     REJECTED = 'rejected'
+    UNDER_REVIEW = 'under_review' 
+
 
     STATUS_CHOICES = [
         (LISTING, 'Listing'),
@@ -23,6 +25,7 @@ class Property(TimeStampedModel):
         (DRAFT, 'Draft'),
         (COMING_SOON, 'Coming Soon'),
         (REJECTED, 'Rejected'),
+        (UNDER_REVIEW, 'Under Review') 
     ]
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=LISTING, help_text="The current status of the property listing.")
