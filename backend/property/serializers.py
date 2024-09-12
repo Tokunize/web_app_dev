@@ -1,17 +1,25 @@
 from rest_framework import serializers
-from property.models import Property
+from property.models import(
+    Property,
+    Token
+)
 
+class TokenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Token
+        fields = '__all__'
 
 #SERIALIZER FOR THE PROPERTY ON MARKETPLACE LANDING PAGE
 class PropertySerializerList(serializers.ModelSerializer):
+    tokens = TokenSerializer(many=True, read_only=True) 
     class Meta:
         model = Property
         fields = [
                     'id', 'title', 'status', 'location', 'image', 
-                    'active',
+                    'active','property_code',
                     'projected_annual_return', 'property_type', 'created_at',
                     'bedrooms', 'bathrooms', 'price', 'size', 'year_built',
-                    'country', 'description','amenities' 
+                    'country', 'description','amenities', 'tokens'
                 ]
 #SERIALZIZERS FOR SINGLE PORPERTY PAGE AND OVERVIEW, FINATIAL, DOCUMENTS, ACTIVITY AND IMAEGES
 class PropertyImagesSerializer(serializers.ModelSerializer):
@@ -33,7 +41,6 @@ class PropertyOverviewSerializer(serializers.ModelSerializer):
             'title', 
             'location', 
             'image', 
-            'token_price', 
             'annual_gross_rents',
             'bedrooms',
             'bathrooms',
@@ -131,4 +138,6 @@ class CreatePropertySerializer(serializers.ModelSerializer):
 
 
 
+
+#SERIALZERS FOR TOKENS 
 

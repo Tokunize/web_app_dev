@@ -5,6 +5,7 @@ import { FaArrowLeft, FaShare } from 'react-icons/fa';
 import { Button } from "@/components/ui/button";
 import { PropertyAccordion } from "@/components/propertyAccordion";
 import { PurchaseForm } from "@/components/buyPropertyForm";
+import { useUser } from "@/context/userProvider";
 
 // Define the PropertyResponse interface
 interface PropertyResponse {
@@ -15,12 +16,12 @@ interface PropertyResponse {
 // Define the component
 export const SingleProperty: React.FC = () => {
   const [propertyImages, setPropertyImages] = useState<string[]>([]);
-  const [propertyVideos, setPropertyVideos] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [tokenPrice, setTokenPrice] = useState<number>(0); //
   const [anuReturns, setAnuReturns] = useState<number>(0);
   const navigate = useNavigate()
+  const {role } = useUser()
 
   const { id } = useParams<{ id: string }>();
 
@@ -33,7 +34,6 @@ export const SingleProperty: React.FC = () => {
         const response = await axios.get<PropertyResponse>(apiUrl);
 
         setPropertyImages(response.data.image);
-        setPropertyVideos(response.data.video_urls);
       } catch (err) {
         console.error(err);
         setError('Failed to fetch property data');
@@ -66,28 +66,6 @@ export const SingleProperty: React.FC = () => {
     }
   }, [id]);
 
-  const getEmbedUrl = (videoUrl: string): string => {
-    const urlParams = new URLSearchParams(new URL(videoUrl).search);
-    const videoId = urlParams.get("v");
-    return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : '';
-  };
-
-  const showImages = () => {
-    return propertyImages.slice(1, 5).map((image, index) => (
-      <div key={index} className="imageContainer h-full">
-        <img
-          src={image}
-          alt={`Property Image ${index + 1}`}
-          className={`
-            object-cover w-full h-full
-            ${index === 1 ? 'rounded-tr-xl' : ''}
-            ${index > 2 ? 'rounded-br-xl' : ''}
-          `}
-        />
-      </div>
-    ));
-  };
-
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 
@@ -111,26 +89,29 @@ export const SingleProperty: React.FC = () => {
       </div>
 
       <div className="flex flex-row h-auto md:h-[580px] gap-4">
-        {/* Left side: Video in a big square */}
-        <div className="w-1/2 flex justify-center items-center">
-          {propertyVideos[0] && (
-            <iframe
-              width="100%"
-              height="100%"
-              src={getEmbedUrl(propertyVideos[0])}
-              title="Property Video"
-              frameBorder="0"
-              className="rounded-l-2xl"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
-          )}
-        </div>
+        {/* First image goes here */}
+          <div className="w-1/2 flex justify-center items-center">
+            {propertyImages[0] && (
+              <img
+                src={propertyImages[0]}
+                alt="First Property Image"
+                className="object-cover w-full h-full rounded-tl-xl"
+              />
+            )}
+          </div>
 
-        {/* Right side: Four smaller squares */}
-        <div className="w-1/2 grid grid-cols-2 gap-4">
-          {showImages()}
-        </div>
+          {/* Other images */}
+          <div className="w-1/2 grid h-[580px] grid-cols-2 gap-4 overflow-hidden">
+            {propertyImages.slice(1).map((image, index) => (
+              <div key={index + 1} className="imageContainer h-[100%] overflow-hidden">
+                <img
+                  src={image}
+                  alt={`Property Image ${index + 2}`}
+                  className="object-cover w-full h-full"
+                />
+              </div>
+            ))}
+          </div>
       </div>
 
       <div className="flex justify-between mt-8">
@@ -138,7 +119,12 @@ export const SingleProperty: React.FC = () => {
           {id && <PropertyAccordion property_id={id} />}
         </div>
         <div className="md:w-[30%]">
-          <PurchaseForm tokenPrice={tokenPrice} projected_annual_return={anuReturns} />
+        <PurchaseForm
+            property_id={id}
+            role={role} 
+            tokenPrice={tokenPrice}
+            projected_annual_return={anuReturns}
+          />
         </div>
       </div>
     </section>

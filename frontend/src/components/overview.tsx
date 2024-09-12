@@ -13,7 +13,6 @@ interface PropertyData {
   title: string;
   location: string;
   image: string[];
-  token_price: string;
   annual_gross_rents: string;
   bedrooms?: number;
   bathrooms?: string;
@@ -101,7 +100,7 @@ export const Overview: React.FC = () => {
           <h2 className="propertyHeading mb-4">Key Features</h2>
           <ul className="list-disc pl-5 space-y-1 text-gray-700 break-words">
             {property.amenities ? (
-              property.amenities.amenities.map((item, index) => (
+              property.amenities.map((item, index) => (
                 <li key={index}>{item}</li>
               ))
             ) : (

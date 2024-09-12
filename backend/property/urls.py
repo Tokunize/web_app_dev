@@ -4,9 +4,8 @@ from .views import (
     PropertyCreateUpdateView,
     PropertyDetailView,
     PropertyFilterView,
-    PublicPropertyList
-    # OwnerPropertiesView,
-    # AdminPropertyView
+    PublicPropertyList,
+    TokenListView
 )
 
 urlpatterns = [
@@ -19,12 +18,7 @@ urlpatterns = [
     
     # Property filtering and unique values
     path('properties/filter/', PropertyFilterView.as_view(), name='property-filter'),
-    # path('properties/locations/', UniqueLocationsView.as_view(), name='unique-locations'),
-    # path('properties/price-range/', PriceRangeView.as_view(), name='price-range'),
-    # path('properties/yields/', YieldRangeView.as_view(), name='yields-range'),
-    # path('properties/types/', PropertyTypeListView.as_view(), name='property-type-list'),
 
-    # Token transactions related URLs
-#     path('<int:property_id>/tokens-transactions/', TokensTransactionListCreateView.as_view(), name='tokens-transaction-list-create'),
-#     path('tokens-transactions/<int:pk>/', TokensTransactionDetailView.as_view(), name='tokens-transaction-detail'),
+    #TOKEN - GET AND POST URL
+    path('tokens/', TokenListView.as_view(), name='token-list'), 
 ]
