@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaEye, FaPen } from 'react-icons/fa';
 import { Button } from '../ui/button';
-import axios from "axios"
+import axios from "axios";
 import { useAuth0 } from '@auth0/auth0-react';
 import {
   Dialog,
@@ -11,7 +11,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogTrigger
-} from '../ui/dialog'; // Asegúrate de que estos componentes existen en '../ui/dialog'
+} from '../ui/dialog'; 
 import { useNavigate } from 'react-router-dom';
 
 interface Property {
@@ -25,27 +25,34 @@ interface Property {
   size: number;
   year_built: number;
   description: string;
-  details: Record<string, string>; // Asegúrate de que esto es un registro de pares clave-valor
+  details: Record<string, string>; 
   country: string;
-  status: string; // Asegúrate de que el estado de la propiedad esté incluido
+  status: string; 
 }
 
 interface OwnerPropertyListProps {
   propertyList: Property[];
-  role: string; // Asegúrate de incluir el rol en las props
+  role: string; 
 }
 
 export const OwnerPropertyList: React.FC<OwnerPropertyListProps> = ({ propertyList, role }) => {
+  const [properties, setProperties] = useState<Property[]>([]); // Inicializamos el estado vacío
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const { getAccessTokenSilently } = useAuth0();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false); // Estado para manejar el modo de edición
+  const [isEditing, setIsEditing] = useState(false); 
   const navigate = useNavigate();
-  const underReviewProperties = propertyList.filter(prop => prop.status === 'under_review');
-  const otherProperties = propertyList.filter(prop => prop.status !== 'under_review');
+
+  // Actualizamos el estado de `properties` cuando cambie `propertyList`
+  useEffect(() => {
+    setProperties(propertyList); // Aseguramos que properties se actualice correctamente al recibir propertyList
+  }, [propertyList]);
+
+  const underReviewProperties = properties.filter(prop => prop.status === 'under_review');
+  const otherProperties = properties.filter(prop => prop.status !== 'under_review');
 
   const onViewDetails = (id: number) => {
-    const property = propertyList.find(prop => prop.id === id) || null;
+    const property = properties.find(prop => prop.id === id) || null;
     setSelectedProperty(property);
     setDialogOpen(true);
   };
@@ -53,7 +60,7 @@ export const OwnerPropertyList: React.FC<OwnerPropertyListProps> = ({ propertyLi
   const handleClose = () => {
     setDialogOpen(false);
     setSelectedProperty(null);
-    setIsEditing(false); // Reset the editing mode when closing
+    setIsEditing(false); 
   };
 
   const handleEdit = () => {
@@ -73,13 +80,20 @@ export const OwnerPropertyList: React.FC<OwnerPropertyListProps> = ({ propertyLi
             'Content-Type': 'application/json' 
           }
         };  
-        await axios.post(apiUrl, selectedProperty, config);
+        await axios.put(apiUrl, selectedProperty, config);
+
+        // Actualizar el estado local con la propiedad editada
+        setProperties((prevProperties) =>
+          prevProperties.map((prop) =>
+            prop.id === selectedProperty.id ? { ...selectedProperty } : prop
+          )
+        );
   
-        console.log('Property updated successfully');
       } catch (error) {
         console.error('Error updating property:', error);
       } finally {
         setIsEditing(false);
+        setDialogOpen(false); // Cerrar el diálogo después de guardar
       }
     }
   };

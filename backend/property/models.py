@@ -13,16 +13,27 @@ class TimeStampedModel(models.Model):
 class Property(TimeStampedModel): 
     LISTING = 'listing'
     PUBLISHED = 'published'
+    DRAFT = 'draft'
+    COMING_SOON = 'coming_soon'
+    REJECTED = 'rejected'
+
     STATUS_CHOICES = [
         (LISTING, 'Listing'),
         (PUBLISHED, 'Published'),
+        (DRAFT, 'Draft'),
+        (COMING_SOON, 'Coming Soon'),
+        (REJECTED, 'Rejected'),
     ]
-    #owner fill form 
+
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=LISTING, help_text="The current status of the property listing.")
+    
+    # owner fill form 
+    property_code = models.CharField(max_length = 50, unique=True, null=True, blank=True)
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    details = models.JSONField(blank=True, null=True, help_text="Detailed description and specifics of the property.")  # Updated
+    details = models.JSONField(blank=True, null=True, help_text="Detailed description and specifics of the property.")
     bedrooms = models.IntegerField(help_text="Number of bedrooms in the property.")
-    bathrooms = models.DecimalField(max_digits=2, decimal_places=1, help_text="Number of bathrooms in the property, supporting half-baths as decimals.")
+    bathrooms = models.IntegerField(help_text="Number of bathrooms in the property, supporting whole numbers only.")
     price = models.DecimalField(max_digits=10, decimal_places=2, help_text="The sale or list price of the property.")
     location = models.CharField(max_length=255)
     country = models.CharField(max_length=100, null=True, blank=True, help_text="The country where the property is located.")
@@ -30,11 +41,11 @@ class Property(TimeStampedModel):
     size = models.DecimalField(max_digits=6, decimal_places=2, help_text="Total interior square footage of the property.")
     year_built = models.IntegerField(help_text="The year in which the property was originally constructed.")
     
-    #admin fill form 
+    # admin fill form 
     image = ArrayField(models.URLField(max_length=500), blank=True, null=True, help_text="A list of URLs pointing to images of the property.")
     video_urls = ArrayField(models.URLField(max_length=500), blank=True, null=True, help_text="A list of URLs pointing to videos of the property.")
     amenities = models.JSONField(blank=True, null=True, help_text="JSON formatted list of property amenities such as pool, gym, pet-friendly, etc.")
-    active = models.BooleanField(null=True, blank=True, help_text="A boolean to control if the property is listed or if it's a comming soon property")
+    active = models.BooleanField(null=True, blank=True, help_text="A boolean to control if the property is listed or if it's a coming soon property.")
     
     # Financial details
     total_investment_value = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, help_text="Total amount of money invested in the property, including purchase and renovation costs.")
@@ -57,51 +68,65 @@ class Property(TimeStampedModel):
     projected_annual_cash_flow = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, help_text="Estimated yearly cash flow based on projected rental and operational costs.")
 
     # Tokenization specifics
-    total_tokens = models.BigIntegerField(null=True, blank=True, help_text="Total number of tokens issued for the property, representing ownership shares.")
-    tokensSold = models.BigIntegerField(default=0, null=True, blank=True, help_text="Current number of tokens sold.")
-    token_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Price per token, reflecting the value of a fractional ownership share.")
-    blockchain_address = models.CharField(max_length=255, default="0xINVALID_DEFAULT_ADDRESS", null=True, blank=True, help_text="Blockchain address where the property's tokens are managed and transactions are recorded.")
+    # total_tokens = models.BigIntegerField(null=True, blank=True, help_text="Total number of tokens issued for the property, representing ownership shares.")
+    # tokensSold = models.BigIntegerField(default=0, null=True, blank=True, help_text="Current number of tokens sold.")
+    # token_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Price per token, reflecting the value of a fractional ownership share.")
+    # blockchain_address = models.CharField(max_length=255, default="0xINVALID_DEFAULT_ADDRESS", null=True, blank=True, help_text="Blockchain address where the property's tokens are managed and transactions are recorded.")
     legal_documents_url = models.URLField(max_length=500, null=True, blank=True, help_text="URL to access legal documents related to this property.")
-
-    # Status field
-    STATUS_CHOICES = [
-        ('listing', 'Listing'),
-        ('under_review', 'Under Review'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected'),
-    ]
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='listing', help_text="The current status of the property listing.")
 
     # Indicadores de estado
     owner_fields_completed = models.BooleanField(default=False)
     admin_fields_completed = models.BooleanField(default=False)
     owner_profile = models.ForeignKey('users.PropertyOwnerProfile',null=True, blank=True, on_delete=models.CASCADE, related_name='properties', help_text="The PropertyOwnerProfile associated with this property.")
 
-
     def __str__(self):
         return self.title
 
 
 
-class TokensTransaction(TimeStampedModel):
-    property = models.ForeignKey(Property, blank=True, null=True, related_name='transactions', on_delete=models.CASCADE)
+
+class Token(models.Model):
+    token_code = models.CharField(max_length=255, unique=True)
+    property_code = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='tokens')
+    total_tokens = models.PositiveIntegerField()
+    tokens_available = models.PositiveIntegerField()
+
+    def __str__(self):
+        return self.token_code
+
+
+class PropertyToken(models.Model):
+    # ownership_id = models.AutoField(primary_key=True)
+    property_code = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='property_tokens')
+    token_code = models.ForeignKey(Token, on_delete=models.CASCADE, related_name='property_tokens')
+    owner_user_code = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE, related_name='property_tokens')
+    number_of_tokens = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"{self.number_of_tokens} tokens for {self.property_code} ({self.token_code})"
+    
+
+
+class Transaction(TimeStampedModel):
+    property_code = models.ForeignKey(Property, blank=True, null=True, related_name='transactions', on_delete=models.CASCADE)
+    transaction_owner_code = models.ForeignKey("users.CustomUser", related_name='transactions', on_delete=models.CASCADE)
+    token_code = models.ForeignKey(Token, on_delete=models.CASCADE, related_name='transactions')
+    transaction_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    transaction_date = models.DateTimeField(auto_now_add=True)
+    additional_details = models.JSONField(null=True, blank=True)
 
     class Event(models.TextChoices):
-        BUY = 'BUY', ('Buy')
-        SELL = 'SELL', ('Sell')
-        CANCELLATION = 'CANCELLATION', ('Cancellation')
+        BUY = 'BUY', 'Buy'
+        SELL = 'SELL', 'Sell'
+        CANCELLATION = 'CANCELLATION', 'Cancellation'
 
-    # Fields
     event = models.CharField(
         max_length=20,
         choices=Event.choices,
     )
-    transaction_price = models.DecimalField( max_digits=10, decimal_places=2, help_text="the price of the transaction, the sum of all the tokens price involved ")
-    tokens_quantity = models.PositiveIntegerField(help_text="number of tokens per transaction")
-    transaction_owner = models.CharField(max_length=255, default="0x358V948499shd7smw424dcg", help_text="Blockchain address of the user who made the transaction.")
 
     def __str__(self):
-        return f"{self.event} - {self.tokens_quantity} tokens at {self.transaction_price} price"
+        return f"{self.event} - {self.transaction_amount} on {self.transaction_date.strftime('%Y-%m-%d')}"
 
     class Meta:
         verbose_name = "Token Transaction"

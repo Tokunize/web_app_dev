@@ -94,7 +94,7 @@ export const PropertyList: React.FC = () => {
               tokensSold={property.tokensSold}
               totalTokens={property.total_tokens}
               createdDay = {property.created_at}
-              active = {property.active}
+              status = {property.status}
             />
           ))}
         </div>

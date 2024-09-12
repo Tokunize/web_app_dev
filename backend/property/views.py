@@ -1,8 +1,8 @@
 from django.shortcuts import render,get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from property.models import Property, TokensTransaction
-from .serializers import PropertySerializerList,AllDetailsPropertySerializer, PropertyOverviewSerializer,PropertyImagesSerializer,TokenTransactionSerializer, CreatePropertySerializer,PropertyFinancialsSerializer
+from property.models import Property
+from .serializers import PropertySerializerList,AllDetailsPropertySerializer, PropertyOverviewSerializer,PropertyImagesSerializer, CreatePropertySerializer,PropertyFinancialsSerializer
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Max
@@ -50,7 +50,7 @@ class PublicPropertyList(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        properties = Property.objects.exclude(status='under_review')        
+        properties = Property.objects.exclude()        
         serializer = PropertySerializerList(properties, many=True)        
         return Response(serializer.data)
     
@@ -95,50 +95,43 @@ class PropertyFilterView(generics.ListAPIView):
 
 class PropertyCreateUpdateView(APIView):
     authentication_classes = [Auth0JWTAuthentication]
-    permission_classes = [IsAuthenticated]  
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        # Get the data from the request
         data = request.data
-        
         user_id = request.user.id
-        # Now, find the PropertyOwnerProfile using the user_id
         try:
             owner_profile = PropertyOwnerProfile.objects.get(user_id=user_id)
             print(f"Owner Profile found: ID {owner_profile.id} for user ID {user_id}")
         except PropertyOwnerProfile.DoesNotExist:
             return Response({'error': f'Owner profile not found for user ID {user_id}.'}, status=404)
-        
         data['owner_profile'] = owner_profile.id
-        # Initialize the serializer with the data from the request
         serializer = CreatePropertySerializer(data=data, context={'request': request})
-        
         if serializer.is_valid():
-            print("Serializer valid, proceeding...")
-
             if 'owner' in request.user.rol:
                 print("User role: owner")
-
-                property_id = data.get('id')  
                 property_instance, created = Property.objects.update_or_create(
-                    id=property_id,
+                    id=serializer.validated_data.get('id'),  # Usar el ID si está disponible
                     defaults={**serializer.validated_data, 'owner_profile': owner_profile, 'owner_fields_completed': True}
                 )
                 return Response({'message': 'Property data saved successfully. Awaiting admin review.'}, status=200)
+            return Response({'error': 'Only owners can create properties.'}, status=403)
 
-            elif 'admin' in request.user.rol:
-                print("User role: admin")
+        return Response(serializer.errors, status=400)
 
-                property_id = data.get('id')
-                try:
-                    property_instance = Property.objects.get(id=property_id)
-                except Property.DoesNotExist:
-                    return Response({'error': 'Property not found.'}, status=404)
+    def put(self, request):
+        data = request.data
+        user_id = request.user.id
+        property_id = data.get('id')
+        try:
+            property_instance = Property.objects.get(id=property_id)
+        except Property.DoesNotExist:
+            return Response({'error': 'Property not found.'}, status=404)
 
-                if not property_instance.owner_fields_completed:
-                    return Response({'error': 'Owner fields must be completed before admin can add data.'}, status=400)
+        if 'admin' in request.user.rol:
+            serializer = CreatePropertySerializer(property_instance, data=data, partial=True, context={'request': request})
 
-                # Update property with admin fields
+            if serializer.is_valid():
                 for field in serializer.validated_data:
                     setattr(property_instance, field, serializer.validated_data[field])
                 property_instance.admin_fields_completed = True
@@ -146,70 +139,31 @@ class PropertyCreateUpdateView(APIView):
 
                 return Response({'message': 'Property updated successfully by admin.'}, status=200)
 
-        # If serializer is not valid, return errors
-        return Response(serializer.errors, status=400)
+            return Response(serializer.errors, status=400)
 
+        # Si el usuario es propietario (owner)
+        elif 'owner' in request.user.rol:
+            try:
+                owner_profile = PropertyOwnerProfile.objects.get(user_id=user_id)
+            except PropertyOwnerProfile.DoesNotExist:
+                return Response({'error': 'Owner profile is required for owners to update properties.'}, status=404)
+            if property_instance.owner_profile != owner_profile:
+                return Response({'error': 'You can only update your own properties.'}, status=403)
+            data['owner_profile'] = owner_profile.id
+            if property_instance.admin_fields_completed:
+                return Response({'error': 'Admin fields are already completed. No further changes allowed.'}, status=400)
+            serializer = CreatePropertySerializer(property_instance,  data=data, partial=True, context={'request': request})
 
+            if serializer.is_valid():
 
-#VIEWS FOR THE TRANSACCTIONS MODEL CRUD OPERATIONS
-class TokensTransactionListCreateView(generics.ListCreateAPIView):
-    authentication_classes = [Auth0JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-    queryset = TokensTransaction.objects.all()
-    serializer_class = TokenTransactionSerializer
+                for field in serializer.validated_data:
+                    setattr(property_instance, field, serializer.validated_data[field])
+                property_instance.owner_fields_completed = True  # Se puede ajustar según la lógica que quieras aplicar
+                property_instance.save()
 
-    def get_queryset(self):
-        property_id = self.kwargs['property_id']
-        property = get_object_or_404(Property, id=property_id)
-        return TokensTransaction.objects.filter(property=property)
+                return Response({'message': 'Property updated successfully by owner.'}, status=200)
 
-class TokensTransactionDetailView(generics.RetrieveUpdateDestroyAPIView):
-    authentication_classes = [Auth0JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-    queryset = TokensTransaction.objects.all()
-    serializer_class = TokenTransactionSerializer
+            return Response(serializer.errors, status=400)
 
-
-
-
-
-
-
-
-
-#views that maybe we dont need but still there just in case
-    
-# class UniqueLocationsView(APIView):
-#     def get(self, request):
-#         locations = Property.objects.order_by('location').values_list('location', flat=True).distinct()
-#         return JsonResponse(list(locations), safe=False)
-    
-# def generate_price_range(max_price, rounding_degree, increment):
-#     max_price_rounded = math.ceil(max_price / rounding_degree) * rounding_degree
-#     price_range = list(range(0, max_price_rounded + increment, increment))
-#     return price_range
-
-# class PriceRangeView(APIView):
-#     def get(self, request):
-#         max_price = Property.objects.aggregate(Max('price'))['price__max']
-#         rounding_degree = 100000  # adjust this value as needed
-#         increment = 100000  # adjust this value as needed
-#         price_range = generate_price_range(max_price, rounding_degree, increment)
-#         return Response(price_range)
-    
-# class YieldRangeView(APIView):
-#     def get(self, request):
-#         max_annual_yield = Property.objects.aggregate(Max('projected_annual_yield'))['projected_annual_yield__max'] or 0
-#         max_rental_yield = Property.objects.aggregate(Max('projected_rental_yield'))['projected_rental_yield__max'] or 0
-#         return Response({
-#             "max_annual_yield": max_annual_yield,
-#             "max_rental_yield": max_rental_yield
-#         })
-
-# class PropertyTypeListView(APIView):
-#     def get(self, request):
-#         property_types = Property.objects.order_by('property_type').values_list('property_type', flat=True).distinct()
-#         return JsonResponse(list(property_types), safe=False)
-    
-
+        return Response({'error': 'Only admins or owners can update properties.'}, status=403)
 

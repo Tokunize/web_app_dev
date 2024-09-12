@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaArrowRight } from 'react-icons/fa';
 import { Carousel } from "flowbite-react";
-import token from "../assets/img/token.svg"
+import token from "../assets/img/token.svg";
 
 interface PropertyListCardProps {
   title: string;
@@ -14,7 +14,7 @@ interface PropertyListCardProps {
   tokensSold: number;
   totalTokens: number;
   createdDay: string;
-  active: boolean;  // ISO 8601 format
+  status: string;  // Use status instead of active
 }
 
 export const PropertyListCard: React.FC<PropertyListCardProps> = ({
@@ -27,7 +27,7 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
   tokensSold,
   totalTokens,
   createdDay,
-  active
+  status
 }) => {
   const [tokensLeft, setTokensLeft] = useState(0);
   const [badgeType, setBadgeType] = useState<string | null>(null);
@@ -36,23 +36,26 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
     // Calculate remaining tokens
     const remainingTokens = totalTokens - tokensSold;
     setTokensLeft(remainingTokens);
+    console.log('Status:', status); // Añade esto para depurar
+
+
 
     // Check if the property is new (within the last 6 months)
     const createdDate = new Date(createdDay);
     const now = new Date();
     const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(now.getMonth() - 1);
+    sixMonthsAgo.setMonth(now.getMonth() - 6); // Corrected to 6 months
 
-    if (createdDate >= sixMonthsAgo) {
+    if (createdDate >= sixMonthsAgo && status === "listing") {
       setBadgeType('New');
-    } else if (!active) {
+    } else if (status === "coming_soon") {
       setBadgeType('Coming Soon');
     } else if ((tokensSold / totalTokens) * 100 >= 80) {
       setBadgeType('Almost Gone!');
     } else {
       setBadgeType(null);
     }
-  }, [tokensSold, totalTokens, createdDay, active]);
+  }, [tokensSold, totalTokens, createdDay]);
 
   return (
     <article className="relative rounded-lg overflow-hidden mt-6">
@@ -76,7 +79,7 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
           Coming Soon
         </div>
       )}
-      {active && (
+      {status === "listing" && (
         <Link
           to={`property-details/${id}`}
           className="absolute top-4 right-4 transform rotate-[-45deg] bg-white bg-opacity-50 p-2 rounded-full shadow-lg z-10"
@@ -84,7 +87,6 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
           <FaArrowRight className="text-gray-800" />
         </Link>
       )}
-      
 
       <div className="h-64 relative">
         <Carousel
@@ -104,18 +106,15 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
       </div>
       <div className="py-3">
         <div className="flex items-center justify-end">
-          {/* <Progress value={progress} className="w-[60%]" /> */}
           <div className="float-right text-sm text-gray-500 flex items-center ">
-            {active ? (
+            {status ==="listing" ? (
               <>
-                 <span><img src={token} alt="token" className="inline-block h-[20px] w-[20px] mr-2" /></span>  {tokensLeft} Tokens Left
+                <span><img src={token} alt="token" className="inline-block h-[20px] w-[20px] mr-2" /></span> {tokensLeft} Tokens Left
               </>
             ) : (
               'Coming Soon'
             )}
           </div>
-
-
         </div>
         <h2 className="text-xl font-semibold mb-2">{title}</h2>
         <p className="text-gray-600 mb-4">{location}</p>
