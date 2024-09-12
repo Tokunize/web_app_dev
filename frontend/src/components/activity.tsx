@@ -7,7 +7,7 @@ import ClipLoader from "react-spinners/ClipLoader"; // Importa el spinner
 
 // Define the type for transactions
 interface Transaction {
-  id: number;
+  id: string;
   event: string;
   transaction_price: number;
   tokens_quantity: number;
@@ -15,7 +15,7 @@ interface Transaction {
 }
 
 interface ActivityProps {
-  property_id: string;
+  property_id: number;
   data: any; // Ajusta el tipo según la estructura de `data`
 }
 

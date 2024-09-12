@@ -8,6 +8,7 @@ import { InvestorDashboard } from "./views/investorDashboard";
 import { UserProvider } from "./context/userProvider";
 import ProtectedRoute from "./protectedRoutes";
 import { DashboardProperty } from "./views/dashboardProperty";
+import { PaymentPage } from "./views/paymentPage";
 
 const Layout = () => {
   return (
@@ -35,6 +36,12 @@ const Layout = () => {
             path="dashboard-property/:propertyId"
             element={
               <ProtectedRoute roleRequired="investor,admin" element={<DashboardProperty />} />
+            }
+          />
+          <Route
+            path="investment/:propertyId/"
+            element={
+              <ProtectedRoute roleRequired="investor" element={<PaymentPage />} />
             }
           />
         </Routes>

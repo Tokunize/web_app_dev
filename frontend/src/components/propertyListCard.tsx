@@ -46,7 +46,7 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(now.getMonth() - 6); // Corrected to 6 months
 
-    if (createdDate >= sixMonthsAgo && status === "listing") {
+    if (createdDate >= sixMonthsAgo && status === "published") {
       setBadgeType('New');
     } else if (status === "coming_soon") {
       setBadgeType('Coming Soon');
@@ -79,7 +79,7 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
           Coming Soon
         </div>
       )}
-      {status === "listing" && (
+      {status === "published" && (
         <Link
           to={`property-details/${id}`}
           className="absolute top-4 right-4 transform rotate-[-45deg] bg-white bg-opacity-50 p-2 rounded-full shadow-lg z-10"
@@ -107,9 +107,9 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
       <div className="py-3">
         <div className="flex items-center justify-end">
           <div className="float-right text-sm text-gray-500 flex items-center ">
-            {status ==="listing" ? (
+            {status ==="published" ? (
               <>
-                <span><img src={token} alt="token" className="inline-block h-[20px] w-[20px] mr-2" /></span> {tokensLeft} Tokens Left
+                <span><img src={token} alt="token" className="inline-block h-[20px] w-[20px] mr-2" /></span>  Tokens Left
               </>
             ) : (
               'Coming Soon'

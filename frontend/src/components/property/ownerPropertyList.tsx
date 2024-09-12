@@ -44,7 +44,7 @@ export const OwnerPropertyList: React.FC<OwnerPropertyListProps> = ({ propertyLi
   const navigate = useNavigate();
 
   // Actualizamos el estado de `properties` cuando cambie `propertyList`
-  useEffect(() => {
+  useEffect(() => {    
     setProperties(propertyList); // Aseguramos que properties se actualice correctamente al recibir propertyList
   }, [propertyList]);
 
@@ -134,7 +134,7 @@ export const OwnerPropertyList: React.FC<OwnerPropertyListProps> = ({ propertyLi
                           className="text-blue-500 hover:text-blue-700 flex items-center"
                         >
                           <FaEye className="w-6 h-6" />
-                          <span className="sr-only">View Details</span>
+                          <span className="sr-only">View Detail</span>
                         </button>
                       </DialogTrigger>
                       <DialogContent className="sm:max-w-[425px]">
