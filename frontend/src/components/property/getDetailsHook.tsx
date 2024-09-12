@@ -36,9 +36,9 @@ const useFetchPropertyDetails = (property_id: number, viewType: string): FetchSt
           }
         };
 
-        const response = await axios.get<PropertyDetails>(apiUrl, config);
+        const response = await axios.get<PropertyDetails>(apiUrl, config);  
         console.log(response.data);
-        
+              
         setData(response.data);
       } catch (err) {
         setError('Failed to fetch property details.');

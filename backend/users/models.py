@@ -36,6 +36,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     ]
 
     sub = models.CharField(max_length=255, unique=True, null=True, blank=True)  # sub es opcional
+    user_code = models.CharField(max_length=50, unique=True, null=True, blank=True)
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
@@ -72,3 +73,7 @@ class PropertyOwner(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - Property Admin"
+
+
+
+

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import OwnerPropertyForm from '@/components/property/ownerForm';
 import ClipLoader from 'react-spinners/ClipLoader';
-// Importa el componente Button de ShadCN
 import { Button } from '@/components/ui/button';
 import { OwnerPropertyList } from '@/components/property/ownerPropertyList';
 import { useUser } from '@/context/userProvider';
@@ -10,14 +9,12 @@ import { useUser } from '@/context/userProvider';
 interface Property {
   id: number;
   title: string;
-  // Añade otros campos necesarios según el modelo de propiedad
 }
 
 export const OwnerDashboard: React.FC = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
   const { role } = useUser(); // Usamos el hook para obtener el rol del usuario
   const [showForm, setShowForm] = useState<boolean>(false);
 
@@ -62,7 +59,6 @@ export const OwnerDashboard: React.FC = () => {
       <div className="mb-6 flex justify-between items-center">
         <h1 className="text-2xl font-bold">Dashboard</h1>
         <div>
-          {/* Muestra el botón "Create Property" solo si el rol no es 'admin' */}
           {role !== 'admin' && (
             <Button onClick={toggleForm} className="mr-4">
               Create Property
@@ -79,10 +75,10 @@ export const OwnerDashboard: React.FC = () => {
         )}
         {error && <p className="text-red-500 mb-4">Error: {error}</p>}
       </div>
-      {showForm && <OwnerPropertyForm userId={userId} />}
+      {showForm && <OwnerPropertyForm />}
       <div className="mt-6">
         <h2 className="text-xl font-semibold mb-4">Properties</h2>
-        <OwnerPropertyList propertyList={properties} />
+        <OwnerPropertyList propertyList={properties}  role={role} />
       </div>
     </section>
   );

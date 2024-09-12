@@ -4,8 +4,6 @@ from .views import (
     PropertyCreateUpdateView,
     PropertyDetailView,
     PropertyFilterView,
-    TokensTransactionListCreateView,
-    TokensTransactionDetailView,
     PublicPropertyList
     # OwnerPropertiesView,
     # AdminPropertyView
@@ -27,6 +25,6 @@ urlpatterns = [
     # path('properties/types/', PropertyTypeListView.as_view(), name='property-type-list'),
 
     # Token transactions related URLs
-    path('<int:property_id>/tokens-transactions/', TokensTransactionListCreateView.as_view(), name='tokens-transaction-list-create'),
-    path('tokens-transactions/<int:pk>/', TokensTransactionDetailView.as_view(), name='tokens-transaction-detail'),
+#     path('<int:property_id>/tokens-transactions/', TokensTransactionListCreateView.as_view(), name='tokens-transaction-list-create'),
+#     path('tokens-transactions/<int:pk>/', TokensTransactionDetailView.as_view(), name='tokens-transaction-detail'),
 ]
