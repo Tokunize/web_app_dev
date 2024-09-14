@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Button } from './ui/button';
-import { TokenPriceGraph } from './tokenPriceGraph';
+import { Button } from '../ui/button';
+import { TokenPriceGraph } from '../tokenPriceGraph';
 import { useNavigate } from 'react-router-dom';
 import {
   Popover,

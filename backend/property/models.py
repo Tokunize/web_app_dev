@@ -87,12 +87,13 @@ class Property(TimeStampedModel):
 
 
 
-
 class Token(models.Model):
     token_code = models.CharField(max_length=255, unique=True)
     property_code = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='tokens')
     total_tokens = models.PositiveIntegerField()
     tokens_available = models.PositiveIntegerField()
+    token_price = models.PositiveIntegerField(null=True, blank=True )
+
 
     def __str__(self):
         return self.token_code
@@ -110,8 +111,9 @@ class PropertyToken(models.Model):
     
 
 
+
 class Transaction(TimeStampedModel):
-    property_code = models.ForeignKey(Property, blank=True, null=True, related_name='transactions', on_delete=models.CASCADE)
+    property_id = models.ForeignKey(Property, blank=True, null=True, related_name='transactions', on_delete=models.CASCADE)
     transaction_owner_code = models.ForeignKey("users.CustomUser", related_name='transactions', on_delete=models.CASCADE)
     token_code = models.ForeignKey(Token, on_delete=models.CASCADE, related_name='transactions')
     transaction_amount = models.DecimalField(max_digits=10, decimal_places=2)

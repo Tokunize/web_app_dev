@@ -10,7 +10,7 @@ export const LogoutButton = () => {
 
   return (
     <Button
-      className='bg-black hover:bg-red-600 duration-300 w-full'
+      className=' duration-300 w-full'
       onClick={()=>{
         removeLocalStorage()
         logout()

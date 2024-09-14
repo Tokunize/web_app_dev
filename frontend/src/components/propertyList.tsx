@@ -87,14 +87,15 @@ export const PropertyList: React.FC = () => {
               key={index}
               title={property.title}
               location={property.location}
-              minTokenPrice={property.token_price}
+              minTokenPrice={property.tokens[0].token_price}
               estAnnualReturn={property.projected_annual_return}
               propertyImgs={property.image.slice(1,5)}  
               id={property.id}  
               tokensSold={property.tokensSold}
-              totalTokens={property.total_tokens}
+              totalTokens={property.tokens[0].total_tokens}
               createdDay = {property.created_at}
               status = {property.status}
+              tokens_available = {property.tokens[0].tokens_available}
             />
           ))}
         </div>

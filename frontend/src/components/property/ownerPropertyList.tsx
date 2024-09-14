@@ -13,6 +13,7 @@ import {
   DialogTrigger
 } from '../ui/dialog'; 
 import { useNavigate } from 'react-router-dom';
+import { PropertyListCard } from '../propertyListCard';
 
 interface Property {
   id: number;
@@ -43,9 +44,8 @@ export const OwnerPropertyList: React.FC<OwnerPropertyListProps> = ({ propertyLi
   const [isEditing, setIsEditing] = useState(false); 
   const navigate = useNavigate();
 
-  // Actualizamos el estado de `properties` cuando cambie `propertyList`
   useEffect(() => {    
-    setProperties(propertyList); // Aseguramos que properties se actualice correctamente al recibir propertyList
+    setProperties(propertyList); 
   }, [propertyList]);
 
   const underReviewProperties = properties.filter(prop => prop.status === 'under_review');
@@ -82,7 +82,6 @@ export const OwnerPropertyList: React.FC<OwnerPropertyListProps> = ({ propertyLi
         };  
         await axios.put(apiUrl, selectedProperty, config);
 
-        // Actualizar el estado local con la propiedad editada
         setProperties((prevProperties) =>
           prevProperties.map((prop) =>
             prop.id === selectedProperty.id ? { ...selectedProperty } : prop
@@ -93,7 +92,7 @@ export const OwnerPropertyList: React.FC<OwnerPropertyListProps> = ({ propertyLi
         console.error('Error updating property:', error);
       } finally {
         setIsEditing(false);
-        setDialogOpen(false); // Cerrar el diálogo después de guardar
+        setDialogOpen(false); 
       }
     }
   };
@@ -241,65 +240,27 @@ export const OwnerPropertyList: React.FC<OwnerPropertyListProps> = ({ propertyLi
       </div>
       
       <div>
-        <h2 className="text-xl font-semibold mb-4">Other Properties</h2>
+        <h2 className="text-xl font-semibold mb-4">Published Properties</h2>
         <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {otherProperties.length > 0 ? (
-            otherProperties.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white shadow-md rounded-lg p-4 flex items-center justify-between"
-              >
-                <h6 className="text-lg font-semibold">{item.title}</h6>
-                <div className="flex items-center">
-                  {role === "admin" && (
-                    <FaPen
-                      onClick={() => navigate(`/dashboard-property/${item.id}`)}
-                      className="text-blue-500 cursor-pointer w-6 h-6 mr-2"
-                    />
-                  )}
-                  {role === "owner" && (
-                    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                      <DialogTrigger asChild>
-                        <button
-                          onClick={() => onViewDetails(item.id)}
-                          className="text-blue-500 hover:text-blue-700 flex items-center"
-                        >
-                          <FaEye className="w-6 h-6" />
-                          <span className="sr-only">View Details</span>
-                        </button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                          <DialogTitle>Property Details</DialogTitle>
-                          <DialogDescription>
-                            Here you can view the details of the selected property.
-                          </DialogDescription>
-                        </DialogHeader>
-                        {selectedProperty && (
-                          <div className="py-4 space-y-2">
-                            <p><strong>Title:</strong> {selectedProperty.title}</p>
-                            <p><strong>Bedrooms:</strong> {selectedProperty.bedrooms}</p>
-                            <p><strong>Bathrooms:</strong> {selectedProperty.bathrooms}</p>
-                            <p><strong>Price:</strong> ${selectedProperty.price}</p>
-                            <p><strong>Location:</strong> {selectedProperty.location}</p>
-                            <p><strong>Property Type:</strong> {selectedProperty.property_type}</p>
-                            <p><strong>Size:</strong> {selectedProperty.size} sq ft</p>
-                            <p><strong>Year Built:</strong> {selectedProperty.year_built}</p>
-                            <p><strong>Description:</strong> {selectedProperty.description}</p>
-                            <p><strong>Country:</strong> {selectedProperty.country}</p>
-                          </div>
-                        )}
-                        <DialogFooter>
-                          <Button onClick={handleClose}>Close</Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
-                  )}
-                </div>
-              </div>
+            otherProperties.map((property) => (
+            <PropertyListCard
+              key={property.id} 
+              title={property.title}
+              location={property.location}
+              minTokenPrice={property.tokens[0].token_price}
+              estAnnualReturn={property.projected_annual_return}
+              propertyImgs={property.image} 
+              id={property.id}
+              tokensSold={property} 
+              totalTokens={property.tokens[0].totalTokens}
+              createdDay={property.createdDay} 
+              status={property.status}
+              tokens_available ={property.tokens[0].tokens_available}
+          />
             ))
           ) : (
-            <p>No other properties available.</p>
+            <p>No publised properties.</p>
           )}
         </div>
       </div>

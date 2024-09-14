@@ -1,26 +1,24 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate, useParams } from 'react-router-dom';
-import { FaArrowLeft, FaShare } from 'react-icons/fa';
+import { useParams } from 'react-router-dom';
+import { FaShare } from 'react-icons/fa';
 import { Button } from "@/components/ui/button";
 import { PropertyAccordion } from "@/components/propertyAccordion";
-import { PurchaseForm } from "@/components/buyPropertyForm";
+import { PurchaseForm } from "@/components/forms/buyPropertyForm";
 import { useUser } from "@/context/userProvider";
+import { BackButton } from "@/components/buttons/backButton";
 
-// Define the PropertyResponse interface
 interface PropertyResponse {
   image: string[];
   video_urls: string[];
 }
 
-// Define the component
 export const SingleProperty: React.FC = () => {
   const [propertyImages, setPropertyImages] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [tokenPrice, setTokenPrice] = useState<number>(0); //
   const [anuReturns, setAnuReturns] = useState<number>(0);
-  const navigate = useNavigate()
   const {role } = useUser()
 
   const { id } = useParams<{ id: string }>();
@@ -72,14 +70,7 @@ export const SingleProperty: React.FC = () => {
   return (
     <section className="md:px-[80px]">
       <div className="flex justify-between items-center md:py-[20px]">
-        <div className="flex items-center space-x-2">
-          <span className="bg-[#A0CC29] rounded-full p-1" onClick={()=>{
-            navigate("/")
-          }}>
-            <FaArrowLeft className="text-white" />
-          </span>
-          <span className="text-normal cursor-pointer">Back to Marketplace</span>
-        </div>
+        <BackButton/>
 
         {/* Right Side: Share Button */}
         <Button variant="outline" className="flex items-center space-x-2">
