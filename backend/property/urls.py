@@ -6,7 +6,8 @@ from .views import (
     PropertyFilterView,
     PublicPropertyList,
     TokenListView,
-    TransactionListview
+    TransactionListview,
+    InvestedProperties
 )
 
 urlpatterns = [
@@ -24,5 +25,8 @@ urlpatterns = [
     path('tokens/', TokenListView.as_view(), name='token-list'), 
 
     #TRANSACTIOS GET AND POST
-    path('transactions/', TransactionListview.as_view(), name='transactions-list')
+    path('transactions/', TransactionListview.as_view(), name='transactions-list'),
+
+    #GET ALL THE PROPERTIES ONE INVESTOR INVESTED
+    path('investment/', InvestedProperties.as_view(), name='invested-properties')
 ]

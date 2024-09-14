@@ -17,17 +17,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatDistanceToNowStrict } from "date-fns";  
 
 // Define the Transaction type
 type Transaction = {
   id: number;
   event: string;
-  transaction_price: number;
-  tokens_quantity: number;
+  transaction_amount: number;
+  transaction_tokens_amount: number;
   transaction_owner: string;
+  transaction_date: string; // Adding the date field
 };
 
-// Define column definitions
 const columns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "event",
@@ -53,27 +54,34 @@ const columns: ColumnDef<Transaction>[] = [
     header: "Owner",
     cell: ({ row }) => {
       const owner = row.getValue<string>("transaction_owner");
-      // Truncate the owner string
-      const truncatedOwner = `${owner.slice(0, 6)}...${owner.slice(-4)}`;
-      return <div className="lowercase">{truncatedOwner}</div>;
+      return <div className="lowercase">{owner}</div>;
     },
   },
   {
-    accessorKey: "transaction_price",
+    accessorKey: "transaction_amount",
     header: () => <div className="text-right">Price</div>,
     cell: ({ row }) => {
-      const price = row.getValue<number>("transaction_price");
-      const formatted = new Intl.NumberFormat("en-US", {
+      const price = row.getValue<number>("transaction_amount");
+      const formatted = new Intl.NumberFormat("en-UK", {
         style: "currency",
-        currency: "USD",
+        currency: "GBP",
       }).format(price);
       return <div className="text-right font-medium">{formatted}</div>;
     },
   },
   {
-    accessorKey: "tokens_quantity",
+    accessorKey: "transaction_tokens_amount",
     header: () => <div className="text-right">Token Quantity</div>,
-    cell: ({ row }) => <div className="text-right">{row.getValue<number>("tokens_quantity")}</div>,
+    cell: ({ row }) => <div className="text-right">{row.getValue<number>("transaction_tokens_amount")}</div>,
+  },
+  {
+    accessorKey: "transaction_date",  // New column for transaction date
+    header: "Date",
+    cell: ({ row }) => {
+      const date = new Date(row.getValue<string>("transaction_date"));
+      const formattedDate = formatDistanceToNowStrict(date, { addSuffix: true });
+      return <div>{formattedDate}</div>;
+    },
   },
 ];
 
