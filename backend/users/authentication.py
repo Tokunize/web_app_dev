@@ -148,9 +148,7 @@ class Auth0JWTAuthentication(authentication.BaseAuthentication):
             if created:
                 print(f'New user {user.email} created during authentication')
             
-            print(user.rol)
             request.user_role = user.rol
-            print(user.id)
             # request.user_role = user_rol
             # request.user_id = user_sub
 

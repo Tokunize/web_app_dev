@@ -2,7 +2,7 @@ from rest_framework import serializers
 from property.models import(
     Property,
     Token,
-    Transaction
+    Transaction,PropertyToken
 )
 
 #SERIALZERS FOR TOKENS 
@@ -162,4 +162,30 @@ class TransactionSerializer(serializers.ModelSerializer):
         model = Transaction
         fields = '__all__'
 
+#
+        
 
+class PropertyTokenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PropertyToken
+        fields = ['number_of_tokens']
+        
+class InvestedPropertiesSerialier(serializers.ModelSerializer):
+    tokens = TokenSerializer(many=True, read_only=True)
+    user_tokens = serializers.SerializerMethodField()  # Añadir el campo para tokens del usuario
+
+    class Meta:
+        model = Property
+        fields = ['title', 'tokens', 'user_tokens']
+
+    def get_user_tokens(self, obj):
+        # Obtener el usuario actual del contexto
+        user = self.context['request'].user
+        
+        # Obtener la cantidad de tokens que el usuario posee para esta propiedad
+        property_tokens = PropertyToken.objects.filter(
+            property_code=obj,
+            owner_user_code=user
+        )
+        
+        return PropertyTokenSerializer(property_tokens, many=True).data

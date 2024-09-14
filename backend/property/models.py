@@ -119,6 +119,7 @@ class Transaction(TimeStampedModel):
     transaction_amount = models.DecimalField(max_digits=10, decimal_places=2)
     transaction_date = models.DateTimeField(auto_now_add=True)
     additional_details = models.JSONField(null=True, blank=True)
+    transaction_tokens_amount = models.BigIntegerField(null=True, blank=True)
 
     class Event(models.TextChoices):
         BUY = 'BUY', 'Buy'

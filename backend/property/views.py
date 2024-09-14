@@ -13,7 +13,8 @@ from .serializers import (
     PropertyFinancialsSerializer,
     TokenSerializer,
     TransactionSerializer,
-    PropertyTokenPaymentSerializer
+    PropertyTokenPaymentSerializer,
+    InvestedPropertiesSerialier
 )
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
@@ -94,12 +95,9 @@ class PropertyDetailView(ConditionalPermissionMixin, APIView):
         elif view_type == 'activity':
             serializer = PropertyFinancialsSerializer(property)
         elif view_type == 'payment':
-            # Serialize property details
             property_serializer = PropertyTokenPaymentSerializer(property)
-            # Serialize financial details separately
             financials_serializer = PropertyFinancialsSerializer(property)
             
-            # Combine the data
             data = property_serializer.data
             data['financials_details'] = financials_serializer.data
 
@@ -221,10 +219,12 @@ class TransactionListview(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = TransactionSerializer
 
-    def get(self,request):
-        transactions = Transaction.objects.all()
+    def get(self, request):
+        user_id = request.user.id
+               
+        transactions = Transaction.objects.filter(transaction_owner_code=user_id)
         serializer = self.serializer_class(transactions, many=True)
-        return Response(serializer.data, status = status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request):
         tokens_amount = int(request.data["token_amount"])
@@ -250,15 +250,18 @@ class TransactionListview(APIView):
         if selected_token.tokens_available < tokens_amount:
             return Response({'error': 'Not enough tokens available'}, status=status.HTTP_400_BAD_REQUEST)
 
+        #CALCULATE THE TOKEN PRICE
+        total_token_price = tokens_amount * selected_token.token_price
         # Reduce the available tokens
         selected_token.tokens_available -= tokens_amount
         selected_token.save()
 
         # Create the transaction
-        transaction = Transaction.objects.create(
+        Transaction.objects.create(
             property_id=property_instance,
             transaction_owner_code=request.user,
-            transaction_amount=tokens_amount,
+            transaction_tokens_amount = tokens_amount,
+            transaction_amount = total_token_price,
             token_code=selected_token,
             event=Transaction.Event.BUY
         )
@@ -279,3 +282,31 @@ class TransactionListview(APIView):
         
 
 
+#GET ALL THE PROPERTIES A INVESTOR INVESTED 
+
+# class InvestedProperties(APIView):
+#     authentication_classes = [Auth0JWTAuthentication]
+#     permission_classes = [IsAuthenticated]
+    
+#     def get(self,request):
+#         print(request.user.id)
+
+#         return Response({"yes": "yess"}, status=status.HTTP_200_OK)
+
+
+class InvestedProperties(APIView):
+    authentication_classes = [Auth0JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = InvestedPropertiesSerialier
+
+    def get(self, request):
+        user_id = request.user.id
+        print(user_id)
+        
+        # Obtener todas las propiedades en las que el usuario ha invertido a través de transacciones
+        properties = Property.objects.filter(transactions__transaction_owner_code_id=user_id).distinct()
+
+        # Serializar las propiedades, pasando el contexto para obtener los tokens del usuario
+        serializer = self.serializer_class(properties, many=True, context={'request': request})
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
