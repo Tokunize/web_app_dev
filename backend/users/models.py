@@ -45,7 +45,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     updated_at = models.DateTimeField(auto_now=True)
     rol = models.CharField(max_length=20, choices=ROLES, default='owner')
 
-    USERNAME_FIELD = 'email'  # El campo para autenticar será email, útil tanto para sub como para superusers
+    USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name']
 
     objects = CustomUserManager()

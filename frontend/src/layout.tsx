@@ -39,7 +39,7 @@ const Layout = () => {
             }
           />
           <Route
-            path="investment/:propertyId/"
+            path="investment/:property_id/"
             element={
               <ProtectedRoute roleRequired="investor" element={<PaymentPage />} />
             }

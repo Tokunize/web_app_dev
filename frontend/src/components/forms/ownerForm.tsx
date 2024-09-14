@@ -6,7 +6,6 @@ import { Textarea } from "../ui/textarea";
 import axios from "axios";
 import { useToast } from "../ui/use-toast";
 
-// Definición de tipos
 type FormData = {
   title: string;
   bedrooms: number;
@@ -21,11 +20,17 @@ type FormData = {
   country: string;
 };
 
-const OwnerPropertyForm: React.FC<{}> = () => {
+interface OwnerPropertyFormProps {
+  onPropertyCreated: (newProperty: FormData) => void;
+}
+
+const OwnerPropertyForm: React.FC<OwnerPropertyFormProps> = ({
+  onPropertyCreated,
+}) => {
   const {
     register,
     handleSubmit,
-    reset, // Añadido para resetear el formulario
+    reset,
     formState: { errors },
   } = useForm<FormData>();
 
@@ -34,9 +39,9 @@ const OwnerPropertyForm: React.FC<{}> = () => {
   const { toast } = useToast();
 
   const handleAddAmenity = () => {
-    if (newAmenity.trim() === '') return; // No añadir si el campo está vacío
+    if (newAmenity.trim() === '') return;
     setAmenities([...amenities, newAmenity]);
-    setNewAmenity(''); // Limpiar el campo de entrada
+    setNewAmenity('');
   };
 
   const handleRemoveAmenity = (index: number) => {
@@ -53,14 +58,14 @@ const OwnerPropertyForm: React.FC<{}> = () => {
 
       const config = {
         headers: {
-          "Authorization": `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
       };
 
       const finalData = { ...data, amenities, status: "under_review" };
 
-      await axios.post(
+      const response = await axios.post(
         `${import.meta.env.VITE_APP_BACKEND_URL}property/create/`,
         finalData,
         config
@@ -69,13 +74,13 @@ const OwnerPropertyForm: React.FC<{}> = () => {
       toast({
         title: "Property submitted!",
         description: "Your property has been successfully submitted.",
-        variant: "default"
+        variant: "default",
       });
 
+      onPropertyCreated(response.data.property);
       reset();
       setAmenities([]);
     } catch (error) {
-      // Mostrar el toast de error
       toast({
         title: "Submission failed",
         description: "There was an error submitting your property.",
@@ -93,32 +98,29 @@ const OwnerPropertyForm: React.FC<{}> = () => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-md space-y-6"
+      className="w-[90%] mx-auto p-6 bg-white shadow-md rounded-md space-y-6"
     >
       <h2 className="text-2xl font-bold mb-4">Property Form</h2>
 
-      {/* Title */}
-      <div>
-        <label
-          htmlFor="title"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Title
-        </label>
-        <Input
-          id="title"
-          {...register("title", { required: "Title is required" })}
-          className="w-full mt-1"
-          placeholder="Enter property title"
-        />
-        {errors.title && (
-          <span className="text-red-500 text-sm">{errors.title.message}</span>
-        )}
-      </div>
-
-      {/* Row: Bedrooms and Bathrooms */}
       <div className="flex gap-4">
-        <div className="w-1/2">
+        <div className="w-1/3">
+          <label
+            htmlFor="title"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Title
+          </label>
+          <Input
+            id="title"
+            {...register("title", { required: "Title is required" })}
+            className="w-full mt-1"
+            placeholder="Enter property title"
+          />
+          {errors.title && (
+            <span className="text-red-500 text-sm">{errors.title.message}</span>
+          )}
+        </div>
+        <div className="w-1/3">
           <label
             htmlFor="bedrooms"
             className="block text-sm font-medium text-gray-700"
@@ -136,8 +138,7 @@ const OwnerPropertyForm: React.FC<{}> = () => {
             <span className="text-red-500 text-sm">{errors.bedrooms.message}</span>
           )}
         </div>
-
-        <div className="w-1/2">
+        <div className="w-1/3">
           <label
             htmlFor="bathrooms"
             className="block text-sm font-medium text-gray-700"
@@ -157,9 +158,8 @@ const OwnerPropertyForm: React.FC<{}> = () => {
         </div>
       </div>
 
-      {/* Row: Price and Location */}
       <div className="flex gap-4">
-        <div className="w-1/2">
+        <div className="w-1/3">
           <label
             htmlFor="price"
             className="block text-sm font-medium text-gray-700"
@@ -178,7 +178,7 @@ const OwnerPropertyForm: React.FC<{}> = () => {
           )}
         </div>
 
-        <div className="w-1/2">
+        <div className="w-1/3">
           <label
             htmlFor="location"
             className="block text-sm font-medium text-gray-700"
@@ -195,11 +195,8 @@ const OwnerPropertyForm: React.FC<{}> = () => {
             <span className="text-red-500 text-sm">{errors.location.message}</span>
           )}
         </div>
-      </div>
 
-      {/* Row: Property Type and Size */}
-      <div className="flex gap-4">
-        <div className="w-1/2">
+        <div className="w-1/3">
           <label
             htmlFor="property_type"
             className="block text-sm font-medium text-gray-700"
@@ -208,9 +205,7 @@ const OwnerPropertyForm: React.FC<{}> = () => {
           </label>
           <Input
             id="property_type"
-            {...register("property_type", {
-              required: "Property type is required",
-            })}
+            {...register("property_type", { required: "Property type is required" })}
             className="w-full mt-1"
             placeholder="Enter property type"
           />
@@ -220,8 +215,10 @@ const OwnerPropertyForm: React.FC<{}> = () => {
             </span>
           )}
         </div>
+      </div>
 
-        <div className="w-1/2">
+      <div className="flex gap-4">
+        <div className="w-1/3">
           <label
             htmlFor="size"
             className="block text-sm font-medium text-gray-700"
@@ -239,31 +236,51 @@ const OwnerPropertyForm: React.FC<{}> = () => {
             <span className="text-red-500 text-sm">{errors.size.message}</span>
           )}
         </div>
+
+        <div className="w-1/3">
+          <label
+            htmlFor="year_built"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Year Built
+          </label>
+          <Input
+            id="year_built"
+            type="number"
+            {...register("year_built", { required: "Year built is required" })}
+            className="w-full mt-1"
+            placeholder="Enter year built"
+          />
+          {errors.year_built && (
+            <span className="text-red-500 text-sm">
+              {errors.year_built.message}
+            </span>
+          )}
+        </div>
+
+        <div className="w-1/3">
+          <label
+            htmlFor="country"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Country
+          </label>
+          <select
+            id="country"
+            {...register("country", { required: "Country is required" })}
+            className="w-full mt-1 border-gray-300 rounded-md"
+          >
+            <option value="">Select country</option>
+            <option value="USA">USA</option>
+            <option value="Canada">Canada</option>
+            <option value="Mexico">Mexico</option>
+          </select>
+          {errors.country && (
+            <span className="text-red-500 text-sm">{errors.country.message}</span>
+          )}
+        </div>
       </div>
 
-      {/* Year Built */}
-      <div>
-        <label
-          htmlFor="year_built"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Year Built
-        </label>
-        <Input
-          id="year_built"
-          type="number"
-          {...register("year_built", { required: "Year built is required" })}
-          className="w-full mt-1"
-          placeholder="Enter year built"
-        />
-        {errors.year_built && (
-          <span className="text-red-500 text-sm">
-            {errors.year_built.message}
-          </span>
-        )}
-      </div>
-
-      {/* Description (Textarea) */}
       <div>
         <label
           htmlFor="description"
@@ -273,9 +290,7 @@ const OwnerPropertyForm: React.FC<{}> = () => {
         </label>
         <Textarea
           id="description"
-          {...register("description", {
-            required: "Description is required",
-          })}
+          {...register("description", { required: "Description is required" })}
           className="w-full mt-1"
           placeholder="Enter property description"
         />
@@ -286,7 +301,6 @@ const OwnerPropertyForm: React.FC<{}> = () => {
         )}
       </div>
 
-      {/* Amenities */}
       <div>
         <label
           htmlFor="amenities"
@@ -309,40 +323,20 @@ const OwnerPropertyForm: React.FC<{}> = () => {
         {amenities.map((amenity, index) => (
           <div key={index} className="flex items-center gap-4 mb-2">
             <span className="flex-1">{amenity}</span>
-            <Button type="button" onClick={() => handleRemoveAmenity(index)} className="ml-2">
+            <Button
+              type="button"
+              onClick={() => handleRemoveAmenity(index)}
+              className="ml-2"
+            >
               Remove
             </Button>
           </div>
         ))}
       </div>
 
-      {/* Country (Select) */}
-      <div>
-        <label
-          htmlFor="country"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Country
-        </label>
-        <select
-          id="country"
-          {...register("country", { required: "Country is required" })}
-          className="w-full mt-1 border-gray-300 rounded-md"
-        >
-          <option value="">Select country</option>
-          <option value="USA">USA</option>
-          <option value="Canada">Canada</option>
-          <option value="Mexico">Mexico</option>
-          {/* Add more country options as needed */}
-        </select>
-        {errors.country && (
-          <span className="text-red-500 text-sm">{errors.country.message}</span>
-        )}
-      </div>
-
       <Button
         type="submit"
-        className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+        className="w-full py-2 px-4 rounded-md "
       >
         Submit
       </Button>
@@ -351,3 +345,4 @@ const OwnerPropertyForm: React.FC<{}> = () => {
 };
 
 export default OwnerPropertyForm;
+

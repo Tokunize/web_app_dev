@@ -14,7 +14,8 @@ interface PropertyListCardProps {
   tokensSold: number;
   totalTokens: number;
   createdDay: string;
-  status: string;  // Use status instead of active
+  status: string;  
+  tokens_available: number;
 }
 
 export const PropertyListCard: React.FC<PropertyListCardProps> = ({
@@ -27,20 +28,13 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
   tokensSold,
   totalTokens,
   createdDay,
-  status
+  status,
+  tokens_available
 }) => {
-  const [tokensLeft, setTokensLeft] = useState(0);
   const [badgeType, setBadgeType] = useState<string | null>(null);
 
   useEffect(() => {
-    // Calculate remaining tokens
-    const remainingTokens = totalTokens - tokensSold;
-    setTokensLeft(remainingTokens);
-    console.log('Status:', status); // Añade esto para depurar
 
-
-
-    // Check if the property is new (within the last 6 months)
     const createdDate = new Date(createdDay);
     const now = new Date();
     const sixMonthsAgo = new Date();
@@ -81,7 +75,7 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
       )}
       {status === "published" && (
         <Link
-          to={`property-details/${id}`}
+          to={`/property-details/${id}`}
           className="absolute top-4 right-4 transform rotate-[-45deg] bg-white bg-opacity-50 p-2 rounded-full shadow-lg z-10"
         >
           <FaArrowRight className="text-gray-800" />
@@ -109,7 +103,7 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
           <div className="float-right text-sm text-gray-500 flex items-center ">
             {status ==="published" ? (
               <>
-                <span><img src={token} alt="token" className="inline-block h-[20px] w-[20px] mr-2" /></span>  Tokens Left
+                <span><img src={token} alt="token" className="inline-block h-[20px] w-[20px] mr-2" /></span> {tokens_available} Tokens Left
               </>
             ) : (
               'Coming Soon'

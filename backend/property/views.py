@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from rest_framework.views import APIView
-from property.models import Property,Token
+from property.models import Property,Token,Transaction,PropertyToken
 from .serializers import (
     PropertySerializerList,
     AllDetailsPropertySerializer,
@@ -11,8 +11,9 @@ from .serializers import (
     PropertyImagesSerializer, 
     CreatePropertySerializer,
     PropertyFinancialsSerializer,
-    TokenSerializer
-
+    TokenSerializer,
+    TransactionSerializer,
+    PropertyTokenPaymentSerializer
 )
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
@@ -92,6 +93,17 @@ class PropertyDetailView(ConditionalPermissionMixin, APIView):
             serializer = AllDetailsPropertySerializer(property)
         elif view_type == 'activity':
             serializer = PropertyFinancialsSerializer(property)
+        elif view_type == 'payment':
+            # Serialize property details
+            property_serializer = PropertyTokenPaymentSerializer(property)
+            # Serialize financial details separately
+            financials_serializer = PropertyFinancialsSerializer(property)
+            
+            # Combine the data
+            data = property_serializer.data
+            data['financials_details'] = financials_serializer.data
+
+            return Response(data)
         else:
             return Response({'detail': 'Invalid view type'}, status=400)
         
@@ -116,6 +128,7 @@ class PropertyCreateUpdateView(APIView):
             print(f"Owner Profile found: ID {owner_profile.id} for user ID {user_id}")
         except PropertyOwnerProfile.DoesNotExist:
             return Response({'error': f'Owner profile not found for user ID {user_id}.'}, status=404)
+        
         data['owner_profile'] = owner_profile.id
         serializer = CreatePropertySerializer(data=data, context={'request': request})
         if serializer.is_valid():
@@ -125,7 +138,13 @@ class PropertyCreateUpdateView(APIView):
                     id=serializer.validated_data.get('id'),  # Usar el ID si está disponible
                     defaults={**serializer.validated_data, 'owner_profile': owner_profile, 'owner_fields_completed': True}
                 )
-                return Response({'message': 'Property data saved successfully. Awaiting admin review.'}, status=200)
+                
+                property_serializer = PropertySerializerList(property_instance)
+                
+                return Response({
+                    'message': 'Property data saved successfully. Awaiting admin review.',
+                    'property': property_serializer.data  # Incluye la propiedad en la respuesta
+                }, status=200)
             return Response({'error': 'Only owners can create properties.'}, status=403)
 
         return Response(serializer.errors, status=400)
@@ -196,3 +215,67 @@ class TokenListView(APIView):
             serializer.save()  # Guarda el nuevo token si los datos son válidos
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class TransactionListview(APIView):
+    authentication_classes = [Auth0JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = TransactionSerializer
+
+    def get(self,request):
+        transactions = Transaction.objects.all()
+        serializer = self.serializer_class(transactions, many=True)
+        return Response(serializer.data, status = status.HTTP_200_OK)
+    
+    def post(self, request):
+        tokens_amount = int(request.data["token_amount"])
+        property_id = request.data["property_id"]
+
+        if not property_id:
+            return Response({'error': 'Property ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if tokens_amount > 10000: 
+            #THE TOTAL TOKENS -----
+            return Response({
+                'error': 'You cannot buy more than 10000 tokens. If you need further information, please contact us, thank you.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        property_instance = get_object_or_404(Property, id=property_id)
+        tokens_property = property_instance.tokens.all()
+
+        if tokens_property.exists():
+            selected_token = tokens_property.first()
+        else:
+            return Response({'error': 'No tokens found for this property'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Check if enough tokens are available
+        if selected_token.tokens_available < tokens_amount:
+            return Response({'error': 'Not enough tokens available'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Reduce the available tokens
+        selected_token.tokens_available -= tokens_amount
+        selected_token.save()
+
+        # Create the transaction
+        transaction = Transaction.objects.create(
+            property_id=property_instance,
+            transaction_owner_code=request.user,
+            transaction_amount=tokens_amount,
+            token_code=selected_token,
+            event=Transaction.Event.BUY
+        )
+
+        # Register or update the PropertyToken
+        property_token, created = PropertyToken.objects.get_or_create(
+            property_code=property_instance,
+            token_code=selected_token,
+            owner_user_code=request.user,
+            defaults={'number_of_tokens': tokens_amount}
+        )
+
+        if not created:
+            property_token.number_of_tokens += tokens_amount
+            property_token.save()
+
+        return Response({'message': 'Transaction completed successfully'}, status=status.HTTP_201_CREATED)
+        
+
+

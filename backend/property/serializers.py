@@ -1,8 +1,11 @@
 from rest_framework import serializers
 from property.models import(
     Property,
-    Token
+    Token,
+    Transaction
 )
+
+#SERIALZERS FOR TOKENS 
 
 class TokenSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,6 +24,7 @@ class PropertySerializerList(serializers.ModelSerializer):
                     'bedrooms', 'bathrooms', 'price', 'size', 'year_built',
                     'country', 'description','amenities', 'tokens'
                 ]
+        
 #SERIALZIZERS FOR SINGLE PORPERTY PAGE AND OVERVIEW, FINATIAL, DOCUMENTS, ACTIVITY AND IMAEGES
 class PropertyImagesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -33,7 +37,7 @@ class AllDetailsPropertySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class PropertyOverviewSerializer(serializers.ModelSerializer):
-    amenities = serializers.JSONField()  # Adjust according to your model's field type
+    amenities = serializers.JSONField()  
     
     class Meta:
         model = Property
@@ -52,7 +56,6 @@ class PropertyOverviewSerializer(serializers.ModelSerializer):
             'property_type',
             'projected_annual_return'
         ]
-
 
 class PropertyFinancialsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -74,7 +77,20 @@ class PropertyFinancialsSerializer(serializers.ModelSerializer):
             "annual_cash_flow",
             "monthly_cash_flow",
             "projected_annual_cash_flow",
-            "legal_documents_url"
+            "legal_documents_url",
+        ]
+
+
+class PropertyTokenPaymentSerializer(serializers.ModelSerializer):
+    tokens = TokenSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Property
+        fields = [
+                'id', 'title', 'location', 'image', 
+                'property_type',
+                'price',
+                'country', 'tokens'
         ]
 
 #SERIALIZER TO CREATE A PROPERTY, TWO STEPS, OWNER FILL BASIC DATA AND ADMIN FILL THE FINANCTIAL DATA
@@ -139,5 +155,11 @@ class CreatePropertySerializer(serializers.ModelSerializer):
 
 
 
-#SERIALZERS FOR TOKENS 
+#SERIALIZER FOR TRANSACTIONS
+
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = '__all__'
+
 

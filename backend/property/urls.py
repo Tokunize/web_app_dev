@@ -5,7 +5,8 @@ from .views import (
     PropertyDetailView,
     PropertyFilterView,
     PublicPropertyList,
-    TokenListView
+    TokenListView,
+    TransactionListview
 )
 
 urlpatterns = [
@@ -21,4 +22,7 @@ urlpatterns = [
 
     #TOKEN - GET AND POST URL
     path('tokens/', TokenListView.as_view(), name='token-list'), 
+
+    #TRANSACTIOS GET AND POST
+    path('transactions/', TransactionListview.as_view(), name='transactions-list')
 ]

@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageUploader } from '@/components/property/imageUploader';
 import ImageGallery from '@/components/property/imageGallery';
-import { TokenForm } from '@/components/tokenForm';
+import { TokenForm } from '@/components/forms/tokenForm';
 
 export const DashboardProperty: React.FC = () => {
   const { propertyId } = useParams<{ propertyId: string }>();
