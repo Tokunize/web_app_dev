@@ -184,3 +184,10 @@ REST_FRAMEWORK = {
 
 
 
+import os
+
+print("DATABASE_NAME:", os.getenv('DATABASE_NAME'))
+print("DATABASE_USER:", os.getenv('DATABASE_USER'))
+print("DATABASE_PWD:", os.getenv('DATABASE_PWD'))
+print("DATABASE_HOST:", os.getenv('DATABASE_HOST'))
+print("DATABASE_PORT:", os.getenv('DATABASE_PORT'))
