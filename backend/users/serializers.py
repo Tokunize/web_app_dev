@@ -12,7 +12,6 @@ class InvestorProfileSerializer(serializers.ModelSerializer):
         model = InvestorProfile
         fields = ['total_investment']
 
-# Diccionario de mapeo de roles a perfiles
 ROLE_PROFILE_MAPPING = {
     'owner': PropertyOwnerProfileSerializer,
     'investor': InvestorProfileSerializer,
@@ -41,10 +40,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         password = validated_data.pop('password', None)
 
-        # Crea el usuario con los datos validados
         user = CustomUser.objects.create_user(**validated_data)
         
-        # Establece la contraseña solo si se proporciona
         if password:
             user.set_password(password)
             user.save()
@@ -54,11 +51,9 @@ class CustomUserSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         password = validated_data.pop('password', None)
         
-        # Actualiza los campos del usuario
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         
-        # Establece la contraseña solo si se proporciona
         if password:
             instance.set_password(password)
         
@@ -72,3 +67,5 @@ class CustomUserSerializer(serializers.ModelSerializer):
             if profile:
                 return profile_class(profile).data
         return None
+
+

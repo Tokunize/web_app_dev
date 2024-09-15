@@ -282,17 +282,23 @@ class TransactionListview(APIView):
         
 
 
-#GET ALL THE PROPERTIES A INVESTOR INVESTED 
+class SinglePropertyTransactionListView(APIView):
+    authentication_classes = [Auth0JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = TransactionSerializer
 
-# class InvestedProperties(APIView):
-#     authentication_classes = [Auth0JWTAuthentication]
-#     permission_classes = [IsAuthenticated]
+    def get(self,request,property_id):
+        user_id = request.user.id
+        
+        # Filtrar transacciones por usuario y propiedad
+        transactions = Transaction.objects.filter(
+            transaction_owner_code=user_id, 
+            property_id=property_id
+        )
+        
+        serializer = self.serializer_class(transactions, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
-#     def get(self,request):
-#         print(request.user.id)
-
-#         return Response({"yes": "yess"}, status=status.HTTP_200_OK)
-
 
 class InvestedProperties(APIView):
     authentication_classes = [Auth0JWTAuthentication]
@@ -303,10 +309,11 @@ class InvestedProperties(APIView):
         user_id = request.user.id
         print(user_id)
         
-        # Obtener todas las propiedades en las que el usuario ha invertido a través de transacciones
         properties = Property.objects.filter(transactions__transaction_owner_code_id=user_id).distinct()
 
-        # Serializar las propiedades, pasando el contexto para obtener los tokens del usuario
         serializer = self.serializer_class(properties, many=True, context={'request': request})
         
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+

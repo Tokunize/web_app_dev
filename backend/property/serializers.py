@@ -176,7 +176,7 @@ class InvestedPropertiesSerialier(serializers.ModelSerializer):
 
     class Meta:
         model = Property
-        fields = ['title', 'tokens', 'user_tokens']
+        fields = ['id','title', 'tokens', 'user_tokens']
 
     def get_user_tokens(self, obj):
         # Obtener el usuario actual del contexto
