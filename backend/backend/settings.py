@@ -56,7 +56,7 @@ INSTALLED_APPS = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000", 
-    "https://seahorse-app-nbf4g.ondigitalocean.app/"
+    "https://seahorse-app-nbf4g.ondigitalocean.app"
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 
