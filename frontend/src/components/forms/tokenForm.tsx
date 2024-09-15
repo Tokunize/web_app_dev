@@ -6,8 +6,11 @@ import axios from "axios";
 import { useAuth0 } from '@auth0/auth0-react';
 
 interface TokenFormProps {
-    propertyId: number; 
+  propertyId: number; 
+  onNext: () => void; 
+  onBack: () => void; 
 }
+
 
 interface FormData {
   token_code: string;
@@ -16,7 +19,7 @@ interface FormData {
   tokens_available: number | string;
 }
 
-export const TokenForm: React.FC<TokenFormProps> = ({ propertyId }) => {
+export const TokenForm: React.FC<TokenFormProps> = ({ propertyId,OnNext,onBack }) => {
   const { getAccessTokenSilently } = useAuth0();  // Acceso al método para obtener el token
   const [formData, setFormData] = useState<FormData>({
     token_code: '',
@@ -69,7 +72,7 @@ export const TokenForm: React.FC<TokenFormProps> = ({ propertyId }) => {
   };
 
   return (
-    <section className="p-6 bg-white shadow-md rounded-md max-w-md mx-auto">
+    <section className="p-6 bg-white shadow-md rounded-md ">
       <h1 className="text-xl font-bold mb-4">Create Token</h1>
       <form onSubmit={handleSubmit}>
         {/* Token Code */}
@@ -133,6 +136,8 @@ export const TokenForm: React.FC<TokenFormProps> = ({ propertyId }) => {
           <Button type="submit" className="w-full mr-2">
             Create Token
           </Button>
+          <Button type="button" onClick={onBack}>Back</Button>
+          {/* <Button type="button" onClick={OnNext}>Next</Button> */}
         </div>
       </form>
     </section>

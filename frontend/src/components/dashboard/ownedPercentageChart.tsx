@@ -13,27 +13,34 @@ import {
 interface OwnedPercentageChartProps {
   totalTokens: number;
   myTokens: number;
-  title: string
-  tokenAvailable: number
+  title: string;
+  tokenAvailable: number;
 }
 
-export const OwnedPercentageChart: React.FC<OwnedPercentageChartProps> = ({ totalTokens, myTokens,title,tokenAvailable }) => {
+export const OwnedPercentageChart: React.FC<OwnedPercentageChartProps> = ({
+  totalTokens,
+  myTokens,
+  title,
+  tokenAvailable,
+}) => {
+  const percentageAvailable =
+    totalTokens > 0 ? (tokenAvailable / totalTokens) * 100 : 0;
   const percentageOwned = totalTokens > 0 ? (myTokens / totalTokens) * 100 : 0;
-  const percentageOthers = 100 - percentageOwned;
+  const percentageOthers = 100 - (percentageAvailable + percentageOwned);
 
   // Define chart data
   const chartData = [
-    { category: "My Tokens", value: percentageOwned, fill: "#4a90e2" }, // Custom color
-    { category: "Tokens Available", value: tokenAvailable, fill: "#2EB88A" }, // Custom color
-    { category: "Other Investors", value: percentageOthers, fill: "#E88D30" }, // Custom color
+    { category: "My Tokens", value: percentageOwned, fill: "#E88D30" }, // Custom color
+    { category: "Other Investors", value: percentageOthers, fill: "#4a90e2" }, // Custom color
+    { category: "Tokens Available", value: percentageAvailable, fill: "#2EB88A" }, // Custom color
   ];
 
   // Get current date
   const currentDate = new Date();
-  const formattedDate = currentDate.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+  const formattedDate = currentDate.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 
   return (
@@ -43,14 +50,17 @@ export const OwnedPercentageChart: React.FC<OwnedPercentageChartProps> = ({ tota
         <CardDescription>Updated on {formattedDate}</CardDescription>
       </CardHeader>
       <CardContent className="flex items-center pb-0">
-        <div className="mx-auto aspect-square max-h-[250px]" style={{ height: '250px', width: '250px' }}>
+        <div
+          className="mx-auto aspect-square max-h-[250px]"
+          style={{ height: "250px", width: "250px" }}
+        >
           <PieChart width={250} height={250}>
             <Pie
               data={chartData}
               dataKey="value"
               nameKey="category"
-              innerRadius={70}  // Increase this value to make the inner radius larger
-              outerRadius={110}  // Increase this value to make the outer radius larger
+              innerRadius={70} // Increase this value to make the inner radius larger
+              outerRadius={110} // Increase this value to make the outer radius larger
               strokeWidth={5}
             >
               <Label
@@ -87,18 +97,20 @@ export const OwnedPercentageChart: React.FC<OwnedPercentageChartProps> = ({ tota
           </PieChart>
         </div>
         <div className="mt-4">
-            <ul className="list-disc pl-5">
-              {chartData.map((item, index) => (
-                <li key={index} className="flex items-center gap-2">
-                  <div
-                    className="h-4 w-4 rounded-sm"
-                    style={{ backgroundColor: item.fill }}
-                  />
-                  <span className="text-sm">{item.category}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <ul className="list-disc pl-5">
+            {chartData.map((item, index) => (
+              <li key={index} className="flex items-center gap-2">
+                <div
+                  className="h-4 w-4 rounded-sm"
+                  style={{ backgroundColor: item.fill }}
+                />
+                <span className="text-sm">
+                  {item.category} - {item.value.toFixed(1)}%
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="leading-none text-muted-foreground">
