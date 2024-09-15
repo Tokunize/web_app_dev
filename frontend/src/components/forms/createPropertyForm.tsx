@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import useFetchPropertyDetails from '@/components/property/getDetailsHook';
@@ -8,9 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageUploader } from '@/components/property/imageUploader';
 import ImageGallery from '@/components/property/imageGallery';
-import { TokenForm } from '@/components/forms/tokenForm';
 
-export const DashboardProperty: React.FC = () => {
+export const CreatePropertyForm: React.FC<{ onNext: () => void }> = ({ onNext }) => {
   const { propertyId } = useParams<{ propertyId: string }>();
   const numericPropertyId = propertyId ? parseInt(propertyId, 10) : 0;
   const viewType = 'all';
@@ -49,7 +49,7 @@ export const DashboardProperty: React.FC = () => {
     projected_annual_cash_flow: 0,
     projected_annual_return:0,
     legal_documents_url: '',
-    status: 'draft', // Default status
+    status: 'draft', 
   });
 
   useEffect(() => {
@@ -111,9 +111,8 @@ export const DashboardProperty: React.FC = () => {
 
   return (
     <section>
-      <h3>Create the Tokens For this property</h3>
-      <TokenForm propertyId={formValues.id || ''} />
-      <form onSubmit={handleSubmit} className="w-[70%] mx-auto">
+      {/* <TokenForm propertyId={formValues.id || ''} /> */}
+      <form onSubmit={handleSubmit} className="w-[90%] mx-auto">
         <h2 className="font-bold">Property Information</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-4">
           <label>
@@ -403,7 +402,8 @@ export const DashboardProperty: React.FC = () => {
           />
         </label>
         
-        <Button type="submit">Submit</Button>
+        <Button className='w-full my-5' type="submit">Submit</Button>
+        <Button type="button" onClick={onNext} className='w-full my-5'>Next</Button>
       </form>
     </section>
   );

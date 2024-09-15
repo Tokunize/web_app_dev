@@ -52,7 +52,7 @@ export const Transaction = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-4">My Transactions</h2>
+      <h2 className="text-xl font-bold mb-4">All Transactions</h2>
       {transactions.length > 0 ? (
         <TransactionTable transactions={transactions} />
       ) : (

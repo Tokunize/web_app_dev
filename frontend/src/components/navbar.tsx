@@ -66,15 +66,14 @@ export const Navbar = () => {
   }, [isAuthenticated, user, role, getAccessTokenSilently]);
 
 
-  // Determine the appropriate links based on user role
-  const renderAuthenticatedLinks = useMemo(() => {
-    if (role === "owner" || role === "admin") {
-      return <Link to="/dashboard">Dashboard</Link>;
-    } else if (role === "investor") {
-      return <Link to="/investment-dashboard">Dashboard</Link>;
-    }
-    return null;
-  }, [role]);
+  // const renderAuthenticatedLinks = useMemo(() => {
+  //   if (role === "owner" || role === "admin") {
+  //     return <Link to="/overview/">Dashboard</Link>;
+  //   } else if (role === "investor") {
+  //     return <Link to="/dashboard">Dashboard</Link>;
+  //   }
+  //   return null;
+  // }, [role]);
 
   // Navbar background class based on scroll position
   const navbarClasses = useMemo(
@@ -96,7 +95,7 @@ export const Navbar = () => {
         <Link to="/learn">Learn</Link>
         {isAuthenticated ? (
           <>
-            {renderAuthenticatedLinks}
+            <Link to="/overview/">Dashboard</Link>
             <LogoutButton />
           </>
         ) : (
@@ -120,7 +119,7 @@ export const Navbar = () => {
               <Link to="/learn">Learn</Link>
               {isAuthenticated ? (
                 <>
-                  {renderAuthenticatedLinks}
+                  <Link to="/overview/">Dashboard</Link>
                   <LogoutButton />
                 </>
               ) : (
