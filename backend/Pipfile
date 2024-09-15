@@ -17,6 +17,7 @@ gunicorn = "*"
 faker = "*"
 requests = "*"
 cryptography = "*"
+python-decouple = "*"
 
 [dev-packages]
 
