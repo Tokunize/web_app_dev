@@ -7,7 +7,7 @@ from .serializers import CustomUserSerializer
 from rest_framework import status
 from .authentication import Auth0JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
-
+from .utils import get_total_invested, get_total_tokens_owned
 
 class SyncUserView(APIView):
     authentication_classes = [Auth0JWTAuthentication]
@@ -63,3 +63,24 @@ class UserProfileView(APIView):
         serializer = CustomUserSerializer(user)
         return Response(serializer.data)
 
+
+class UserInvestmentSummaryAPIView(APIView):
+    authentication_classes = [Auth0JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user_id = request.user.id
+        try:
+            user = CustomUser.objects.get(pk=user_id)
+        except CustomUser.DoesNotExist:
+            return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        total_invested = get_total_invested(user)
+        total_tokens_owned = get_total_tokens_owned(user)
+        
+        data = {
+            'total_invested': str(total_invested),  # Convertir a string para evitar problemas con la serialización de Decimal
+            'total_tokens_owned': total_tokens_owned
+        }
+        
+        return Response(data, status=status.HTTP_200_OK)
