@@ -106,9 +106,9 @@ DATABASES = {
         'PASSWORD': config('DATABASE_PWD'),
         'HOST': config('DATABASE_HOST'),
         'PORT': config('DATABASE_PORT', cast=int),
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
+        # 'OPTIONS': {
+        #     'sslmode': 'require',
+        # },
     }
 }
 
@@ -159,13 +159,13 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-SECRET_KEY = 'your-secret-key'  # Asegúrate de tener una clave secreta
+SECRET_KEY = 'your-secret-key'  
 ALGORITHM = 'RS256'
 
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'users.authentication.Auth0JWTAuthentication',  # Reemplaza esto con la ruta correcta
+        'users.authentication.Auth0JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -173,21 +173,3 @@ REST_FRAMEWORK = {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-import os
-
-print("DATABASE_NAME:", os.getenv('DATABASE_NAME'))
-print("DATABASE_USER:", os.getenv('DATABASE_USER'))
-print("DATABASE_PWD:", os.getenv('DATABASE_PWD'))
-print("DATABASE_HOST:", os.getenv('DATABASE_HOST'))
-print("DATABASE_PORT:", os.getenv('DATABASE_PORT'))
