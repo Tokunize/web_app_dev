@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     'rest_framework', #Django REST Framework
     'corsheaders', #CORS]
     'django_filters',
-    'users'
+    'users',
+    'blog'
 ]
 
 
@@ -162,6 +163,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SECRET_KEY = 'your-secret-key'  
 ALGORITHM = 'RS256'
 
+# settings.py
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -170,6 +172,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,  
 }
+
 
 

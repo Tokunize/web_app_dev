@@ -1,20 +1,17 @@
 import React, { useState } from 'react';
 
-const cloudName = 'dhyrv5g3w';
-const uploadPreset = 'ptwmh2mt';
-
 interface ImageFile {
   file: File;
   previewUrl: string;
-  publicId?: string; 
+  publicId?: string; // Este campo se utilizará solo si subimos a Cloudinary en el futuro
 }
 
 interface ImageUploaderProps {
-  onImagesUploaded: (urls: string[]) => void; 
-  onImageRemoved: (publicId: string) => void; 
+  onImagesSelected: (files: File[]) => void; // Notificar al componente padre sobre los archivos seleccionados
+  onImageRemoved: (index: number) => void; // Notificar al componente padre sobre la eliminación de una imagen
 }
 
-export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUploaded, onImageRemoved }) => {
+export const ImageUploaderBlog: React.FC<ImageUploaderProps> = ({ onImagesSelected, onImageRemoved }) => {
   const [files, setFiles] = useState<ImageFile[]>([]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,62 +35,12 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUploaded, 
       previewUrl: URL.createObjectURL(file),
     }));
     setFiles((prevFiles) => [...prevFiles, ...filePreviews]);
+    onImagesSelected([...files.map(f => f.file), ...newFiles]); // Notificar al componente padre sobre los archivos seleccionados
   };
 
   const removeFile = (index: number) => {
-    const fileToRemove = files[index];
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
-    
-    // If the file was uploaded, delete it from Cloudinary
-    if (fileToRemove.publicId) {
-      console.log("eliminaaaado");
-      
-      deleteFromCloudinary(fileToRemove.publicId);
-      onImageRemoved(fileToRemove.publicId); // Notify parent
-    }
-  };
-
-  const uploadToCloudinary = async (file: File) => {
-    const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', uploadPreset);
-
-    const response = await fetch(url, { method: 'POST', body: formData });
-    if (response.ok) {
-      const data = await response.json();
-      return data;
-    } else {
-      throw new Error('Failed to upload image');
-    }
-  };
-
-  const deleteFromCloudinary = async (publicId: string) => {
-    const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/destroy`;
-    const formData = new FormData();
-    formData.append('public_id', publicId);
-    formData.append('api_key', 'your_api_key'); // Replace with your Cloudinary API key
-    formData.append('upload_preset', uploadPreset);
-
-    const response = await fetch(url, { method: 'POST', body: formData });
-    if (!response.ok) {
-      console.error('Failed to delete image from Cloudinary');
-    }
-  };
-
-  const handleUpload = async () => {
-    if (files.length > 0) {
-      try {
-        const uploadPromises = files.map(async ({ file }) => {
-          const data = await uploadToCloudinary(file);
-          return data.secure_url;
-        });
-        const uploadedUrls = await Promise.all(uploadPromises);
-        onImagesUploaded(uploadedUrls);
-      } catch (error) {
-        console.error('Error uploading images:', error);
-      }
-    }
+    onImageRemoved(index); // Notificar al componente padre sobre la eliminación de la imagen
   };
 
   return (
@@ -145,17 +92,6 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUploaded, 
           </div>
         </div>
       )}
-
-      {files.length > 0 && (
-        <button
-          type="button"
-          className="mt-6 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none transition-colors duration-300"
-          onClick={handleUpload}
-        >
-          Upload All
-        </button>
-      )}
     </div>
   );
 };
-

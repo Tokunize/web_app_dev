@@ -28,7 +28,7 @@ const DashboardLayout: React.FC = () => {
   ]:[];
 
   return (
-    <div className="flex h-screen">
+    <div className="flex min-h-screen ">
       <SideMenu data={menuData} onMenuClick={() => {}} />
       <div className="flex-grow p-5">
         <Outlet />

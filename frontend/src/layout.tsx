@@ -6,7 +6,6 @@ import { Toaster } from "./components/ui/toaster";
 import { SignUpPage } from "./views/signUpPage";
 import { UserProvider } from "./context/userProvider";
 import ProtectedRoute from "./protectedRoutes";
-import { CreatePropertyForm } from "./components/forms/createPropertyForm";
 import CreatePropertyController from "./components/dashboard/createPropertyController";
 import { PaymentPage } from "./views/paymentPage";
 import DashboardLayout from "./dashboardLayout";
