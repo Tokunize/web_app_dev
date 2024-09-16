@@ -92,7 +92,7 @@ export const Navbar = () => {
 
       <div className="hidden md:flex items-center space-x-4 mr-10">
         <Link to="/">Home</Link>
-        <Link to="/learn">Learn</Link>
+        <Link to="/blog/">Learn</Link>
         {isAuthenticated ? (
           <>
             <Link to="/overview/">Dashboard</Link>
@@ -116,7 +116,7 @@ export const Navbar = () => {
           <SheetContent side="right">
             <div className="flex flex-col space-y-4">
               <Link to="/">Home</Link>
-              <Link to="/learn">Learn</Link>
+              <Link to="/blog/">Learn</Link>
               {isAuthenticated ? (
                 <>
                   <Link to="/overview/">Dashboard</Link>

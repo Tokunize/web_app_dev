@@ -21,7 +21,11 @@ const DashboardLayout: React.FC = () => {
     { name: 'My Investments', link: '/investments/' },
     { name: 'My Transactions', link: '/transactions/' },
     { name: 'Settings', link: '/dashboard/settings' },
-  ] : [];
+  ] : role === "blog-admin" ? [
+    { name: 'Overview', link: '/overview/' },
+    { name: 'All Articles', link: '/articles-list/' },
+    { name: 'Create Articles', link: '/create-article/' },
+  ]:[];
 
   return (
     <div className="flex h-screen">
