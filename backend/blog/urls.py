@@ -6,7 +6,8 @@ from .views import(
     DeleteArticleView,
     PublicArticleListView,
     WeeklyVisitStatsView,
-    delete_image
+    delete_image,
+    SubscriberListCreateView
 )
 
 urlpatterns = [
@@ -14,6 +15,7 @@ urlpatterns = [
     path('articles/public/', PublicArticleListView.as_view(), name='articles-list-public'),
     path('articles/stats/', WeeklyVisitStatsView.as_view(), name='blog_statistics'),
     path('delete-image/', delete_image, name='delete_image'),
+    path('subscriber/', SubscriberListCreateView.as_view(), name='subscriber-list-create'),
 
 
 
