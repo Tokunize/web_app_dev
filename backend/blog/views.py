@@ -1,10 +1,14 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Article
+from .models import Article, DailyVisit
 from .serializers import ArticleSerializer
 from users.authentication import Auth0JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.utils import timezone
+from django.db.models import F
+
+from datetime import timedelta
 
 class ArticleListView(APIView):
     authentication_classes = [Auth0JWTAuthentication]
@@ -23,10 +27,14 @@ class ArticleListView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class PublicArticleListView(APIView):
-    permission_classes = [AllowAny]  
+    permission_classes = [AllowAny]
+    
     def get(self, request):
+        DailyVisit.increment_visits()
+
         articles = Article.objects.all()
         serializer = ArticleSerializer(articles, many=True)
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class SingleArticleView(APIView):
@@ -34,13 +42,16 @@ class SingleArticleView(APIView):
 
     def get(self, request, pk):
         try:
+            # Use update() with F() expression for safe concurrent updates
+            Article.objects.filter(pk=pk).update(views=F('views') + 1)
+            
+            # Fetch the updated article to serialize
             article = Article.objects.get(pk=pk)
+            
+            serializer = ArticleSerializer(article)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except Article.DoesNotExist:
             return Response({"detail": "Article not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = ArticleSerializer(article)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
 
 class DeleteArticleView(APIView):
     authentication_classes = [Auth0JWTAuthentication]
@@ -59,7 +70,7 @@ class DeleteArticleView(APIView):
 
         article.delete()
         return Response({"detail": "Article deleted."}, status=status.HTTP_204_NO_CONTENT)
-    
+
 class EditArticleView(APIView):
     authentication_classes = [Auth0JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -81,4 +92,22 @@ class EditArticleView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-   
+class WeeklyVisitStatsView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        today = timezone.now().date()
+        start_date = today - timedelta(days=6)  
+
+        visits = DailyVisit.objects.filter(date__range=[start_date, today])
+        visit_data = {
+            "dates": [visit.date.strftime('%Y-%m-%d') for visit in visits],
+            "visits": [visit.visits for visit in visits]
+        }
+
+        total_articles = Article.objects.count()
+
+        return Response({
+            "visit_data": visit_data,
+            "total_articles": total_articles
+        }, status=status.HTTP_200_OK)

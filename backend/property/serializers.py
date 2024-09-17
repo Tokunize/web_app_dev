@@ -161,9 +161,7 @@ class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = '__all__'
-
-#
-        
+ 
 
 class PropertyTokenSerializer(serializers.ModelSerializer):
     class Meta:
@@ -176,13 +174,28 @@ class InvestedPropertiesSerialier(serializers.ModelSerializer):
 
     class Meta:
         model = Property
-        fields = ['id','title', 'tokens', 'user_tokens']
+        fields = ['id','title', 'tokens', 'user_tokens',
+            "total_investment_value", 
+            "underlying_asset_price",
+            "closing_costs",
+            "upfront_fees",
+            "operating_reserve",
+            "projected_annual_yield",
+            "projected_rental_yield", 
+            "projected_annual_return",
+            "annual_gross_rents",
+            "property_taxes",
+            "homeowners_insurance",
+            "property_management",
+            "dao_administration_fees",
+            "annual_cash_flow",
+            "monthly_cash_flow",
+            "projected_annual_cash_flow",
+            "legal_documents_url",
+        ]
 
     def get_user_tokens(self, obj):
-        # Obtener el usuario actual del contexto
-        user = self.context['request'].user
-        
-        # Obtener la cantidad de tokens que el usuario posee para esta propiedad
+        user = self.context['request'].user        
         property_tokens = PropertyToken.objects.filter(
             property_code=obj,
             owner_user_code=user

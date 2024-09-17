@@ -1,44 +1,51 @@
 import React from 'react';
-import arrowUrl from "../../assets/arrowUrl.svg"
+import arrowUrl from "../../assets/arrowUrl.svg";
 import { useNavigate } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 
 
 interface BlogCardProps {
-  imageUrl: string; 
+  imageUrl: string;
   title: string;
   description: string;
   day_posted: string;
-  article_id:number
+  article_id: number;
 }
 
-export const BlogCard: React.FC<BlogCardProps> = ({ imageUrl, title, description,article_id, day_posted }) => {
-  const navigate = useNavigate()
+export const BlogCard: React.FC<BlogCardProps> = ({ imageUrl, title, description, article_id, day_posted }) => {
+  const navigate = useNavigate();
   const formattedDate = new Date(day_posted).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   });
 
+  const sanitizedDescription = DOMPurify.sanitize(description);
 
 
   return (
-    <article className="flex flex-col my-5 md:flex-row overflow-hidden transition-transform duration-300 hover:scale-105">
+    <article className="flex flex-col my-5 overflow-hidden transition-transform duration-300">
       <aside className="w-full h-[300px]">
         <img
           alt={title}
-          src={imageUrl} 
+          src={imageUrl}
           className="w-full h-full object-cover rounded-lg"
         />
       </aside>
-      <div className="w-full p-6 flex flex-col justify-between">
+      <div className="p-6 flex flex-col justify-between">
         <header>
           <p className="text-[#ADD244] font-bold">Investing fundamentals</p>
-          <div className="flex justify-between items-start">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">{title}</h2>
-            <img alt='arrow-url-redirect' onClick={()=>navigate(`article/${article_id}`)} src={arrowUrl} />
+          <div className="flex justify-between items-start mb-2">
+            <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
+            <img
+              alt='arrow-url-redirect'
+              onClick={() => navigate(`article/${article_id}`)}
+              src={arrowUrl}
+              className="cursor-pointer"
+            />
           </div>
-          <p className="text-gray-600 mb-4">
-            {description}
+          <p className="text-gray-600 mb-4 line-clamp-3">
+            <span dangerouslySetInnerHTML={{ __html: sanitizedDescription }} />
           </p>
         </header>
         <footer>
