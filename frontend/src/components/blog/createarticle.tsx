@@ -1,10 +1,10 @@
-
-import { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, ChangeEvent, FormEvent } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
 import { ImageUploaderBlog } from './imageUploaderBlog';
+import ImageGallery from '../property/imageGallery';
 
 interface Article {
   title: string;
@@ -12,7 +12,9 @@ interface Article {
   first_section: string;
   second_section: string;
   third_section: string;
+  image_urls?: { url: string; publicId: string }[];
 }
+
 
 const modules = {
   toolbar: [
@@ -27,13 +29,17 @@ const modules = {
   ]
 };
 
-const CreateArticle = () => {
-  const { getAccessTokenSilently } = useAuth0();
+interface CreateArticleProps {
+  article?: Article;
+  onClose: () => void;
+}
 
+const CreateArticle: React.FC<CreateArticleProps> = ({ article, onClose }) => {
+  const { getAccessTokenSilently } = useAuth0();
   const cloudName = 'dhyrv5g3w';
   const uploadPreset = 'ptwmh2mt';
 
-  const [article, setArticle] = useState<Article>({
+  const [articleData, setArticleData] = useState<Article>(article || {
     title: "",
     subtitle: "",
     first_section: "",
@@ -41,15 +47,16 @@ const CreateArticle = () => {
     third_section: ""
   });
 
-  const [images, setImages] = useState<File[]>([]); // Lista de archivos seleccionados
+  const [images, setImages] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<{ url: string; publicId: string }[]>(article?.image_urls || []);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setArticle(prev => ({ ...prev, [name]: value }));
+    setArticleData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleQuillChange = (name: string, value: string) => {
-    setArticle(prev => ({ ...prev, [name]: value }));
+    setArticleData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleImageSelected = (files: File[]) => {
@@ -61,7 +68,7 @@ const CreateArticle = () => {
   };
 
   const handleReset = () => {
-    setArticle({
+    setArticleData({
       title: "",
       subtitle: "",
       first_section: "",
@@ -82,28 +89,49 @@ const CreateArticle = () => {
     const response = await fetch(url, { method: 'POST', body: formData });
     if (response.ok) {
       const data = await response.json();
-      return data.secure_url;
+      return { url: data.secure_url, publicId: data.public_id };
     } else {
       throw new Error('Failed to upload image');
     }
   };
 
+  const deleteFromCloudinary = async (publicId: string) => {
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_APP_BACKEND_URL}blog/delete-image/`, {
+        public_id: publicId,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      return response.data.success; // Retorna true si la eliminación fue exitosa
+    } catch (error) {
+      console.error('Error eliminando la imagen:', error);
+      return false;
+    }
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const imageUrls: string[] = [];
+    const imageUrls: { url: string; publicId: string }[] = [];
 
     try {
-      // Subir todas las imágenes y recoger sus URLs
+      // Subir nuevas imágenes
       for (const file of images) {
-        const url = await uploadToCloudinary(file);
-        imageUrls.push(url);
+        const { url, publicId } = await uploadToCloudinary(file);
+        imageUrls.push({ url, publicId });
       }
 
-      const articleData = {
-        ...article,
-        image_urls: imageUrls, 
-        slug: article.title.toLowerCase().replace(/ /g, '-'),
+      // Combinar imágenes existentes (sin las eliminadas) con las nuevas imágenes
+      const updatedImageUrls = existingImages.concat(imageUrls);
+      
+      const articleDataToSave = {
+        ...articleData,
+        image_urls: updatedImageUrls,
+        slug: articleData.title.toLowerCase().replace(/ /g, '-'),
       };
+
       const accessToken = await getAccessTokenSilently();
 
       const config = {
@@ -114,14 +142,49 @@ const CreateArticle = () => {
       };
 
       try {
-        const response = await axios.post(`${import.meta.env.VITE_APP_BACKEND_URL}blog/articles/`, articleData, config);
-        console.log(response.data);
+        if (article) {
+          await axios.put(`${import.meta.env.VITE_APP_BACKEND_URL}blog/articles/${article.id}/edit/`, articleDataToSave, config);
+        } else {
+          await axios.post(`${import.meta.env.VITE_APP_BACKEND_URL}blog/articles/`, articleDataToSave, config);
+        }
         handleReset();
+        onClose();
       } catch (error) {
         console.error("Error saving article:", error);
       }
     } catch (error) {
       console.error("Error uploading images:", error);
+    }
+  };
+
+  const handleDeleteImage = async (publicId: string, e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    try {
+      const success = await deleteFromCloudinary(publicId);
+      if (success) {
+        const updatedImages = existingImages.filter(img => img.publicId !== publicId);
+        setExistingImages(updatedImages);
+
+        const accessToken = await getAccessTokenSilently();
+        const articleDataToSave = {
+          ...articleData,
+          image_urls: updatedImages,
+          slug: articleData.title.toLowerCase().replace(/ /g, '-'),
+        };
+
+        const config = {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        };
+
+        await axios.put(`${import.meta.env.VITE_APP_BACKEND_URL}blog/articles/${article?.id}/edit/`, articleDataToSave, config);
+        console.log('Artículo actualizado con éxito.');
+      }
+    } catch (error) {
+      console.error("Error deleting image:", error);
     }
   };
 
@@ -136,7 +199,7 @@ const CreateArticle = () => {
             type="text"
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500"
             placeholder="Enter Article Title"
-            value={article.title}
+            value={articleData.title}
             onChange={handleInputChange}
             required
           />
@@ -149,7 +212,7 @@ const CreateArticle = () => {
             type="text"
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500"
             placeholder="Enter Article Subtitle"
-            value={article.subtitle}
+            value={articleData.subtitle}
             onChange={handleInputChange}
             required
           />
@@ -163,7 +226,7 @@ const CreateArticle = () => {
           name="first_section"
           className="mt-1 bg-white"
           modules={modules}
-          value={article.first_section}
+          value={articleData.first_section}
           onChange={(value) => handleQuillChange('first_section', value)}
           required
         />
@@ -176,7 +239,7 @@ const CreateArticle = () => {
           name="second_section"
           className="mt-1 bg-white"
           modules={modules}
-          value={article.second_section}
+          value={articleData.second_section}
           onChange={(value) => handleQuillChange('second_section', value)}
           required
         />
@@ -189,7 +252,7 @@ const CreateArticle = () => {
           name="third_section"
           className="mt-1 bg-white"
           modules={modules}
-          value={article.third_section}
+          value={articleData.third_section}
           onChange={(value) => handleQuillChange('third_section', value)}
           required
         />
@@ -198,6 +261,11 @@ const CreateArticle = () => {
       <ImageUploaderBlog
         onImagesSelected={handleImageSelected}
         onImageRemoved={handleImageRemoved}
+      />
+
+      <ImageGallery 
+        images={existingImages} 
+        onDelete={handleDeleteImage} 
       />
 
       <div className="flex justify-between items-center mt-6">

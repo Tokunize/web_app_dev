@@ -10,7 +10,8 @@ interface Article {
   slug: string;
   title: string;
   first_section: string;
-  image_urls: string[];
+  image_urls: { url: string }[];  
+  views: number
 }
 
 export const ArticleList = () => {
@@ -33,6 +34,8 @@ export const ArticleList = () => {
       };
       const response = await axios.get<Article[]>(apiUrl, config);
       setArticles(response.data);
+      console.log(response.data);
+      
     } catch (err) {
       setError('Error fetching articles. Please try again later.');
       console.error(err);
@@ -45,7 +48,6 @@ export const ArticleList = () => {
     getAllArticles();
   }, [getAccessTokenSilently]);
 
-  // Función para manejar la eliminación de un artículo
   const handleArticleDeleted = (id: number) => {
     setArticles(articles.filter(article => article.id !== id));
   };
@@ -65,7 +67,8 @@ export const ArticleList = () => {
           {articles.map((article) => (
             <AllArticlesCard
               key={article.id} 
-              imageSrc={article.image_urls[0] || 'https://via.placeholder.com/400'}
+              views={article.views}
+              imageSrc={article.image_urls[0].url || 'https://via.placeholder.com/400'}
               title={article.title}
               link={`/blog/article/${article.id}`}
               articleId={article.id} 

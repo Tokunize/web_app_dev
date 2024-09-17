@@ -7,6 +7,11 @@ from users.authentication import Auth0JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.utils import timezone
 from django.db.models import F
+from django.http import JsonResponse
+import cloudinary.uploader
+from django.views.decorators.csrf import csrf_exempt
+import json
+
 
 from datetime import timedelta
 
@@ -87,6 +92,7 @@ class EditArticleView(APIView):
             return Response({"detail": "Article not found."}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = ArticleSerializer(article, data=request.data, partial=False)
+        print(serializer)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -111,3 +117,23 @@ class WeeklyVisitStatsView(APIView):
             "visit_data": visit_data,
             "total_articles": total_articles
         }, status=status.HTTP_200_OK)
+
+
+@csrf_exempt 
+def delete_image(request):
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body)
+            public_id = body.get('public_id')
+
+            result = cloudinary.uploader.destroy(public_id)
+
+            if result.get('result') == 'ok':
+                return JsonResponse({'success': True, 'message': 'Imagen eliminada correctamente'})
+            else:
+                return JsonResponse({'success': False, 'message': 'No se pudo eliminar la imagen'}, status=500)
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=500)
+    
+    return JsonResponse({'success': False, 'message': 'Método no permitido'}, status=405)

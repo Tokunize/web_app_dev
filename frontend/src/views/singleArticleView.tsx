@@ -10,7 +10,7 @@ export interface Article {
   first_section: string;
   second_section: string;
   third_section: string;
-  image_urls: string[];
+  image_urls: { url: string }[];  
 }
 
 export const SingleArticleView: React.FC = () => {
@@ -70,7 +70,7 @@ export const SingleArticleView: React.FC = () => {
       {/* Main Image */}
       <figure className="mb-8">
         <img
-          src={article.image_urls[1] || 'fallback-image-url.jpg'}
+          src={article.image_urls[0].url || 'fallback-image-url.jpg'}
           alt={article.title}
           className="w-full h-[350px] object-cover"
         />
@@ -86,7 +86,7 @@ export const SingleArticleView: React.FC = () => {
         {article.image_urls[0] && (
           <figure className="my-8">
             <img
-              src={article.image_urls[0] || 'fallback-image-url.jpg'}
+              src={article.image_urls[1].url || 'fallback-image-url.jpg'}
               alt="Illustrative image"
               className="w-full h-[300px] object-cover"
             />
@@ -102,7 +102,7 @@ export const SingleArticleView: React.FC = () => {
         {article.image_urls[2] && (
           <figure className="my-8">
             <img
-              src={article.image_urls[2] || 'fallback-image-url.jpg'}
+              src={article.image_urls[2].url || 'fallback-image-url.jpg'}
               alt="Illustrative image"
               className="w-full h-[300px] object-cover"
             />

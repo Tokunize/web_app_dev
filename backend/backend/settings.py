@@ -177,4 +177,12 @@ REST_FRAMEWORK = {
 }
 
 
+import cloudinary
+
+# Configura tus credenciales de Cloudinary
+cloudinary.config(
+    cloud_name='dhyrv5g3w',
+    api_key='577211589791536',
+    api_secret='LhkuFGSvQWYkISi9a0PONdfj27o'
+)
 
