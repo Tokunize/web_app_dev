@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { BlogCard } from "@/components/blog/blogCard";
 import BackgroundImage from "../assets/background-blog.png";
+import { BlogSubscriberForm } from '@/components/forms/blogSusbcribeForm';
 
 interface BlogPost {
   id: number;
@@ -42,6 +43,10 @@ export const Blog = () => {
         <p className="text-[#667085] text-medium w-[90%] md:w-[50%] mx-auto">
           Sign up for the Tokunize platform to gain full access to our product offerings, thought leadership and more.
         </p>
+        <div className="flex items-center flex-col justify-center">
+          <BlogSubscriberForm/>
+          <span className="text-sm text-gray-400 mt-2">We care about your data in our  <a href="#" className="underline">Privacy Policy</a></span>
+        </div>
       </div>
       <div className="flex flex-col md:flex-row mt-[64px] px-[16px] md:px-[60px]">
         <aside className="flex w-[30%] flex-col space-y-3 pr-0 md:pr-[64px] mb-8 md:mb-0">

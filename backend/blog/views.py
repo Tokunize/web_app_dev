@@ -1,8 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from .models import Article, DailyVisit
-from .serializers import ArticleSerializer
+from rest_framework import status,generics
+
+from .models import Article, DailyVisit,Subscriber
+from .serializers import ArticleSerializer,SubscriberSerializer
 from users.authentication import Auth0JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.utils import timezone
@@ -137,3 +138,11 @@ def delete_image(request):
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
     
     return JsonResponse({'success': False, 'message': 'Método no permitido'}, status=405)
+
+
+
+class SubscriberListCreateView(generics.ListCreateAPIView):
+    permission_classes = [AllowAny]
+
+    queryset = Subscriber.objects.all()
+    serializer_class = SubscriberSerializer
