@@ -18,6 +18,7 @@ faker = "*"
 requests = "*"
 cryptography = "*"
 python-decouple = "*"
+cloudinary = "*"
 
 [dev-packages]
 

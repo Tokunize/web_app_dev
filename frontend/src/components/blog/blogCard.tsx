@@ -34,15 +34,18 @@ export const BlogCard: React.FC<BlogCardProps> = ({ imageUrl, title, description
       </aside>
       <div className="p-6 flex flex-col justify-between">
         <header>
-          <p className="text-[#ADD244] font-bold">Investing fundamentals</p>
+          <p className="text-[#ADD244] mb-3 font-bold">Investing fundamentals</p>
           <div className="flex justify-between items-start mb-2">
             <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
-            <img
-              alt='arrow-url-redirect'
+            <span 
+              className="cursor-pointer rounded-full bg-gray-100 hover:bg-gray-300 p-2 inline-flex items-center justify-center"
               onClick={() => navigate(`article/${article_id}`)}
-              src={arrowUrl}
-              className="cursor-pointer"
-            />
+            >
+              <img 
+                alt='arrow-url-redirect' 
+                src={arrowUrl} 
+              />
+            </span>
           </div>
           <p className="text-gray-600 mb-4 line-clamp-3">
             <span dangerouslySetInnerHTML={{ __html: sanitizedDescription }} />

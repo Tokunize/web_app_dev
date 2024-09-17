@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Button } from "@/components/ui/button";
 import { BlogCard } from "@/components/blog/blogCard";
 import BackgroundImage from "../assets/background-blog.png";
 
 interface BlogPost {
   id: number;
-  image_urls: string[];
+  image_urls: { url: string }[];  
   title: string;
   first_section: string;
   day_posted: string;
@@ -14,6 +13,7 @@ interface BlogPost {
 
 export const Blog = () => {
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   useEffect(() => {
     const fetchBlogPosts = async () => {
@@ -29,6 +29,11 @@ export const Blog = () => {
     fetchBlogPosts();
   }, []);
 
+  const filteredPosts = blogPosts.filter(post =>
+    post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    post.first_section.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <section>
       <div className="bg-[#F9FAFB] text-center space-y-5 py-[60px]">
@@ -39,10 +44,21 @@ export const Blog = () => {
         </p>
       </div>
       <div className="flex flex-col md:flex-row mt-[64px] px-[16px] md:px-[60px]">
-        <aside className="flex flex-col space-y-3 pr-0 md:pr-[64px] mb-8 md:mb-0">
+        <aside className="flex w-[30%] flex-col space-y-3 pr-0 md:pr-[64px] mb-8 md:mb-0">
           <p className="text-[#C8E870] text-sm font-bold">Blog Categories</p>
-          <Button>View All</Button>
-          <Button>Investing Fundamentals</Button>
+          {/* Search Bar */}
+          <div className="relative mb-4">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search blog posts..."
+              className="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#A0CC29] focus:border-transparent"
+            />
+          </div>
+          <ul className="space-y-2">
+            <li className="bg-[#F3F4F7] w-full font-semibold rounded-md px-3 py-1">View All</li>
+          </ul>
         </aside>
         <article className="w-full">
           <article className="flex flex-col lg:flex-row overflow-hidden transition-transform duration-300 mb-8">
@@ -70,11 +86,11 @@ export const Blog = () => {
           </article>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mx-auto">
-            {blogPosts.length > 0 ? (
-              blogPosts.map((post) => (
+            {filteredPosts.length > 0 ? (
+              filteredPosts.map((post) => (
                 <BlogCard
                   key={post.id}
-                  imageUrl={post.image_urls[0]}
+                  imageUrl={post.image_urls[0].url}
                   title={post.title}
                   description={post.first_section}
                   day_posted={post.day_posted}

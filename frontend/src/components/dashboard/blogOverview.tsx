@@ -24,8 +24,6 @@ export const BlogOverview = () => {
         },
       };
       const response = await axios.get(apiUrl, config);
-      console.log(response.data);
-
       setBlogVisits(response.data.visit_data);
       setArticlesAmount(response.data.total_articles);
     } catch (error) {
