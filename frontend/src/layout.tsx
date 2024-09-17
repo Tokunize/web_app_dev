@@ -1,5 +1,5 @@
 
-import App from "./App";
+import { Marketplace } from "./views/marketplace";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { SingleProperty } from "./views/singleProperty";
 import { Toaster } from "./components/ui/toaster";
@@ -18,6 +18,8 @@ import { Blog } from "./views/blog";
 import { ArticleList } from "./components/blog/articleList";
 import CreateArticle from "./components/blog/createarticle";
 import { SingleArticleView } from "./views/singleArticleView";
+import { BlogOverview } from "./components/dashboard/blogOverview";
+
 
 const Layout = () => {
   return (
@@ -27,7 +29,7 @@ const Layout = () => {
         <Routes>
           {/*Main Layout Routes */}
           <Route element={<MainLayout />}>
-            <Route path="/" element={<App />} />
+            <Route path="/" element={<Marketplace />} />
             <Route path="property-details/:id/" element={<SingleProperty />} />
             <Route path="sign-up/" element={<SignUpPage />} />
             <Route path="blog/" element={<Blog/>} />
@@ -40,6 +42,13 @@ const Layout = () => {
               path="porfolio/"
               element={
                 <ProtectedRoute roleRequired="owner,admin" element={<Porfolio />} />
+              }
+            />
+
+            <Route
+              path="blog-overview/"
+              element={
+                <ProtectedRoute roleRequired="blog-admin" element={<BlogOverview />} />
               }
             />
             <Route

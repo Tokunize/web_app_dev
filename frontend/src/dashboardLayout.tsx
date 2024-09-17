@@ -1,4 +1,4 @@
-// components/DashboardLayout.tsx
+
 import React from "react";
 import { Outlet } from "react-router-dom";
 import SideMenu from "./components/dashboard/sideMenu";
@@ -22,7 +22,7 @@ const DashboardLayout: React.FC = () => {
     { name: 'My Transactions', link: '/transactions/' },
     { name: 'Settings', link: '/dashboard/settings' },
   ] : role === "blog-admin" ? [
-    { name: 'Overview', link: '/overview/' },
+    { name: 'Overview', link: '/blog-overview/' },
     { name: 'All Articles', link: '/articles-list/' },
     { name: 'Create Articles', link: '/create-article/' },
   ]:[];

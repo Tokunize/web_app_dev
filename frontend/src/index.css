@@ -88,8 +88,11 @@
 
 
 
+#singleArticleView ul, ol {
+  list-style-type: disc; 
+  padding-left: 50px; 
+}
 
-/* css for the carousel of the main marketplace to remove the arrows */
 .group {
   display: none;
 }

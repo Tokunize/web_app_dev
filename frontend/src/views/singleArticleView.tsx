@@ -57,10 +57,11 @@ export const SingleArticleView: React.FC = () => {
     return <div className="text-center">No article found</div>;
   }
 
-  const sanitizeHTML = (html: string) => DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
+  const sanitizeHTML = (html: string) => 
+    DOMPurify.sanitize(html, { USE_PROFILES: { html: true }, ALLOWED_TAGS: ['ol', 'li', 'ul', 'p', 'img'] });
 
   return (
-    <article className="px-8 mt-24">
+    <article className="px-8 mt-24" id="singleArticleView">
       <header className="text-center mb-8">
         <p className="font-bold text-lg text-[#C8E870] mb-4">Investing Fundamentals</p>
         <h1 className="text-4xl md:w-[60%] mx-auto font-bold mb-8">{article.title}</h1>

@@ -4,12 +4,15 @@ from .views import(
     SingleArticleView,
     EditArticleView,
     DeleteArticleView,
-    PublicArticleListView
+    PublicArticleListView,
+    WeeklyVisitStatsView
 )
 
 urlpatterns = [
     path('articles/', ArticleListView.as_view(), name='articles-list'),
     path('articles/public/', PublicArticleListView.as_view(), name='articles-list-public'),
+    path('articles/stats/', WeeklyVisitStatsView.as_view(), name='blog_statistics'),
+
 
     path('articles/<int:pk>/', SingleArticleView.as_view(), name='single-article'),
     path('articles/<int:pk>/edit/', EditArticleView.as_view(), name='article-edit'),
