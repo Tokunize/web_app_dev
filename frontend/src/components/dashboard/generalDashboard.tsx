@@ -112,7 +112,7 @@ export const GeneralDashboard = () =>{
                 </div>
                 <div className="grid grid-cols-2 gap-4 px-4 pb-4">
                     <Card className="flex items-center justify-center p-4">
-                        <Overview />  
+                        {/* <Overview />   */}
                     </Card>
                     <Card className="p-4">
                         <Transaction />
