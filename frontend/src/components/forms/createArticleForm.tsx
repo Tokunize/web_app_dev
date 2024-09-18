@@ -3,7 +3,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
-import { ImageUploaderBlog } from './imageUploaderBlog';
+import { ImageUploaderBlog } from '../blog/imageUploaderBlog';
 import ImageGallery from '../property/imageGallery';
 
 interface Article {
@@ -214,7 +214,6 @@ const CreateArticle: React.FC<CreateArticleProps> = ({ article, onClose }) => {
             placeholder="Enter Article Subtitle"
             value={articleData.subtitle}
             onChange={handleInputChange}
-            required
           />
         </div>
       </div>
@@ -241,7 +240,6 @@ const CreateArticle: React.FC<CreateArticleProps> = ({ article, onClose }) => {
           modules={modules}
           value={articleData.second_section}
           onChange={(value) => handleQuillChange('second_section', value)}
-          required
         />
       </div>
 
@@ -254,7 +252,6 @@ const CreateArticle: React.FC<CreateArticleProps> = ({ article, onClose }) => {
           modules={modules}
           value={articleData.third_section}
           onChange={(value) => handleQuillChange('third_section', value)}
-          required
         />
       </div>
 

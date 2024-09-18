@@ -7,7 +7,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Button } from '@/components/ui/button';
 import { useToast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
-import CreateArticle from './createarticle';
+import CreateArticle from '../forms/createArticleForm';
 
 interface AllArticlesCardProps {
   imageSrc: string;

@@ -25,7 +25,7 @@ const useFetchPropertyDetails = (property_id: number, viewType: string): FetchSt
   useEffect(() => {
     const fetchPropertyDetails = async () => {
       setLoading(true);
-      setError(null);  // Reset error state before fetching
+      setError(null);  
 
       try {
         const accessToken = await getAccessTokenSilently();
