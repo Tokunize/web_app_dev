@@ -29,7 +29,7 @@ export const Navbar = () => {
         const token = await getAccessTokenSilently();
         localStorage.setItem("accessToken", token);
 
-        const response = await fetch('http://localhost:8000/users/sync-user/', {
+        const response = await fetch(`${import.meta.env.VITE_APP_BACKEND_URL}users/sync-user/`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
