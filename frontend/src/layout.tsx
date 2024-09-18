@@ -2,7 +2,6 @@
 import { Marketplace } from "./views/marketplace";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { SingleProperty } from "./views/singleProperty";
-import { Toaster } from "./components/ui/toaster";
 import { SignUpPage } from "./views/signUpPage";
 import { UserProvider } from "./context/userProvider";
 import ProtectedRoute from "./protectedRoutes";
@@ -24,7 +23,6 @@ import { BlogOverview } from "./components/dashboard/blogOverview";
 const Layout = () => {
   return (
     <UserProvider>
-      <Toaster />
       <BrowserRouter>
         <Routes>
           {/*Main Layout Routes */}

@@ -69,7 +69,7 @@ export const Navbar = () => {
   const renderAuthenticatedLinks = useMemo(() => {
     if (role === "blog-admin") {
       return <Link to="/blog-overview/">Dashboard</Link>;
-    } else if (role === "investor" || role ==="owner") {
+    } else if (role === "investor" || role ==="owner" || role ==="admin") {
       return <Link to="/overview/">Dashboard</Link>;
     }
     return null;
