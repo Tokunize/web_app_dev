@@ -16,7 +16,7 @@ import { Investment } from "./components/dashboard/investment";
 import { Transaction } from "./components/dashboard/transactions";
 import { Blog } from "./views/blog";
 import { ArticleList } from "./components/blog/articleList";
-import CreateArticle from "./components/blog/createarticle";
+import CreateArticle from "./components/forms/createArticleForm";
 import { SingleArticleView } from "./views/singleArticleView";
 import { BlogOverview } from "./components/dashboard/blogOverview";
 

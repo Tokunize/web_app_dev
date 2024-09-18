@@ -112,11 +112,18 @@ class WeeklyVisitStatsView(APIView):
             "visits": [visit.visits for visit in visits]
         }
 
+        total_subscribers = Subscriber.objects.all().count()
+        subscriber_emails = list(Subscriber.objects.values_list('email', flat=True))
+
+
         total_articles = Article.objects.count()
 
         return Response({
             "visit_data": visit_data,
-            "total_articles": total_articles
+            "total_articles": total_articles,
+            "total_subscribers": total_subscribers,
+            "subscriber_emails": subscriber_emails  
+
         }, status=status.HTTP_200_OK)
 
 
