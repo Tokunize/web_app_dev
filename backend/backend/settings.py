@@ -31,7 +31,6 @@ SECRET_KEY = 'django-insecure-7rd+ggxl@zmwna&zce-n20qv!s-&jacl9eu8ivyo-#d*$kk9me
 DEBUG = True
 
 ALLOWED_HOSTS = [
-   'seahorse-app-nbf4g.ondigitalocean.app',
    'monkfish-app-o6nz8.ondigitalocean.app'
    '127.0.0.1',
    'localhost'
@@ -59,11 +58,13 @@ INSTALLED_APPS = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000", 
-    "https://seahorse-app-nbf4g.ondigitalocean.app",
     "https://monkfish-app-o6nz8.ondigitalocean.app"
 ]
-CORS_ALLOW_ALL_ORIGINS = True
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://monkfish-app-o6nz8.ondigitalocean.app"
+
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
