@@ -32,6 +32,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
    'seahorse-app-nbf4g.ondigitalocean.app',
+   'monkfish-app-o6nz8.ondigitalocean.app'
    '127.0.0.1',
    'localhost'
 ]
@@ -58,7 +59,8 @@ INSTALLED_APPS = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000", 
-    "https://seahorse-app-nbf4g.ondigitalocean.app"
+    "https://seahorse-app-nbf4g.ondigitalocean.app",
+    "https://monkfish-app-o6nz8.ondigitalocean.app"
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 
