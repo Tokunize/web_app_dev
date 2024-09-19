@@ -6,13 +6,9 @@ import { UserProvider } from './context/userProvider';
 import './index.css';
 import 'leaflet/dist/leaflet.css';
 import Layout from './layout';
-import { Toaster } from "./components/ui/toaster";
-import { ToastProvider } from './components/ui/toast';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <ToastProvider>
-      <Toaster />
     <Auth0Provider
       domain="dev-2l2jjwfm5ekzae3u.us.auth0.com"
       clientId="RkDK38n0VPNZEmuv0ZgQx9P93rLPAOTK"
@@ -26,6 +22,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Layout />
       </UserProvider>
     </Auth0Provider>
-    </ToastProvider>
   </React.StrictMode>,
 );

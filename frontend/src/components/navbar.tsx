@@ -107,11 +107,11 @@ export const Navbar = () => {
 
       <div className="md:hidden mr-5">
         <Sheet>
-          <SheetTrigger>
+          <span>
             <Button variant="outline">
               <AlignJustify className="h-4 w-4" />
             </Button>
-          </SheetTrigger>
+          </span>
           <SheetContent side="right">
             <div className="flex flex-col space-y-4">
               <Link to="/">Home</Link>

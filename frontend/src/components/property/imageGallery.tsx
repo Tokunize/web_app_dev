@@ -3,7 +3,7 @@ import "../../styles/imageGallery.css";
 
 interface ImageGalleryProps {
   images: { url: string; publicId: string }[]; 
-  onDelete: (publicId: string) => void;
+  onDelete: (publicId: string, e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onDelete }) => {

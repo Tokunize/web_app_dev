@@ -12,6 +12,8 @@ interface Article {
   first_section: string;
   second_section: string;
   third_section: string;
+  fourth_section:string;
+  five_section:string;
   image_urls?: { url: string; publicId: string }[];
 }
 
@@ -21,7 +23,7 @@ const modules = {
     [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
     [{ size: [] }],
     [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+    ['bold', 'italic', 'underline', 'strike', 'blockquote', 'image'],
     [{ 'color': [] }, { 'background': [] }],
     [{ 'align': [] }],
     ['link'],
@@ -47,7 +49,7 @@ const CreateArticle: React.FC<CreateArticleProps> = ({ article, onClose }) => {
     third_section: ""
   });
 
-  const [images, setImages] = useState<File[]>([]);
+  const [images, setImages] = useState<{ file: File, temporaryId: string }[]>([]);
   const [existingImages, setExistingImages] = useState<{ url: string; publicId: string }[]>(article?.image_urls || []);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -59,8 +61,8 @@ const CreateArticle: React.FC<CreateArticleProps> = ({ article, onClose }) => {
     setArticleData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleImageSelected = (files: File[]) => {
-    setImages(files);
+  const handleImageSelected = (files: { file: File, previewUrl: string, temporaryId: string }[]) => {
+    setImages(prevFiles => [...prevFiles, ...files]);
   };
 
   const handleImageRemoved = (index: number) => {
@@ -73,7 +75,9 @@ const CreateArticle: React.FC<CreateArticleProps> = ({ article, onClose }) => {
       subtitle: "",
       first_section: "",
       second_section: "",
-      third_section: ""
+      third_section: "",
+      fourth_section:"",
+      five_section:""
     });
     setImages([]);
   };
@@ -105,7 +109,7 @@ const CreateArticle: React.FC<CreateArticleProps> = ({ article, onClose }) => {
         }
       });
 
-      return response.data.success; // Retorna true si la eliminación fue exitosa
+      return response.data.success;
     } catch (error) {
       console.error('Error eliminando la imagen:', error);
       return false;
@@ -117,15 +121,13 @@ const CreateArticle: React.FC<CreateArticleProps> = ({ article, onClose }) => {
     const imageUrls: { url: string; publicId: string }[] = [];
 
     try {
-      // Subir nuevas imágenes
-      for (const file of images) {
+      for (const { file } of images) {
         const { url, publicId } = await uploadToCloudinary(file);
         imageUrls.push({ url, publicId });
       }
 
-      // Combinar imágenes existentes (sin las eliminadas) con las nuevas imágenes
       const updatedImageUrls = existingImages.concat(imageUrls);
-      
+
       const articleDataToSave = {
         ...articleData,
         image_urls: updatedImageUrls,
@@ -222,12 +224,10 @@ const CreateArticle: React.FC<CreateArticleProps> = ({ article, onClose }) => {
         <label htmlFor="first_section" className="block text-sm font-medium text-gray-700">Article First Section</label>
         <ReactQuill
           id="first_section"
-          name="first_section"
           className="mt-1 bg-white"
           modules={modules}
           value={articleData.first_section}
           onChange={(value) => handleQuillChange('first_section', value)}
-          required
         />
       </div>
 
@@ -235,7 +235,6 @@ const CreateArticle: React.FC<CreateArticleProps> = ({ article, onClose }) => {
         <label htmlFor="second_section" className="block text-sm font-medium text-gray-700">Article Second Section</label>
         <ReactQuill
           id="second_section"
-          name="second_section"
           className="mt-1 bg-white"
           modules={modules}
           value={articleData.second_section}
@@ -247,11 +246,32 @@ const CreateArticle: React.FC<CreateArticleProps> = ({ article, onClose }) => {
         <label htmlFor="third_section" className="block text-sm font-medium text-gray-700">Article Third Section</label>
         <ReactQuill
           id="third_section"
-          name="third_section"
           className="mt-1 bg-white"
           modules={modules}
           value={articleData.third_section}
           onChange={(value) => handleQuillChange('third_section', value)}
+        />
+      </div>
+
+      <div>
+        <label htmlFor="fourth_section" className="block text-sm font-medium text-gray-700">Article Fourth Section</label>
+        <ReactQuill
+          id="fourth_section"
+          className="mt-1 bg-white"
+          modules={modules}
+          value={articleData.fourth_section}
+          onChange={(value) => handleQuillChange('fourth_section', value)}
+        />
+      </div>
+
+      <div>
+        <label htmlFor="five_section" className="block text-sm font-medium text-gray-700">Article Fifth Section</label>
+        <ReactQuill
+          id="five_section"
+          className="mt-1 bg-white"
+          modules={modules}
+          value={articleData.five_section}
+          onChange={(value) => handleQuillChange('five_section', value)}
         />
       </div>
 
@@ -278,3 +298,4 @@ const CreateArticle: React.FC<CreateArticleProps> = ({ article, onClose }) => {
 };
 
 export default CreateArticle;
+

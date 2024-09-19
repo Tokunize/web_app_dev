@@ -29,7 +29,9 @@ export const SingleArticleView: React.FC = () => {
 
       const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}blog/articles/${id}/`;
       try {
-        const response = await axios.get<Article>(apiUrl);
+        const response = await axios.get<Article>(apiUrl); 
+        console.log(response.data);
+               
         setArticle(response.data);
       } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -68,51 +70,95 @@ export const SingleArticleView: React.FC = () => {
       </header>
 
       {/* Main Image */}
-      <figure className="mb-8">
-        <img
-          src={article.image_urls[0].url || 'fallback-image-url.jpg'}
-          alt={article.title}
-          className="w-full h-[350px] object-cover"
-        />
-      </figure>
+      {article.image_urls[0] && (
+        <figure className="mb-8">
+          <img
+            src={article.image_urls[0].url || 'fallback-image-url.jpg'}
+            alt={article.title}
+            className="w-full h-[350px] object-cover"
+          />
+        </figure>
+      )}
 
       <section className="md:w-3/4 mx-auto py-8">
         {/* First Section */}
-        <article className="mb-8">
-          <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(article.first_section) }} />
-        </article>
+        {article.first_section && (
+          <article className="mb-8">
+            <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(article.first_section) }} />
+          </article>
+        )}
 
-        {/* Image between sections */}
-        {article.image_urls[0] && (
+        {/* Second Image */}
+        {article.image_urls[1] && (
           <figure className="my-8">
             <img
               src={article.image_urls[1].url || 'fallback-image-url.jpg'}
-              alt="Illustrative image"
+              alt="Second illustrative image"
               className="w-full h-[300px] object-cover"
             />
           </figure>
         )}
 
         {/* Second Section */}
-        <article className="mb-8">
-          <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(article.second_section) }} />
-        </article>
+        {article.second_section && (
+          <article className="mb-8">
+            <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(article.second_section) }} />
+          </article>
+        )}
 
-        {/* Image between sections */}
+        {/* Third Image */}
         {article.image_urls[2] && (
           <figure className="my-8">
             <img
               src={article.image_urls[2].url || 'fallback-image-url.jpg'}
-              alt="Illustrative image"
+              alt="Third illustrative image"
               className="w-full h-[300px] object-cover"
             />
           </figure>
         )}
 
         {/* Third Section */}
-        <article>
-          <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(article.third_section) }} />
-        </article>
+        {article.third_section && (
+          <article>
+            <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(article.third_section) }} />
+          </article>
+        )}
+
+        {/* 4 Image */}
+        {article.image_urls[3] && (
+          <figure className="my-8">
+            <img
+              src={article.image_urls[2].url || 'fallback-image-url.jpg'}
+              alt="Third illustrative image"
+              className="w-full h-[300px] object-cover"
+            />
+          </figure>
+        )}
+
+         {/* 4 Section */}
+         {article.third_section && (
+          <article>
+            <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(article.third_section) }} />
+          </article>
+        )}
+
+        {/* 4 Image */}
+        {article.image_urls[4] && (
+          <figure className="my-8">
+            <img
+              src={article.image_urls[2].url || 'fallback-image-url.jpg'}
+              alt="Third illustrative image"
+              className="w-full h-[300px] object-cover"
+            />
+          </figure>
+        )}
+
+         {/* 5 Section */}
+         {article.third_section && (
+          <article>
+            <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(article.third_section) }} />
+          </article>
+        )}
       </section>
     </article>
   );

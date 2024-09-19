@@ -19,7 +19,6 @@ import CreateArticle from "./components/forms/createArticleForm";
 import { SingleArticleView } from "./views/singleArticleView";
 import { BlogOverview } from "./components/dashboard/blogOverview";
 
-
 const Layout = () => {
   return (
     <UserProvider>

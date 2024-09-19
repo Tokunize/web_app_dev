@@ -4,7 +4,6 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import axios from "axios";
-import { useToast } from "../ui/use-toast";
 
 type FormData = {
   title: string;
@@ -36,7 +35,6 @@ const OwnerPropertyForm: React.FC<OwnerPropertyFormProps> = ({
 
   const [amenities, setAmenities] = useState<string[]>([]);
   const [newAmenity, setNewAmenity] = useState('');
-  const { toast } = useToast();
 
   const handleAddAmenity = () => {
     if (newAmenity.trim() === '') return;
@@ -71,22 +69,10 @@ const OwnerPropertyForm: React.FC<OwnerPropertyFormProps> = ({
         config
       );
 
-      toast({
-        title: "Property submitted!",
-        description: "Your property has been successfully submitted.",
-        variant: "default",
-      });
-
       onPropertyCreated(response.data.property);
       reset();
       setAmenities([]);
     } catch (error) {
-      toast({
-        title: "Submission failed",
-        description: "There was an error submitting your property.",
-        variant: "destructive",
-      });
-
       if (axios.isAxiosError(error)) {
         console.error("Axios error:", error.message);
       } else {

@@ -5,8 +5,6 @@ import { useAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { useToast } from "@/components/ui/use-toast"
-import { ToastAction } from "@/components/ui/toast"
 import CreateArticle from '../forms/createArticleForm';
 
 interface AllArticlesCardProps {
@@ -26,7 +24,6 @@ interface Article {
   views: number;
 }
 export const AllArticlesCard: React.FC<AllArticlesCardProps> = ({ imageSrc, title, link, articleId, onArticleDeleted, views }) => {
-  const { toast } = useToast();
   const { getAccessTokenSilently } = useAuth0();
   const [openDialog, setOpenDialog] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -40,19 +37,11 @@ export const AllArticlesCard: React.FC<AllArticlesCardProps> = ({ imageSrc, titl
         headers: {
           'Authorization': `Bearer ${token}`,
         },
-      });
-      toast({
-        title: "Deleted!",
-        description: "You deleted successfully this article!",
-        action: (
-          <ToastAction altText="Close">Close</ToastAction>
-        ),
-      });
+      });     
       onArticleDeleted(articleId);
       setOpenDialog(false);
     } catch (error) {
       console.error('Error deleting article:', error);
-      alert('Failed to delete the article');
     }
   };
 

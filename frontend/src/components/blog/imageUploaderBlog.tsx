@@ -3,11 +3,11 @@ import React, { useState } from 'react';
 interface ImageFile {
   file: File;
   previewUrl: string;
-  publicId?: string; // Este campo se utilizará solo si subimos a Cloudinary en el futuro
+  temporaryId: string;
 }
 
 interface ImageUploaderProps {
-  onImagesSelected: (files: File[]) => void; // Notificar al componente padre sobre los archivos seleccionados
+  onImagesSelected: (files: ImageFile[]) => void; // Notificar al componente padre sobre los archivos seleccionados
   onImageRemoved: (index: number) => void; // Notificar al componente padre sobre la eliminación de una imagen
 }
 
@@ -30,12 +30,14 @@ export const ImageUploaderBlog: React.FC<ImageUploaderProps> = ({ onImagesSelect
   };
 
   const handleFiles = (newFiles: File[]) => {
-    const filePreviews = newFiles.map((file) => ({
+    const filePreviews = newFiles.map((file, index) => ({
       file,
       previewUrl: URL.createObjectURL(file),
+      temporaryId: `${Date.now()}-${index}` // Asignar un ID único temporal a cada imagen
     }));
+
     setFiles((prevFiles) => [...prevFiles, ...filePreviews]);
-    onImagesSelected([...files.map(f => f.file), ...newFiles]); // Notificar al componente padre sobre los archivos seleccionados
+    onImagesSelected(filePreviews); // Notificar al componente padre sobre los archivos seleccionados
   };
 
   const removeFile = (index: number) => {
@@ -66,11 +68,11 @@ export const ImageUploaderBlog: React.FC<ImageUploaderProps> = ({ onImagesSelect
 
       {files.length > 0 && (
         <div className="w-full max-w-4xl mt-6">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">Image Previews</h2>
+          <h2 className="text-xl font-semibold text-gray-700 mb-4">Image Order Previews</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {files.map((file, index) => (
               <div
-                key={index}
+                key={file.temporaryId}
                 className="relative rounded-lg border border-gray-200 overflow-hidden shadow-sm"
               >
                 <img
