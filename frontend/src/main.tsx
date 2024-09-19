@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Auth0Provider } from '@auth0/auth0-react';
 import { UserProvider } from './context/userProvider';
-
 import './index.css';
 import 'leaflet/dist/leaflet.css';
 import Layout from './layout';

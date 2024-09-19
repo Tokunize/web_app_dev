@@ -86,13 +86,11 @@
   }
 }
 
-
-
 #singleArticleView ul, ol {
   list-style-type: disc; 
   padding-left: 50px; 
 }
 
-.group {
+.custom-landing-carousel group {
   display: none;
-}
+} 

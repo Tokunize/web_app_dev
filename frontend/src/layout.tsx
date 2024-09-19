@@ -18,11 +18,13 @@ import { ArticleList } from "./components/blog/articleList";
 import CreateArticle from "./components/forms/createArticleForm";
 import { SingleArticleView } from "./views/singleArticleView";
 import { BlogOverview } from "./components/dashboard/blogOverview";
+import { Toaster } from "./components/ui/toaster";
 
 const Layout = () => {
   return (
     <UserProvider>
       <BrowserRouter>
+        <Toaster />
         <Routes>
           {/*Main Layout Routes */}
           <Route element={<MainLayout />}>
