@@ -63,19 +63,15 @@ class DeleteArticleView(APIView):
     authentication_classes = [Auth0JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get_object(self, pk):
-        try:
-            return Article.objects.get(pk=pk)
-        except Article.DoesNotExist:
-            return None
-
     def delete(self, request, pk):
-        article = self.get_object(pk)
-        if article is None:
+        try:
+            article = Article.objects.get(pk=pk)
+        except Article.DoesNotExist:
             return Response({"detail": "Article not found."}, status=status.HTTP_404_NOT_FOUND)
 
         article.delete()
         return Response({"detail": "Article deleted."}, status=status.HTTP_204_NO_CONTENT)
+
 
 class EditArticleView(APIView):
     authentication_classes = [Auth0JWTAuthentication]
