@@ -1,4 +1,3 @@
-// src/components/PropertyFilters.tsx
 import React, { useState } from 'react';
 import { ChevronsUpDown, Check } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,15 @@ import {
 } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
+// Mapeo de opciones legibles para clasificación
+const sortOptions: { [key: string]: string } = {
+  'price_asc': 'Price: Low to High',
+  'price_desc': 'Price: High to Low',
+  'annual_return_asc': 'Annual Return: Low to High',
+  'annual_return_desc': 'Annual Return: High to Low',
+//   'funding_asc': 'Funding: Low to High',
+//   'funding_desc': 'Funding: High to Low',
+};
 
 interface FiltersProps {
   locations: string[];
@@ -130,16 +138,13 @@ export const PropertyFilters: React.FC<FiltersProps> = ({
             <Select onValueChange={handleSortChange}>
                 <SelectTrigger className="w-full">
                 <SelectValue placeholder='Sort by'>
-                    {sortBy || "Select sorting option"}
+                    {sortBy ? sortOptions[sortBy] : "Select sorting option"}
                 </SelectValue>
                 </SelectTrigger>
                 <SelectContent className="left-0 origin-top-right">
-                    <SelectItem value="price_asc">Price: Low to High</SelectItem>
-                    <SelectItem value="price_desc">Price: High to Low</SelectItem>
-                    <SelectItem value="annual_return_asc">Ann. Return: Low to High</SelectItem>
-                    <SelectItem value="annual_return_desc">Ann. Return: High to Low</SelectItem>
-                    <SelectItem value="funding_asc">Funding: Low to High</SelectItem>
-                    <SelectItem value="funding_desc">Funding: High to Low</SelectItem>
+                    {Object.entries(sortOptions).map(([value, label]) => (
+                        <SelectItem key={value} value={value}>{label}</SelectItem>
+                    ))}
                 </SelectContent>
             </Select>
         </div>

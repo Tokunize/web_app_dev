@@ -2,12 +2,24 @@ import { useState, useEffect } from 'react';
 import axios, { AxiosRequestConfig } from 'axios';
 import { useAuth0 } from '@auth0/auth0-react';
 
+interface Token {
+  total_tokens: number;
+  tokens_available: number;
+  token_price:number
+}
+
+interface FinancialsDetails {
+  projected_annual_yield: number;
+  projected_rental_yield: number;
+}
 interface PropertyDetails {
-  id: number;
-  name: string;
-  title: string;  
-  location:string,
-  image: []
+  title: string;
+  location: string;
+  property_type: string;
+  image: string[];
+  price: number;
+  financials_details: FinancialsDetails;
+  tokens: Token[];
 }
 
 interface FetchState<T> {

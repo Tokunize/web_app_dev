@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaArrowRight } from 'react-icons/fa';
 import { Carousel } from "flowbite-react";
-import token from "../assets/img/token.svg";
+import token from "../assets/token.svg";
 
 interface PropertyListCardProps {
   title: string;

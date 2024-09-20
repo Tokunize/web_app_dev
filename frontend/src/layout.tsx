@@ -6,7 +6,6 @@ import { SignUpPage } from "./views/signUpPage";
 import { UserProvider } from "./context/userProvider";
 import ProtectedRoute from "./protectedRoutes";
 import CreatePropertyController from "./components/dashboard/createPropertyController";
-import { PaymentPage } from "./views/paymentPage";
 import DashboardLayout from "./dashboardLayout";
 import MainLayout from "./mainLayout"; 
 import { GeneralDashboard } from "./components/dashboard/generalDashboard";
@@ -80,13 +79,6 @@ const Layout = () => {
                 <ProtectedRoute roleRequired="investor,admin" element={<CreatePropertyController />} />
               }
             />
-            <Route
-              path="investment/:property_id"
-              element={
-                <ProtectedRoute roleRequired="investor" element={<PaymentPage />} />
-              }
-            />
-
             {/* ROUTES FOR THE BLOG ADMIN */}
             <Route
               path="articles-list/"

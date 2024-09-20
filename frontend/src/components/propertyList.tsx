@@ -1,26 +1,26 @@
-// src/components/PropertyList.tsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { PropertyFilters } from './propertyFilters';
 import { PropertyListCard } from './propertyListCard';
 
 
-const sortProperties = (properties: any[], sortBy: string) => {
-  return properties.sort((a, b) => {
+const sortProperties = (properties: any[], sortBy: string) => {  
+  return properties.sort((a, b) => {    
     switch (sortBy) {
       case 'price_asc':
-        return parseFloat(a.token_price) - parseFloat(b.token_price);
+        return (a.tokens[0].token_price) - (b.tokens[0].token_price);
       case 'price_desc':
-        return parseFloat(b.token_price) - parseFloat(a.token_price);
+        return parseFloat(b.tokens[0].token_price) - parseFloat(a.tokens[0].token_price);
       case 'annual_return_asc':
-        return parseFloat(a.annual_gross_rents) - parseFloat(b.annual_gross_rents);
+        return parseFloat(a.projected_annual_return) - parseFloat(b.projected_annual_return);
       case 'annual_return_desc':
-        return parseFloat(b.annual_gross_rents) - parseFloat(a.annual_gross_rents);
+        return parseFloat(b.projected_annual_return) - parseFloat(a.projected_annual_return);
       default:
         return 0;
     }
   });
 };
+
 
 export const PropertyList: React.FC = () => {
   const [properties, setProperties] = useState<any[]>([]);
@@ -38,9 +38,7 @@ export const PropertyList: React.FC = () => {
     const fetchProperties = async () => {
       try {
         const apiUrl = `${backendUrl}property/properties/public/`;
-        const response = await axios.get(apiUrl);
-        console.log(response.data);
-        
+        const response = await axios.get(apiUrl);        
         setProperties(response.data);
         
       } catch (err) {
@@ -72,7 +70,7 @@ export const PropertyList: React.FC = () => {
   return (
     <div className="py-10">
       <PropertyFilters
-        locations={[...new Set(properties.map(p => p.location))]}  // Dynamically generate locations from data
+        locations={[...new Set(properties.map(p => p.location))]} 
         onFilterChange={handleFilterChange}
         propertyTypes={[...new Set(properties.map(p => p.property_type))]}  // Dynamically generate property types from data
       />

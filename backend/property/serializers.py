@@ -38,7 +38,8 @@ class AllDetailsPropertySerializer(serializers.ModelSerializer):
 
 class PropertyOverviewSerializer(serializers.ModelSerializer):
     amenities = serializers.JSONField()  
-    
+    tokens = TokenSerializer(many=True, read_only=True)
+
     class Meta:
         model = Property
         fields = [
@@ -54,7 +55,8 @@ class PropertyOverviewSerializer(serializers.ModelSerializer):
             'amenities',
             'video_urls',
             'property_type',
-            'projected_annual_return'
+            'projected_annual_return',
+            'tokens'
         ]
 
 class PropertyFinancialsSerializer(serializers.ModelSerializer):

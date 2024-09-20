@@ -51,7 +51,7 @@ export const SingleProperty: React.FC = () => {
         const apiUrl = `http://127.0.0.1:8000/property/${id}/?view=overview`;
         const response = await axios.get<{ token_price: number, projected_annual_return:number }>(apiUrl);
         
-        setTokenPrice(response.data.token_price);
+        setTokenPrice(response.data.tokens[0].token_price);
         setAnuReturns(response.data.projected_annual_return)
       } catch (error) {
         console.error('Failed to fetch property overview:', error);
