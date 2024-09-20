@@ -13,11 +13,9 @@ import { Porfolio } from "./components/dashboard/porfolio";
 import { Investment } from "./components/dashboard/investment";
 import { Transaction } from "./components/dashboard/transactions";
 import { Blog } from "./views/blog";
-import { ArticleList } from "./components/blog/articleList";
-import CreateArticle from "./components/forms/createArticleForm";
 import { SingleArticleView } from "./views/singleArticleView";
-import { BlogOverview } from "./components/dashboard/blogOverview";
 import { Toaster } from "./components/ui/toaster";
+import { InvestorOverview } from "./components/dashboard/investorOverview";
 
 const Layout = () => {
   return (
@@ -42,13 +40,6 @@ const Layout = () => {
                 <ProtectedRoute roleRequired="owner,admin" element={<Porfolio />} />
               }
             />
-
-            <Route
-              path="blog-overview/"
-              element={
-                <ProtectedRoute roleRequired="blog-admin" element={<BlogOverview />} />
-              }
-            />
             <Route
               path="transactions/"
               element={
@@ -62,9 +53,15 @@ const Layout = () => {
               }
             />
             <Route
+              path="investor-dashboard/"
+              element={
+                <ProtectedRoute roleRequired="investor" element={<InvestorOverview />} />
+              }
+            />
+            <Route
               path="overview/"
               element={
-                <ProtectedRoute roleRequired="owner,admin,investor,blog-admin" element={<GeneralDashboard />} />
+                <ProtectedRoute roleRequired="owner,admin,investor" element={<GeneralDashboard />} />
               }
             />
             {/* <Route
@@ -77,19 +74,6 @@ const Layout = () => {
               path="dashboard-property/:propertyId"
               element={
                 <ProtectedRoute roleRequired="investor,admin" element={<CreatePropertyController />} />
-              }
-            />
-            {/* ROUTES FOR THE BLOG ADMIN */}
-            <Route
-              path="articles-list/"
-              element={
-                <ProtectedRoute roleRequired="blog-admin" element={<ArticleList />} />
-              }
-            />
-            <Route
-              path="create-article/"
-              element={
-                <ProtectedRoute roleRequired="blog-admin" element={<CreateArticle />} />
               }
             />
           </Route>

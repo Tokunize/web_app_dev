@@ -118,9 +118,9 @@ DATABASES = {
         'PASSWORD': config('DATABASE_PWD'),
         'HOST': config('DATABASE_HOST'),
         'PORT': config('DATABASE_PORT', cast=int),
-        # 'OPTIONS': {
-        #     'sslmode': 'require',
-        # },
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
     }
 }
 

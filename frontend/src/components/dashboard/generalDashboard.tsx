@@ -1,4 +1,3 @@
-import { Overview } from "./overviewDashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Transaction } from "./transactions";
 import axios from "axios"

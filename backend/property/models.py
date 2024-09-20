@@ -69,6 +69,7 @@ class Property(TimeStampedModel):
     annual_cash_flow = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, help_text="Net annual revenue from the property, after deducting all expenses.")
     monthly_cash_flow = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, help_text="Net income from the property calculated on a monthly basis.")
     projected_annual_cash_flow = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, help_text="Estimated yearly cash flow based on projected rental and operational costs.")
+# equiy listed
 
     # Tokenization specifics
     # total_tokens = models.BigIntegerField(null=True, blank=True, help_text="Total number of tokens issued for the property, representing ownership shares.")
@@ -120,7 +121,7 @@ class Transaction(TimeStampedModel):
     transaction_date = models.DateTimeField(auto_now_add=True)
     additional_details = models.JSONField(null=True, blank=True)
     transaction_tokens_amount = models.BigIntegerField(null=True, blank=True)
-
+# unique reference number
     class Event(models.TextChoices):
         BUY = 'BUY', 'Buy'
         SELL = 'SELL', 'Sell'
