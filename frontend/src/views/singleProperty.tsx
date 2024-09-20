@@ -48,7 +48,7 @@ export const SingleProperty: React.FC = () => {
   useEffect(() => {
     const fetchPropertyOverview = async () => {
       try {
-        const apiUrl = `http://127.0.0.1:8000/property/${id}/?view=overview`;
+        const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/${id}/?view=overview`;
         const response = await axios.get<{ token_price: number, projected_annual_return:number }>(apiUrl);
         
         setTokenPrice(response.data.tokens[0].token_price);

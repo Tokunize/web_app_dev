@@ -85,7 +85,7 @@ export const CreatePropertyForm: React.FC<{ onNext: () => void }> = ({ onNext })
           'Content-Type': 'application/json',
         },
       };
-      const response = await axios.put('http://127.0.0.1:8000/property/create/', formValues, config);
+      const response = await axios.put(`${import.meta.env.VITE_APP_BACKEND_URL}property/create/`, formValues, config);
       console.log('Response:', response.data);
     } catch (error) {
       console.error('Error:', error);

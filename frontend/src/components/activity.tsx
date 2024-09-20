@@ -38,7 +38,7 @@ export const Activity: React.FC<ActivityProps> = ({ property_id, data }) => {
           return;
         }
 
-        const apiUrl = `http://127.0.0.1:8000/property/${property_id}/tokens-transactions/`;
+        const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/${property_id}/tokens-transactions/`;
         const config = {
           headers: {
             'Content-Type': 'application/json',
