@@ -16,6 +16,7 @@ import { Blog } from "./views/blog";
 import { SingleArticleView } from "./views/singleArticleView";
 import { Toaster } from "./components/ui/toaster";
 import { InvestorOverview } from "./components/dashboard/investorOverview";
+import AuthenticationPage from "./views/signUpPage2";
 
 const Layout = () => {
   return (
@@ -27,10 +28,11 @@ const Layout = () => {
           <Route element={<MainLayout />}>
             <Route path="/" element={<Marketplace />} />
             <Route path="property-details/:id/" element={<SingleProperty />} />
-            <Route path="sign-up/" element={<SignUpPage />} />
             <Route path="blog/" element={<Blog/>} />
             <Route path="blog/article/:id/" element={<SingleArticleView/>} />
           </Route>
+          
+          <Route path="sign-up/" element={<AuthenticationPage />} />
 
           {/*Dshboard with the sidemenu */}
           <Route element={<DashboardLayout />}>
