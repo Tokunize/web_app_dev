@@ -68,14 +68,8 @@ class Property(TimeStampedModel):
     dao_administration_fees = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Annual fees paid to the DAO for administrative services.")
     annual_cash_flow = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, help_text="Net annual revenue from the property, after deducting all expenses.")
     monthly_cash_flow = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, help_text="Net income from the property calculated on a monthly basis.")
+    equity_listed = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     projected_annual_cash_flow = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, help_text="Estimated yearly cash flow based on projected rental and operational costs.")
-# equiy listed
-
-    # Tokenization specifics
-    # total_tokens = models.BigIntegerField(null=True, blank=True, help_text="Total number of tokens issued for the property, representing ownership shares.")
-    # tokensSold = models.BigIntegerField(default=0, null=True, blank=True, help_text="Current number of tokens sold.")
-    # token_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Price per token, reflecting the value of a fractional ownership share.")
-    # blockchain_address = models.CharField(max_length=255, default="0xINVALID_DEFAULT_ADDRESS", null=True, blank=True, help_text="Blockchain address where the property's tokens are managed and transactions are recorded.")
     legal_documents_url = models.URLField(max_length=500, null=True, blank=True, help_text="URL to access legal documents related to this property.")
 
     # Indicadores de estado
@@ -101,7 +95,6 @@ class Token(models.Model):
 
 
 class PropertyToken(models.Model):
-    # ownership_id = models.AutoField(primary_key=True)
     property_code = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='property_tokens')
     token_code = models.ForeignKey(Token, on_delete=models.CASCADE, related_name='property_tokens')
     owner_user_code = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE, related_name='property_tokens')
@@ -121,7 +114,7 @@ class Transaction(TimeStampedModel):
     transaction_date = models.DateTimeField(auto_now_add=True)
     additional_details = models.JSONField(null=True, blank=True)
     transaction_tokens_amount = models.BigIntegerField(null=True, blank=True)
-# unique reference number
+    referene_number = models.CharField(null=True,blank=True, unique=True)
     class Event(models.TextChoices):
         BUY = 'BUY', 'Buy'
         SELL = 'SELL', 'Sell'

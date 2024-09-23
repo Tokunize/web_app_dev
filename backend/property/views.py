@@ -14,17 +14,18 @@ from .serializers import (
     TokenSerializer,
     TransactionSerializer,
     PropertyTokenPaymentSerializer,
-    InvestedPropertiesSerialier
+    InvestedPropertiesSerialier,
+    InvestmentOverviewSerializer
 )
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Max
+from .utils import get_total_tokens_owned
 from users.models import PropertyOwnerProfile
 from django.http import JsonResponse
 from .filters import PropertyFilter
 from users.authentication import Auth0JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny,BasePermission
-
 
 class IsAdminOrOwner(BasePermission):
     def has_permission(self, request, view):
@@ -307,7 +308,6 @@ class InvestedProperties(APIView):
 
     def get(self, request):
         user_id = request.user.id
-        print(user_id)
         
         properties = Property.objects.filter(transactions__transaction_owner_code_id=user_id).distinct()
 
@@ -317,3 +317,28 @@ class InvestedProperties(APIView):
     
 
 
+
+
+class UserInvestmentSummaryAPIView(APIView):
+    authentication_classes = [Auth0JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = InvestmentOverviewSerializer
+
+    def get(self, request):
+        user_id = request.user.id
+        user = request.user
+
+        total_tokens_owned = get_total_tokens_owned(user)
+
+        # Obtener propiedades del usuario
+        properties = Property.objects.filter(transactions__transaction_owner_code_id=user_id).distinct()
+        
+        # Serializar propiedades
+        properties_data = self.serializer_class(properties, many=True).data
+
+        data = {
+            'total_tokens_owned': total_tokens_owned,
+            'properties': properties_data,
+        }
+
+        return Response(data, status=status.HTTP_200_OK)

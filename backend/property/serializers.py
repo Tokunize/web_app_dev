@@ -204,3 +204,30 @@ class InvestedPropertiesSerialier(serializers.ModelSerializer):
         )
         
         return PropertyTokenSerializer(property_tokens, many=True).data
+    
+
+class InvestmentOverviewSerializer(serializers.ModelSerializer):
+    tokens = TokenSerializer(many=True, read_only=True)
+
+    yield_data = serializers.SerializerMethodField()
+    
+    diversification_data = serializers.SerializerMethodField()
+    class Meta:
+        model = Property
+        fields = ['title', 'tokens', 'yield_data', 'diversification_data']
+
+    def get_yield_data(self, obj):
+        first_image = obj.image[0] if obj.image and len(obj.image) > 0 else None
+
+        return {
+            "projected_annual_yield": obj.projected_annual_yield,
+            "projected_rental_yield": obj.projected_rental_yield,
+            "projected_annual_return": obj.projected_annual_return,
+            "image": first_image  
+
+        }
+
+    def get_diversification_data(self, obj):
+        return {
+            "property_type": obj.property_type
+        }
