@@ -47,20 +47,22 @@ const SideMenu: React.FC<SideMenuProps> = ({ data, onMenuClick }) => {
         } transition-transform duration-300 ease-in-out md:translate-x-0 flex flex-col justify-between`} // Add flex-col and justify-between
       >
         <ul className="space-y-2 sticky top-0">
-          {data.map((item, index) => (
-            <li key={index}>
-              <Link
-                to={item.link || '#'}
-                className="w-full text-left hover:bg-gray-100 p-2 rounded block"
-                onClick={() => {
-                  onMenuClick();
-                  setMenuOpen(false); 
-                }}
-              >
-                {item.name}
-              </Link>
-            </li>
-          ))}
+        {data.map((item, index) => (
+  <li key={index}>
+    <Link
+      to={item.link || '#'}
+      className="w-full text-left hover:bg-gray-100 p-2 rounded block flex items-center"
+      onClick={() => {
+        onMenuClick();
+        setMenuOpen(false); 
+      }}
+    >
+      {item.icon} {/* Renderiza el ícono directamente desde item.icon */}
+      <span className="ml-2">{item.name}</span>
+    </Link>
+  </li>
+))}
+
           <li>
             <Button className="w-full" onClick={() => {
               navigate("/");

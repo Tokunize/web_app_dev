@@ -3,28 +3,32 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import SideMenu from "./components/dashboard/sideMenu";
 import { useUser } from "./context/userProvider";
+import wallet from "./assets/cardIcon.svg";
+import coin from "./assets/coin.svg";
+import overview from "./assets/grid.svg"
+
 
 const DashboardLayout: React.FC = () => {
   const { role } = useUser(); 
 
   const menuData = role === 'admin' ? [
-    { name: 'Overview', link: '/overview/' },
-    { name: 'Property Managment', link: '/porfolio/' },
-    { name: 'Users Managment', link: '/dashboard/settings' },
-    { name: 'Settings', link: '/dashboard/settings' },
+    { name: 'Overview', link: '/overview/', icon: <img src={overview} alt="Overview Icon" className="w-4 h-4 inline" /> },
+    { name: 'Property Management', link: '/portfolio/', icon: <img src={wallet} alt="Property Management Icon" className="w-4 h-4 inline" /> },
+    { name: 'Users Management', link: '/dashboard/settings', icon: <img src={coin} alt="Users Management Icon" className="w-4 h-4 inline" /> },
+    { name: 'Settings', link: '/dashboard/settings', icon: <img src={coin} alt="Settings Icon" className="w-4 h-4 inline" /> },
   ] : role === 'owner' ? [
-    { name: 'Overview', link: '/overview/' },
-    { name: 'My Properties', link: '/porfolio/' },
-    { name: 'Settings', link: '/dashboard/settings' },
+    { name: 'Overview', link: '/overview/', icon: <img src={overview} alt="Overview Icon" className="w-4 h-4 inline" /> },
+    { name: 'My Properties', link: '/portfolio/', icon: <img src={wallet} alt="My Properties Icon" className="w-4 h-4 inline" /> },
+    { name: 'Settings', link: '/dashboard/settings', icon: <img src={coin} alt="Settings Icon" className="w-4 h-4 inline" /> },
   ] : role === 'investor' ? [
-    { name: 'Overview', link: '/investor-dashboard/' },
-    { name: 'Assets', link: '/investments/' },
-    { name: 'Wallet', link: '/transactions/' },
+    { name: 'Overview', link: '/investor-dashboard/', icon: <img src={overview} alt="Overview Icon" className="w-4 h-4 inline" /> },
+    { name: 'Assets', link: '/investments/', icon: <img src={coin} alt="Assets Icon" className="w-4 h-4 inline" /> },
+    { name: 'Wallet', link: '/transactions/', icon: <img src={wallet} alt="Wallet Icon" className="w-4 h-4 inline" /> },
   ] : role === "blog-admin" ? [
-    { name: 'Overview', link: '/blog-overview/' },
-    { name: 'All Articles', link: '/articles-list/' },
-    { name: 'Create Articles', link: '/create-article/' },
-  ]:[];
+    { name: 'Overview', link: '/blog-overview/', icon: <img src={overview} alt="Overview Icon" className="w-4 h-4 inline" /> },
+    { name: 'All Articles', link: '/articles-list/', icon: <img src={coin} alt="All Articles Icon" className="w-4 h-4 inline" /> },
+    { name: 'Create Articles', link: '/create-article/', icon: <img src={wallet} alt="Create Articles Icon" className="w-4 h-4 inline" /> },
+  ] : [];
 
   return (
     <div className="flex min-h-screen">
