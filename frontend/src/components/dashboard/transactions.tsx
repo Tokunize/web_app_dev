@@ -8,7 +8,7 @@ import autoTable from "jspdf-autotable";
 import * as React from "react";
 import { Download } from "lucide-react"; 
 import { CurrencyConverter } from "../currencyConverter";
-import { AddFuntsFlow } from "../funds/addFundsFlow";
+import { AddFundsFlow } from "../funds/addFundsFlow";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -138,7 +138,7 @@ export const Transaction = () => {
             <CurrencyConverter amountInUSD={30000} />
         </div>
         <span className="space-x-3">
-            <AddFuntsFlow/>
+            <AddFundsFlow/>
             <Button>Withdraw</Button>
 
         </span>
