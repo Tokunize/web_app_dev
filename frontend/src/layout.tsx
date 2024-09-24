@@ -10,7 +10,7 @@ import DashboardLayout from "./dashboardLayout";
 import MainLayout from "./mainLayout"; 
 import { GeneralDashboard } from "./components/dashboard/generalDashboard";
 import { Porfolio } from "./components/dashboard/porfolio";
-import { Investment } from "./components/dashboard/investment";
+import { Assests } from "./components/dashboard/assets";
 import { Transaction } from "./components/dashboard/transactions";
 import { Blog } from "./views/blog";
 import { SingleArticleView } from "./views/singleArticleView";
@@ -51,7 +51,7 @@ const Layout = () => {
              <Route
               path="investments/"
               element={
-                <ProtectedRoute roleRequired="investor" element={<Investment/>} />
+                <ProtectedRoute roleRequired="investor" element={<Assests/>} />
               }
             />
             <Route

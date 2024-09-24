@@ -25,9 +25,10 @@ const SideMenu: React.FC<SideMenuProps> = ({ data, onMenuClick }) => {
   };
 
   return (
-    <div className="absolute md:static w-full md:w-auto h-[50px] md:h-auto">
+    <aside className="absolute md:static w-full md:w-auto h-[50px] md:h-auto">
       {/* Button for mobile menu */}
-      <div className="md:hidden  p-4 flex justify-between items-center border-b">
+      
+      <div className="md:hidden p-4 flex justify-between items-center border-b">
         <div onClick={() => navigate("/")}>
           <h1 className="text-xl font-bold">Dashboard</h1>
         </div>
@@ -43,7 +44,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ data, onMenuClick }) => {
       <div
         className={`fixed md:static md:flex z-50 top-0 left-0 h-full w-52 bg-white p-5 border-r shadow-md transform ${
           menuOpen ? "translate-x-0 " : "-translate-x-full"
-        } transition-transform duration-300 ease-in-out md:translate-x-0`}
+        } transition-transform duration-300 ease-in-out md:translate-x-0 flex flex-col justify-between`} // Add flex-col and justify-between
       >
         <ul className="space-y-2 sticky top-0">
           {data.map((item, index) => (
@@ -66,10 +67,11 @@ const SideMenu: React.FC<SideMenuProps> = ({ data, onMenuClick }) => {
               setMenuOpen(false); 
             }}>Marketplace</Button>
           </li>
-          <li>
-            {isAuthenticated ? <LogoutButton /> : <LoginButton />}
-          </li>
         </ul>
+        {/* Place Logout/Login buttons at the bottom */}
+        <div className="mb-[40px]"> {/* Optional margin for spacing */}
+          {isAuthenticated ? <LogoutButton /> : <LoginButton />}
+        </div>
       </div>
 
       {menuOpen && (
@@ -78,7 +80,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ data, onMenuClick }) => {
           onClick={toggleMenu}
         ></div>
       )}
-    </div>
+    </aside>
   );
 };
 

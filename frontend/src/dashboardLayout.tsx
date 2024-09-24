@@ -17,10 +17,9 @@ const DashboardLayout: React.FC = () => {
     { name: 'My Properties', link: '/porfolio/' },
     { name: 'Settings', link: '/dashboard/settings' },
   ] : role === 'investor' ? [
-    { name: 'Overview', link: '/overview/' },
-    { name: 'My Investments', link: '/investments/' },
-    { name: 'My Transactions', link: '/transactions/' },
-    { name: 'Settings', link: '/dashboard/settings' },
+    { name: 'Overview', link: '/investor-dashboard/' },
+    { name: 'Assets', link: '/investments/' },
+    { name: 'Wallet', link: '/transactions/' },
   ] : role === "blog-admin" ? [
     { name: 'Overview', link: '/blog-overview/' },
     { name: 'All Articles', link: '/articles-list/' },

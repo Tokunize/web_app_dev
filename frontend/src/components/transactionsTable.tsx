@@ -17,73 +17,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDistanceToNowStrict } from "date-fns";  
+import { formatDistanceToNowStrict } from "date-fns";
 
-// Define the Transaction type
+// Define el tipo Transaction
 type Transaction = {
   id: number;
   event: string;
-  transaction_amount: number;
-  transaction_tokens_amount: number;
+  transaction_amount: string; // Mantén este tipo como string
+  transaction_tokens_amount: string; // Mantén este tipo como string
   transaction_owner: string;
-  transaction_date: string; // Adding the date field
+  created_at:string;
 };
-
-const columns: ColumnDef<Transaction>[] = [
-  {
-    accessorKey: "event",
-    header: "Event",
-    cell: ({ row }) => {
-      const event = row.getValue<string>("event");
-      let eventColor = "text-gray-500"; // Default color
-      
-      // Determine color based on event type
-      if (event === "SELL") {
-        eventColor = "text-blue-500";
-      } else if (event === "CANCELLATION") {
-        eventColor = "text-red-500";
-      } else if (event === "BUY") {
-        eventColor = "text-[#C8E870]";
-      }
-      
-      return <div className={eventColor}>{event}</div>;
-    },
-  },
-  {
-    accessorKey: "transaction_owner",
-    header: "Owner",
-    cell: ({ row }) => {
-      const owner = row.getValue<string>("transaction_owner");
-      return <div className="lowercase">{owner}</div>;
-    },
-  },
-  {
-    accessorKey: "transaction_amount",
-    header: () => <div className="text-right">Price</div>,
-    cell: ({ row }) => {
-      const price = row.getValue<number>("transaction_amount");
-      const formatted = new Intl.NumberFormat("en-UK", {
-        style: "currency",
-        currency: "GBP",
-      }).format(price);
-      return <div className="text-right font-medium">{formatted}</div>;
-    },
-  },
-  {
-    accessorKey: "transaction_tokens_amount",
-    header: () => <div className="text-right">Token Quantity</div>,
-    cell: ({ row }) => <div className="text-right">{row.getValue<number>("transaction_tokens_amount")}</div>,
-  },
-  {
-    accessorKey: "transaction_date",  // New column for transaction date
-    header: "Date",
-    cell: ({ row }) => {
-      const date = new Date(row.getValue<string>("transaction_date"));
-      const formattedDate = formatDistanceToNowStrict(date, { addSuffix: true });
-      return <div>{formattedDate}</div>;
-    },
-  },
-];
 
 interface TransactionTableProps {
   transactions: Transaction[];
@@ -91,6 +35,86 @@ interface TransactionTableProps {
 
 export const TransactionTable: React.FC<TransactionTableProps> = ({ transactions }) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
+
+  const columns: ColumnDef<Transaction>[] = [
+    {
+      accessorKey: "event",
+      header: "Event",
+      cell: ({ row }) => {
+        const event = row.getValue<string>("event");
+        let eventColor = "text-gray-500"; // Color predeterminado
+
+        // Determinar color según el tipo de evento
+        if (event === "SELL") {
+          eventColor = "text-blue-500";
+        } else if (event === "CANCELLATION") {
+          eventColor = "text-red-500";
+        } else if (event === "BUY") {
+          eventColor = "text-[#C8E870]";
+        }
+
+        return <div className={eventColor}>{event}</div>;
+      },
+    },
+    {
+      accessorKey: "transaction_owner",
+      header: "Owner",
+      cell: ({ row }) => {
+        const owner = row.getValue<string>("transaction_owner");
+        return <div className="lowercase">{owner}</div>;
+      },
+    },
+    {
+      accessorKey: "transaction_amount",
+      header: () => (
+        <div className="flex items-center justify-end">
+          <span>Amount (GBP)</span>
+          <button
+            onClick={() => setSorting([{ id: "transaction_amount", desc: !sorting[0]?.desc }])}
+            className="ml-2 text-gray-500 hover:text-gray-700"
+          >
+            {sorting[0]?.desc ? "↑" : "↓"}
+          </button>
+        </div>
+      ),
+      cell: ({ row }) => {
+        const amount = Number(row.getValue<string>("transaction_amount")); // Convertir a número
+        const formattedAmount = new Intl.NumberFormat("en-UK", {
+          style: "currency",
+          currency: "GBP",
+        }).format(amount);
+
+        return <div className="text-right font-medium">{formattedAmount}</div>;
+      },
+      sortingFn: (rowA, rowB) => {
+        const amountA = Number(rowA.getValue<string>("transaction_amount")) || 0; // Convertir a número
+        const amountB = Number(rowB.getValue<string>("transaction_amount")) || 0; // Convertir a número
+        return amountA - amountB; // Ordenar de menor a mayor
+      },
+    },
+    {
+      accessorKey: "transaction_tokens_amount",
+      header: () => <div className="text-right">Token Quantity</div>,
+      cell: ({ row }) => {
+        const tokens = Number(row.getValue<string>("transaction_tokens_amount")); // Convertir a número
+        return <div className="text-right">{tokens}</div>;
+      },
+      sortingFn: (rowA, rowB) => {
+        const tokensA = Number(rowA.getValue<string>("transaction_tokens_amount")) || 0; // Convertir a número
+        const tokensB = Number(rowB.getValue<string>("transaction_tokens_amount")) || 0; // Convertir a número
+        return tokensA - tokensB; // Ordenar de menor a mayor
+      },
+    },
+    {
+      accessorKey: "transaction_date", // Nueva columna para la fecha de transacción
+      header: "Date",
+      cell: ({ row }) => {
+        const date = new Date(row.getValue<string>("transaction_date"));
+        const formattedDate = formatDistanceToNowStrict(date, { addSuffix: true });
+        return <div>{formattedDate}</div>;
+      },
+    },
+  ];
 
   const table = useReactTable({
     data: transactions,
@@ -102,6 +126,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({ transactions
     state: {
       sorting,
     },
+    enableSorting: true, // Asegúrate de que la ordenación esté habilitada
   });
 
   return (
