@@ -173,10 +173,11 @@ class PropertyTokenSerializer(serializers.ModelSerializer):
 class InvestedPropertiesSerialier(serializers.ModelSerializer):
     tokens = TokenSerializer(many=True, read_only=True)
     user_tokens = serializers.SerializerMethodField()  # Añadir el campo para tokens del usuario
+    first_image = serializers.SerializerMethodField()  # Custom method field for the first image
 
     class Meta:
         model = Property
-        fields = ['id','title', 'tokens', 'user_tokens',
+        fields = ['title', 'tokens', 'user_tokens','first_image',
             "total_investment_value", 
             "underlying_asset_price",
             "closing_costs",
@@ -192,8 +193,12 @@ class InvestedPropertiesSerialier(serializers.ModelSerializer):
             "dao_administration_fees",
             "annual_cash_flow",
             "monthly_cash_flow",
+            "property_type",
+            "price",
             "projected_annual_cash_flow",
             "legal_documents_url",
+            "location",
+            "updated_at"
         ]
 
     def get_user_tokens(self, obj):
@@ -204,6 +209,9 @@ class InvestedPropertiesSerialier(serializers.ModelSerializer):
         )
         
         return PropertyTokenSerializer(property_tokens, many=True).data
+    def get_first_image(self, obj):
+        # Return the first image from the image ArrayField if available, else None
+        return obj.image[0] if obj.image and len(obj.image) > 0 else None
     
 
 class InvestmentOverviewSerializer(serializers.ModelSerializer):
@@ -211,23 +219,19 @@ class InvestmentOverviewSerializer(serializers.ModelSerializer):
 
     yield_data = serializers.SerializerMethodField()
     
-    diversification_data = serializers.SerializerMethodField()
     class Meta:
         model = Property
-        fields = ['title', 'tokens', 'yield_data', 'diversification_data']
+        fields = ['title', 'tokens','location', 'property_type','yield_data']
 
     def get_yield_data(self, obj):
         first_image = obj.image[0] if obj.image and len(obj.image) > 0 else None
 
         return {
+            "title": obj.title,
             "projected_annual_yield": obj.projected_annual_yield,
             "projected_rental_yield": obj.projected_rental_yield,
             "projected_annual_return": obj.projected_annual_return,
-            "image": first_image  
-
+            "image": first_image,
+            "location": obj.location 
         }
 
-    def get_diversification_data(self, obj):
-        return {
-            "property_type": obj.property_type
-        }

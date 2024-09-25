@@ -9,6 +9,7 @@ import * as React from "react";
 import { Download } from "lucide-react"; 
 import { CurrencyConverter } from "../currencyConverter";
 import { AddFundsFlow } from "../funds/addFundsFlow";
+import { CreateWallet } from "./createWallet";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -138,7 +139,8 @@ export const Transaction = () => {
             <CurrencyConverter amountInUSD={30000} />
         </div>
         <span className="space-x-3">
-            <AddFundsFlow/>
+            {/* <AddFundsFlow/> */}
+            <CreateWallet />
             <Button>Withdraw</Button>
 
         </span>

@@ -19,6 +19,7 @@ requests = "*"
 cryptography = "*"
 python-decouple = "*"
 cloudinary = "*"
+stripe = "*"
 
 [dev-packages]
 

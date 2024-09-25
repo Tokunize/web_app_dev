@@ -1,5 +1,6 @@
 import React from 'react';
 import { PaymentFlow } from '../payment/paymentFlow';
+import { CheckoutForm } from '../payment/paymentForm';
 
 interface PurchaseFormProps {
   tokenPrice: number;
@@ -28,6 +29,7 @@ export const PurchaseForm: React.FC<PurchaseFormProps> = ({
             <span className="font-xs text-gray-700">Est. annual return</span>
           </div>
         </div>
+        <CheckoutForm/>
         <PaymentFlow property_id={property_id} />
       </div>
     </section>

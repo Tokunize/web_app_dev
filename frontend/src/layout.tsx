@@ -54,6 +54,7 @@ const Layout = () => {
                 <ProtectedRoute roleRequired="investor" element={<Assests/>} />
               }
             />
+         
             <Route
               path="investor-dashboard/"
               element={

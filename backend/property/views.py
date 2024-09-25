@@ -1,6 +1,10 @@
 from django.shortcuts import render,get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import stripe
+import os
 
 from rest_framework.views import APIView
 from property.models import Property,Token,Transaction,PropertyToken
@@ -342,3 +346,43 @@ class UserInvestmentSummaryAPIView(APIView):
         }
 
         return Response(data, status=status.HTTP_200_OK)
+    
+
+
+stripe.api_key = 'sk_test_51Q2roYRqFZlL52ejF4l87u8oFLtm9lyKtUFmNYbeA04DX7aTv3YD1tbSkrQizCqtS5UWWE5RRXbcMdTN9fmU7VMa00MP5yTPjw'
+
+YOUR_DOMAIN = 'http://localhost:3000'
+
+@csrf_exempt  # Solo si estás usando el método POST y no tienes un CSRF token
+def create_checkout_session(request):
+    if request.method == 'POST':
+        try:
+            session = stripe.checkout.Session.create(
+                line_items=[
+                    {
+                        'price': '{{PRICE_ID}}',  # Cambia {{PRICE_ID}} por el ID del precio de tu producto
+                        'quantity': 1,
+                    },
+                ],
+                mode='payment',
+                success_url=YOUR_DOMAIN + '/success',
+                cancel_url=YOUR_DOMAIN + '/cancel',
+                payment_method_types=['card'],
+            )
+            return JsonResponse({'clientSecret': session.id})  # Usa session.id para el clientSecret
+        except Exception as e:
+            return JsonResponse({'error': str(e)})
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@csrf_exempt
+def session_status(request):
+    if request.method == 'GET':
+        session_id = request.GET.get('session_id')
+        session = stripe.checkout.Session.retrieve(session_id)
+        return JsonResponse({
+            'status': session.status,
+            'customer_email': session.customer_details.email,
+        })
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)

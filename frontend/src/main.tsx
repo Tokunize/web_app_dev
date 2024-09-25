@@ -5,6 +5,18 @@ import { UserProvider } from './context/userProvider';
 import './index.css';
 import 'leaflet/dist/leaflet.css';
 import Layout from './layout';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import { Buffer } from 'buffer';
+import process from 'process';
+
+// Assign Buffer and process to the global object
+window.Buffer = Buffer;
+window.process = process;
+
+
+// Cargar la clave pública de Stripe (clave de prueba)
+const stripePromise = loadStripe("pk_test_51Q2roYRqFZlL52ejvDj7VFzt4zFQWGszC1u8EBfu2P7hfzPbcmHaHRB6YFNItDxOjfb1ZzAlSUnWnEvG9vWJJ4sX00wcaLrbhW");
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -17,8 +29,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         scope: "openid profile email read:users write:users" 
       }}
     >
-      <UserProvider> 
-        <Layout />
+      <UserProvider>
+        {/* Agregar Elements de Stripe para envolver la aplicación */}
+        <Elements stripe={stripePromise}>
+          <Layout />
+        </Elements>
       </UserProvider>
     </Auth0Provider>
   </React.StrictMode>,

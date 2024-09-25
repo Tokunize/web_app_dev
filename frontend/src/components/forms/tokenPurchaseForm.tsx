@@ -3,6 +3,7 @@ import { Button } from '../ui/button';
 import axios from "axios";
 import { useAuth0 } from '@auth0/auth0-react';
 
+
 interface TokenPurchaseFormProps {
     token_price: number;
     property_id: number

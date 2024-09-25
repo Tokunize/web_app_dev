@@ -13,12 +13,12 @@ const DashboardLayout: React.FC = () => {
 
   const menuData = role === 'admin' ? [
     { name: 'Overview', link: '/overview/', icon: <img src={overview} alt="Overview Icon" className="w-4 h-4 inline" /> },
-    { name: 'Property Management', link: '/portfolio/', icon: <img src={wallet} alt="Property Management Icon" className="w-4 h-4 inline" /> },
+    { name: 'Property Management', link: '/porfolio/', icon: <img src={wallet} alt="Property Management Icon" className="w-4 h-4 inline" /> },
     { name: 'Users Management', link: '/dashboard/settings', icon: <img src={coin} alt="Users Management Icon" className="w-4 h-4 inline" /> },
     { name: 'Settings', link: '/dashboard/settings', icon: <img src={coin} alt="Settings Icon" className="w-4 h-4 inline" /> },
   ] : role === 'owner' ? [
     { name: 'Overview', link: '/overview/', icon: <img src={overview} alt="Overview Icon" className="w-4 h-4 inline" /> },
-    { name: 'My Properties', link: '/portfolio/', icon: <img src={wallet} alt="My Properties Icon" className="w-4 h-4 inline" /> },
+    { name: 'My Properties', link: '/porfolio/', icon: <img src={wallet} alt="My Properties Icon" className="w-4 h-4 inline" /> },
     { name: 'Settings', link: '/dashboard/settings', icon: <img src={coin} alt="Settings Icon" className="w-4 h-4 inline" /> },
   ] : role === 'investor' ? [
     { name: 'Overview', link: '/investor-dashboard/', icon: <img src={overview} alt="Overview Icon" className="w-4 h-4 inline" /> },

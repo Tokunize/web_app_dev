@@ -54,7 +54,8 @@ INSTALLED_APPS = [
     'corsheaders', #CORS]
     'django_filters',
     'users',
-    'blog'
+    'blog',
+    'wallet'
 ]
 
 
