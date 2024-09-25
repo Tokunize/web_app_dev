@@ -123,7 +123,7 @@ export const Transaction = () => {
   };
 
   if (loading) {
-    return <div>Loading transactions...</div>;
+    return <div>Loading the wallet...</div>;
   }
 
   if (error) {

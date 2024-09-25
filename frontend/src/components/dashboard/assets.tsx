@@ -98,18 +98,18 @@ export const Assests = () => {
         </h1>
         <Button>Back to marketplace</Button>
       </div>
-      <div  className="p-4 grid lg:grid-cols-2 bg-white flex shadow-md rounded-lg ">
-          <div className="space-y-3">
-            <p className="text-gray-500 text-sm">Total Properties Owned</p>
-            <span className="text-xl font-bold" >{investments?.length}</span>
-            <p className="text-gray-500 text-sm">Projected Rental Yield</p>
-            <span className="text-xl font-bold" >12.6%</span>
+      <div  className=" grid lg:grid-cols-2 bg-white flex items-center shadow-md rounded-lg ">
+          <div className="space-y-3 text-left border rounded-lg ml-4 p-4">
+            <p className="text-gray-500 text-medium">Total Properties Owned</p>
+            <span className="text-2xl font-bold" >{investments?.length}</span>
+            <p className="text-gray-500 text-medium">Projected Rental Yield</p>
+            <span className="text-2xl font-bold" >12.6%</span>
           </div>
-          <PieGraph
-            data={propertyChartData}
-            title="Property Types"
-            footerDescription="Showing total properties based on the property type"
-          />
+            <PieGraph
+              data={propertyChartData}
+              title="Property Types"
+              footerDescription="Showing total properties based on the property type"
+            />
       </div>
       <AssetsAccordion data={investments} />
   </div>

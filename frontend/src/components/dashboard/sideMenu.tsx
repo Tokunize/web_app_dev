@@ -8,6 +8,7 @@ import { useState } from 'react';
 interface MenuItem {
   name: string;
   link?: string;
+  icon:string
 }
 
 interface SideMenuProps {
@@ -48,21 +49,20 @@ const SideMenu: React.FC<SideMenuProps> = ({ data, onMenuClick }) => {
       >
         <ul className="space-y-2 sticky top-0">
         {data.map((item, index) => (
-  <li key={index}>
-    <Link
-      to={item.link || '#'}
-      className="w-full text-left hover:bg-gray-100 p-2 rounded block flex items-center"
-      onClick={() => {
-        onMenuClick();
-        setMenuOpen(false); 
-      }}
-    >
-      {item.icon} {/* Renderiza el ícono directamente desde item.icon */}
-      <span className="ml-2">{item.name}</span>
-    </Link>
-  </li>
-))}
-
+            <li key={index}>
+              <Link
+                to={item.link || '#'}
+                className="w-full text-left hover:bg-gray-100 p-2 rounded block flex items-center"
+                onClick={() => {
+                  onMenuClick();
+                  setMenuOpen(false); 
+                }}
+              >
+                {item.icon} {/* Renderiza el ícono directamente desde item.icon */}
+                <span className="ml-2">{item.name}</span>
+              </Link>
+            </li>
+          ))}
           <li>
             <Button className="w-full" onClick={() => {
               navigate("/");

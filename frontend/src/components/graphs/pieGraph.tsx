@@ -53,15 +53,17 @@ const Legend = ({ data }: { data: { location: string; fill: string, percentage:n
 export const PieGraph = ({ data, title,footerDescription }: PieGraphProps) => {
   const description = `Updated: ${formatDate(new Date())}`; // Set the description with the current date
   return (
-    <Card className="flex border-0 flex-col">
-      <CardHeader className="items-center pb-0">
+    <Card className="flex border-0 flex-col ">
+      <CardHeader className="items-center pb-0 hidden">
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription> {/* Use the description here */}
       </CardHeader>
-      <CardContent className="flex-1 pb-0">
+      <div className="flex items-center">
+
+      <CardContent className=" h-[250px] flex  w-[250px] items-center pb-0">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
+          className=" aspect-square w-[100%] h-[100%]"
         >
           <PieChart>
             <ChartTooltip
@@ -72,17 +74,20 @@ export const PieGraph = ({ data, title,footerDescription }: PieGraphProps) => {
               data={data}
               dataKey="percentage" // Change to "percentage"
               nameKey="location" // Change to "location"
-              innerRadius={60}
+              innerRadius={20}
             />
           </PieChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
+      <CardFooter className="flex-col text-center gap-2 text-sm">
         <div className="leading-none text-muted-foreground">
+          <p className="font-bold text-2xl mb-3 text-black">{title}</p>
           {footerDescription}
         </div>
         <Legend data={data} /> 
       </CardFooter>
+      </div>
+
     </Card>
   )
 }
