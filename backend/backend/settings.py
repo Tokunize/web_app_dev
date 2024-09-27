@@ -62,7 +62,8 @@ INSTALLED_APPS = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://monkfish-app-o6nz8.ondigitalocean.app"
+    "https://monkfish-app-o6nz8.ondigitalocean.app",
+    "https://dev-2l2jjwfm5ekzae3u.us.auth0.com"
 ]
 
 
@@ -198,3 +199,5 @@ cloudinary.config(
     api_secret='LhkuFGSvQWYkISi9a0PONdfj27o'
 )
 
+
+CIRCLE_API_KEY = config('CIRCLE_API_KEY')

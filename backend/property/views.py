@@ -5,6 +5,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import stripe
 import os
+from wallet.serializers import WalletSerializer
+from wallet.models import Wallet
 
 from rest_framework.views import APIView
 from property.models import Property,Token,Transaction,PropertyToken
@@ -228,8 +230,18 @@ class TransactionListview(APIView):
         user_id = request.user.id
                
         transactions = Transaction.objects.filter(transaction_owner_code=user_id)
+        transaction_serializer = TransactionSerializer(transactions, many=True)
+
         serializer = self.serializer_class(transactions, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        wallets = Wallet.objects.filter(wallet_user_id=user_id)
+        wallet_serializer = WalletSerializer(wallets, many=True)
+
+        response_data = {
+            "transactions": transaction_serializer.data,
+            "wallets": wallet_serializer.data
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
     
     def post(self, request):
         tokens_amount = int(request.data["token_amount"])

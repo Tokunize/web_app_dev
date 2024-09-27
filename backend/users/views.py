@@ -14,7 +14,6 @@ class SyncUserView(APIView):
     def post(self, request):
         # The user is already authenticated by the time we reach this point
         user = request.user  # This is the CustomUser that was either created or fetched
-        print(user.id, "ussserr")
 
         # Get additional data from the frontend
         email = request.data.get('email', user.email)
