@@ -8,6 +8,7 @@ from rest_framework import status
 from .authentication import Auth0JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.views.decorators.csrf import csrf_exempt
+import json
 
 from django.http import JsonResponse
 
@@ -15,6 +16,15 @@ from django.http import JsonResponse
 
 def hola_view(request):
     if request.method == 'POST':
+        data = json.loads(request.body)
+        print(data)
+        email = data.get('email', 'No email provided')
+        name = data.get('name', 'No name provided')
+        role = data.get('role', 'No role provided')
+
+            # Imprimir o registrar los datos (aquí usaremos print para debug)
+        print(f"Email: {email}, Name: {name}, Role: {role}")
+
         return JsonResponse({'message': 'Hola'}, status=200)
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
