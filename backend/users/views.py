@@ -7,8 +7,11 @@ from .serializers import CustomUserSerializer
 from rest_framework import status
 from .authentication import Auth0JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.views.decorators.csrf import csrf_exempt
 
 from django.http import JsonResponse
+
+@csrf_exempt
 
 def hola_view(request):
     if request.method == 'POST':
