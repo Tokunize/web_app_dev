@@ -8,6 +8,13 @@ from rest_framework import status
 from .authentication import Auth0JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
+from django.http import JsonResponse
+
+def hola_view(request):
+    if request.method == 'POST':
+        return JsonResponse({'message': 'Hola'}, status=200)
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
 class SyncUserView(APIView):
     authentication_classes = [Auth0JWTAuthentication]
 

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import SyncUserView, UserDetailView, UserListView, UserProfileView
+from .views import SyncUserView, UserDetailView, UserListView, UserProfileView,hola_view
 
 urlpatterns = [
     # Ruta para sincronizar o crear un usuario basado en el JWT
@@ -13,6 +13,9 @@ urlpatterns = [
 
     # Ruta para obtener el perfil del usuario autenticado
     path('profile/', UserProfileView.as_view(), name='user-profile'),
+
+    path('hola/', hola_view, name='hola'),
+
 
 
 ]
