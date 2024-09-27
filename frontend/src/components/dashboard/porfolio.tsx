@@ -5,6 +5,7 @@ import ClipLoader from 'react-spinners/ClipLoader';
 import { Button } from '@/components/ui/button';
 import { OwnerPropertyList } from '@/components/property/ownerPropertyList';
 import { useUser } from '@/context/userProvider';
+import { AddPropertyFlow } from '../addPropertyOwnerFlow';
 
 interface Property {
   id: number;
@@ -64,9 +65,7 @@ export const Porfolio: React.FC = () => {
       <div className="mb-6 flex justify-between items-center">
         <div>
           {role !== 'admin' && (
-            <Button onClick={toggleForm} className="mr-4">
-              {showForm ? 'Back to Properties' : 'New Property'}
-            </Button> 
+            <AddPropertyFlow/>
           )}
         </div>
       </div>
@@ -80,11 +79,8 @@ export const Porfolio: React.FC = () => {
         {error && <p className="text-red-500 mb-4">Error: {error}</p>}
       </div>
 
-      {showForm ? (
-        <OwnerPropertyForm onPropertyCreated={handlePropertyCreated} />  
-      ) : (
         <OwnerPropertyList propertyList={properties} role={role} />  
-      )}
+ 
     </section>
   );
 };

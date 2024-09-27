@@ -17,6 +17,7 @@ import { SingleArticleView } from "./views/singleArticleView";
 import { Toaster } from "./components/ui/toaster";
 import { InvestorOverview } from "./components/dashboard/investorOverview";
 import AuthenticationPage from "./views/signUpPage2";
+import { OwnerDashboard } from "./components/dashboard/ownerOverview";
 
 const Layout = () => {
   return (
@@ -62,9 +63,9 @@ const Layout = () => {
               }
             />
             <Route
-              path="overview/"
+              path="owner-dashboard/"
               element={
-                <ProtectedRoute roleRequired="owner,admin,investor" element={<GeneralDashboard />} />
+                <ProtectedRoute roleRequired="owner" element={<OwnerDashboard />} />
               }
             />
             {/* <Route

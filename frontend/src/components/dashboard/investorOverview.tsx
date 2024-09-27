@@ -161,7 +161,7 @@ export const InvestorOverview = () => {
           <RiskOverview />
         </Card>
         <Card>
-          <PerformanceGraph />
+          {/* <PerformanceGraph/> */}
         </Card>
       </div>
     </section>

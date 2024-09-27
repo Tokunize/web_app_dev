@@ -94,3 +94,8 @@
 .custom-landing-carousel group {
   display: none;
 } 
+
+#addPropertyModal{
+  display: flex !important;
+  flex-direction: column !important;
+}

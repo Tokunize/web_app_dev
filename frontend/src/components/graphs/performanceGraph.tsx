@@ -1,8 +1,7 @@
-"use client"
+"use client";
 
-import { TrendingUp } from "lucide-react"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
-
+import { TrendingUp } from "lucide-react";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
 import {
   Card,
@@ -11,46 +10,46 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
 
-export const description = "A linear area chart"
+// Define the props type for PerformanceGraph
+interface PerformanceGraphProps {
+  title: string;
+  description: string;
+  data: { month: string; value: number }[]; // Adjust this type based on the data structure
+}
 
-const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-]
+export const description = "A linear area chart";
 
-const chartConfig = {
+const chartConfig: ChartConfig = {
   desktop: {
     label: "Desktop",
     color: "hsl(var(--chart-1))",
   },
-} satisfies ChartConfig
+};
 
-export const PerformanceGraph = () => {
+export const PerformanceGraph: React.FC<PerformanceGraphProps> = ({
+  title,
+  description,
+  data,
+}) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Area Chart - Linear</CardTitle>
-        <CardDescription>
-          Showing total visitors for the last 6 months
-        </CardDescription>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
           <AreaChart
             accessibilityLayer
-            data={chartData}
+            data={data}
             margin={{
               left: 12,
               right: 12,
@@ -69,7 +68,7 @@ export const PerformanceGraph = () => {
               content={<ChartTooltipContent indicator="dot" hideLabel />}
             />
             <Area
-              dataKey="desktop"
+              dataKey="value"  // Cambiar de "desktop" a "value" para usar el valor dinámico
               type="linear"
               fill="var(--color-desktop)"
               fillOpacity={0.4}
@@ -91,5 +90,5 @@ export const PerformanceGraph = () => {
         </div>
       </CardFooter>
     </Card>
-  )
-}
+  );
+};

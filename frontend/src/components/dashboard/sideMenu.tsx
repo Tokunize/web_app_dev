@@ -63,12 +63,6 @@ const SideMenu: React.FC<SideMenuProps> = ({ data, onMenuClick }) => {
               </Link>
             </li>
           ))}
-          <li>
-            <Button className="w-full" onClick={() => {
-              navigate("/");
-              setMenuOpen(false); 
-            }}>Marketplace</Button>
-          </li>
         </ul>
         {/* Place Logout/Login buttons at the bottom */}
         <div className="mb-[40px]"> {/* Optional margin for spacing */}

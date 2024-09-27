@@ -17,9 +17,8 @@ const DashboardLayout: React.FC = () => {
     { name: 'Users Management', link: '/dashboard/settings', icon: <img src={coin} alt="Users Management Icon" className="w-4 h-4 inline" /> },
     { name: 'Settings', link: '/dashboard/settings', icon: <img src={coin} alt="Settings Icon" className="w-4 h-4 inline" /> },
   ] : role === 'owner' ? [
-    { name: 'Overview', link: '/overview/', icon: <img src={overview} alt="Overview Icon" className="w-4 h-4 inline" /> },
-    { name: 'My Properties', link: '/porfolio/', icon: <img src={wallet} alt="My Properties Icon" className="w-4 h-4 inline" /> },
-    { name: 'Settings', link: '/dashboard/settings', icon: <img src={coin} alt="Settings Icon" className="w-4 h-4 inline" /> },
+    { name: 'Overview', link: '/owner-dashboard/', icon: <img src={overview} alt="Overview Icon" className="w-4 h-4 inline" /> },
+    { name: 'My Properties', link: '/porfolio/', icon: <img src={coin} alt="Settings Icon" className="w-4 h-4 inline" /> },
   ] : role === 'investor' ? [
     { name: 'Overview', link: '/investor-dashboard/', icon: <img src={overview} alt="Overview Icon" className="w-4 h-4 inline" /> },
     { name: 'Assets', link: '/investments/', icon: <img src={coin} alt="Assets Icon" className="w-4 h-4 inline" /> },
