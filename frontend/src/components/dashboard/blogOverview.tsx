@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
-import { SubscribersTableList } from "../blog/subscribersTablelist";
+import { SubscribersTableList } from "../blog/subscribersTableList";
 
 interface BlogVisits {
   dates: string[];
@@ -30,7 +30,7 @@ export const BlogOverview = () => {
       const config = {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          "Authorization": `Bearer ${accessToken}`,
         },
       };
       const response = await axios.get(apiUrl, config);

@@ -54,7 +54,7 @@ export const Transaction = () => {
         },
       });
       console.log(response.data); // Log the data
-      setTransactions(response.data);
+      setTransactions(response.data.transactions);
       setLoading(false);
     } catch (error) {
       setError("Failed to fetch transactions");

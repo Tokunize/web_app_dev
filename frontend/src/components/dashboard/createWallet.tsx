@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import axios from 'axios';
 import {
   Dialog,
   DialogTrigger,
@@ -7,8 +8,9 @@ import {
   DialogDescription,
 } from '../ui/dialog';
 import { Button } from '../ui/button';
+import { useAuth0 } from '@auth0/auth0-react';
+import { Pin } from '@/views/pin';
 
-// Componente Spinner
 const Spinner = () => {
   return (
     <div className="flex justify-center items-center mt-4">
@@ -17,22 +19,62 @@ const Spinner = () => {
   );
 };
 
-// Componente CreateWallet
 export const CreateWallet = () => {
+  const { getAccessTokenSilently } = useAuth0();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [acceptedTerms, setAcceptedTerms] = useState(false); // Estado del checkbox
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [walletResponse, setWalletResponse] = useState(null); // State to hold the wallet response data
 
-  const handleCreateWallet = () => {
+  const handleCreateWallet = async () => {
     setLoading(true);
+    try {
+      const accessToken = await getAccessTokenSilently();
+      const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}wallet/create/`;
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      };
+      const payload = {};
 
-    // Simular la creación de una wallet
-    setTimeout(() => {
+      const response = await axios.post(apiUrl, payload, config);
+      // Handle the API response
+      console.log('Wallet created:', response.data);
+
+
+      setWalletResponse(response.data); // Store the wallet response
+      setOpen(false);
+    } catch (error) {
+      console.error('Error creating wallet:', error);
+    } finally {
       setLoading(false);
-      // Aquí puedes cerrar el diálogo si es necesario
-      // setOpen(false);
-    }, 2000); // Simular un tiempo de carga de 2 segundos
+    }
   };
+
+  const saveWalletInBackend = async () =>{
+    try{
+      const accessToken = await getAccessTokenSilently()
+      const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}wallet/save-wallet/`;
+
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      };
+
+      const payload = {};
+
+      const response = await axios.post(apiUrl,payload,config)
+      console.log(response.data);
+    }catch(err){
+      console.log(err);
+      
+    }
+  }
+
 
   return (
     <div>
@@ -60,13 +102,17 @@ export const CreateWallet = () => {
           </div>
           <div className="mt-4">
             {!loading ? (
+              <>
               <Button
                 onClick={handleCreateWallet}
-                disabled={!acceptedTerms} // Deshabilitar el botón si no se acepta el checkbox
+                disabled={!acceptedTerms}
                 className={`${acceptedTerms ? '' : 'bg-gray-300 cursor-not-allowed'}`}
               >
                 Confirm Creation
               </Button>
+
+              <Button onClick={saveWalletInBackend} >Svae it</Button>
+              </>
             ) : (
               <>
                 <p className="mt-4">We are creating an account for you...</p>
@@ -76,6 +122,15 @@ export const CreateWallet = () => {
           </div>
         </DialogContent>
       </Dialog>
+      {/* Render Pin component conditionally after wallet creation */}
+      {walletResponse && (
+        <Pin
+          userToken={walletResponse.userToken}
+          encryptionKey={walletResponse.encryptionKey}
+          challengeId={walletResponse.challengeId}
+          user_id={walletResponse.user_id}
+        />
+      )}
     </div>
   );
 };

@@ -21,7 +21,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           // Obtén los claims del ID token
           const claims = await getIdTokenClaims();
-
+          console.log(claims);
+          
           // Extrae el rol, nombre y apellido del claim personalizado
           const userRole = claims["https://tokunize.com/role"];
         
