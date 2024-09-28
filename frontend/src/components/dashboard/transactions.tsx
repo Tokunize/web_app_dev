@@ -139,7 +139,7 @@ export const Transaction = () => {
             <CurrencyConverter amountInUSD={30000} />
         </div>
         <span className="space-x-3">
-            {/* <AddFundsFlow/> */}
+            <AddFundsFlow/>
             <CreateWallet />
             <Button>Withdraw</Button>
 

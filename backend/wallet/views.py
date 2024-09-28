@@ -10,7 +10,7 @@ from decouple import config
 import uuid
 from django.conf import settings
 from rest_framework.views import APIView
-
+from users.models import CustomUser
 
 class CreateWalletAPIView(APIView):
     authentication_classes = [Auth0JWTAuthentication]
@@ -32,7 +32,7 @@ class CreateWalletAPIView(APIView):
 
             print(combined_user_id)
 
-            # Preparar el payload para la creación de la wallet
+            # Preparar el payload para la creación de la wallet -----------------------------
             payload = {
                 "userId": str(combined_user_id)  # Se asegura que el userId coincida con lo que Circle espera
             }
@@ -209,3 +209,56 @@ class SaveWalletInBackend(APIView):
             return Response({"detail": f"An error occurred during saving the wallet in the backend: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
+
+
+class AddFundsWallet(APIView):
+    authentication_classes = [Auth0JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user_id = request.user.id
+        amount_fund = request.data.get('fundAmount')  # Aquí usamos paréntesis para get()
+        
+        # Obtener la API key desde settings
+        api_key = settings.CIRCLE_API_KEY
+
+        # Verificar si la API key está configurada
+        if not api_key:
+            return Response({"error": "API key not configured"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        try:
+            # Obtener la wallet asociada al usuario
+            wallet = Wallet.objects.get(wallet_user_id=user_id)
+            wallet_address = wallet.wallet_address
+        except Wallet.DoesNotExist:
+            return Response({"error": "No wallet found for this user"}, status=status.HTTP_404_NOT_FOUND)
+
+        url = "https://api.circle.com/v1/faucet/drips"
+
+        # Payload para la API de Circle
+        payload = {
+            "address": wallet_address,
+            "blockchain": "ETH-SEPOLIA",
+            "native": False,
+            "usdc": True,
+            "eurc": False,
+            "amount": amount_fund  
+        }
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {api_key}"
+        }
+
+        try:
+            response = requests.post(url, json=payload, headers=headers)
+            response_data = response.json()
+
+            # Verificar si la solicitud fue exitosa
+            if response.status_code not in (200, 201):
+                return Response({"error": response_data}, status=response.status_code)
+            else:
+                return Response(response_data, status=status.HTTP_200_OK)
+            
+        except requests.exceptions.RequestException as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

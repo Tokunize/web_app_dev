@@ -3,7 +3,10 @@ import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTrigger, Dialo
 import { Button } from "@/components/ui/button";
 import cardIcon from "../../assets/cardIcon.svg";
 import yellowCardIcon from "../../assets/yellowCardIcon.svg";
+import axios from "axios"
 import checkBoxSuccesIcon from "../../assets/bigCheckBox.svg";
+import { useAuth0 } from '@auth0/auth0-react';
+
 
 export const AddFundsFlow: React.FC = () => {
     const [step, setStep] = useState(1);
@@ -86,31 +89,84 @@ export const AddFundsFlow: React.FC = () => {
 };
 
 interface FundAmountReviewProps {
-    selectedPaymentMethod: string | null; // Allow null for the method
-    fundAmount: number | null; // Allow null for the amount
-}
-
-export const FundAmountReview: React.FC<FundAmountReviewProps> = ({ fundAmount, selectedPaymentMethod }) => {
+    selectedPaymentMethod: string | null; // Permitir null para el método de pago
+    fundAmount: number | null; // Permitir null para el monto
+  }
+  
+  export const FundAmountReview: React.FC<FundAmountReviewProps> = ({ fundAmount, selectedPaymentMethod }) => {
+    const { getAccessTokenSilently } = useAuth0();
+    const [responseMessage, setResponseMessage] = useState<string | null>(null);
+  
+    const makePayment = async () => {
+      try {
+        // Obtener el access token desde Auth0
+        const token = await getAccessTokenSilently();
+  
+        const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}wallet/fund-wallet/`; 
+  
+        // Configuración de la solicitud con los headers
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`, // Token de acceso en los headers
+            'Content-Type': 'application/json', // El cuerpo será tratado como JSON
+          },
+        };
+  
+        // Realizar la solicitud POST utilizando axios
+        const response = await axios.post(
+          apiUrl, // URL de la API
+          {
+            fundAmount, 
+            selectedPaymentMethod,
+          },
+          config // Configuración con los headers
+        );
+  
+        // Verificar si la solicitud fue exitosa
+        if (response.status === 200) {
+          setResponseMessage('Payment successful!');
+        } else {
+          setResponseMessage(`Payment failed! Status: ${response.status}`);
+        }
+  
+      } catch (error: any) {
+        // Manejo detallado del error
+        if (error.response) {
+          // Errores con respuesta del servidor
+          console.error('Error en la respuesta:', error.response.data);
+          setResponseMessage(`Payment failed! Error: ${error.response.data.message}`);
+        } else if (error.request) {
+          // Errores en la solicitud pero sin respuesta
+          console.error('No se recibió respuesta del servidor:', error.request);
+          setResponseMessage('Payment failed! No response from server.');
+        } else {
+          // Otros errores durante la solicitud
+          console.error('Error al hacer la solicitud:', error.message);
+          setResponseMessage(`Payment failed! Error: ${error.message}`);
+        }
+      }
+    };
+    
     return (
-        <form className="p-5 border rounded-lg bg-white">
-            <h4 className="font-bold text-xl mb-4">Order View</h4>
-            <div className="flex items-center justify-center mb-4">
-                <h3 className="font-bold text-3xl text-[#C8E870]">£{fundAmount ?? "0.00"}</h3>
-            </div>
-            <ul className="space-y-2">
-                <li className="flex justify-between py-2 border-b">
-                    <span className="font-bold text-sm">Fee</span>
-                    <span className="text-gray-500">£ 0.00GBP</span>
-                </li>
-                <li className="flex justify-between py-2">
-                    <span className="font-bold text-sm">Pay With</span>
-                    <span className="text-gray-500">{selectedPaymentMethod}</span>
-                </li>
-            </ul>
-        </form>
+      <form className="p-5 border rounded-lg bg-white">
+        <h4 className="font-bold text-xl mb-4">Order View</h4>
+        <div className="flex items-center justify-center mb-4">
+          <h3 className="font-bold text-3xl text-[#C8E870]">£{fundAmount ?? "0.00"}</h3>
+        </div>
+        <ul className="space-y-2">
+          <li className="flex justify-between py-2 border-b">
+            <span className="font-bold text-sm">Fee</span>
+            <span className="text-gray-500">£ 0.00GBP</span>
+          </li>
+          <li className="flex justify-between py-2">
+            <span className="font-bold text-sm">Pay With</span>
+            <span className="text-gray-500">{selectedPaymentMethod ?? "Not selected"}</span>
+          </li>
+        </ul>
+        {responseMessage && <p>{responseMessage}</p>}
+      </form>
     );
-}
-
+  };
 interface FundAmountProps {
     goNext: () => void;
     selectedPaymentMethod: string | null;
