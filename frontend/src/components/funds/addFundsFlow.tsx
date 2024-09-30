@@ -9,14 +9,16 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 
 export const AddFundsFlow: React.FC = () => {
+    const { getAccessTokenSilently } = useAuth0();
     const [step, setStep] = useState(1);
     const [fundMethod, setFundMethod] = useState<string | null>(null);
-    const [fundAmount, setFundAmount] = useState<number | null>(null); // Change this to number
+    const [fundAmount, setFundAmount] = useState<number | null>(null);
+    const [responseMessage, setResponseMessage] = useState<string | null>(null);
 
     const goNext = () => setStep((prev) => prev + 1);
     const goBack = () => {
         if (step === 3 && fundMethod) {
-            setStep(1); // Go back to step 2 if a payment method is selected
+            setStep(1); // Go back to step 1 if a payment method is selected
         } else {
             setStep((prev) => Math.max(prev - 1, 1)); // Ensure we don’t go below step 1
         }
@@ -27,13 +29,53 @@ export const AddFundsFlow: React.FC = () => {
         setStep(1);
     };
 
+    const makePayment = async () => {
+        try {
+            const token = await getAccessTokenSilently();
+            const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}wallet/fund-wallet/`;
+    
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            };
+    
+            const response = await axios.post(
+                apiUrl,
+                { fundAmount, selectedPaymentMethod: fundMethod },
+                config
+            );
+    
+            if (response.status === 200) {
+                setResponseMessage('Payment successful!');
+                goNext();  // Solo avanzamos si el pago fue exitoso
+                setStep(4);  // Ir directamente al paso 4 (final) si el pago es exitoso
+
+            } else {
+                setResponseMessage(`Payment failed! Status: ${response.status}`);
+            }
+        } catch (error: any) {
+            if (error.response) {
+                console.error('Error en la respuesta:', error.response.data);
+                setResponseMessage(`Payment failed! Error: ${error.response.data.message}`);
+            } else if (error.request) {
+                console.error('No se recibió respuesta del servidor:', error.request);
+                setResponseMessage('Payment failed! No response from server.');
+            } else {
+                console.error('Error al hacer la solicitud:', error.message);
+                setResponseMessage(`Payment failed! Error: ${error.message}`);
+            }
+        }
+    };
+
     const renderSteps = () => {
         switch (step) {
             case 1:
                 return (
                     <FundAmount
                         selectedPaymentMethod={fundMethod}
-                        setFundAmount={(amount) => setFundAmount(amount ? Number(amount) : null)} // Ensure the amount is converted to number
+                        setFundAmount={(amount) => setFundAmount(amount ? Number(amount) : null)}
                         fundAmount={fundAmount}
                         goNext={() => setStep(2)}
                     />
@@ -43,7 +85,7 @@ export const AddFundsFlow: React.FC = () => {
             case 3:
                 return <FundAmountReview selectedPaymentMethod={fundMethod} fundAmount={fundAmount} />;
             case 4:
-                return <FundSummary investmentAmount={fundAmount?.toString() || "0"} />; // Pass as string
+                return <FundSummary investmentAmount={fundAmount?.toString() || "0"} />;
             default:
                 return null;
         }
@@ -78,7 +120,7 @@ export const AddFundsFlow: React.FC = () => {
                         </Button>
                     )}
                     {step === 3 && (
-                        <Button onClick={goNext}>
+                        <Button onClick={makePayment}> {/* Ejecutar makePayment en lugar de goNext */}
                             Confirm
                         </Button>
                     )}
@@ -88,65 +130,14 @@ export const AddFundsFlow: React.FC = () => {
     );
 };
 
+
 interface FundAmountReviewProps {
     selectedPaymentMethod: string | null; // Permitir null para el método de pago
     fundAmount: number | null; // Permitir null para el monto
   }
   
   export const FundAmountReview: React.FC<FundAmountReviewProps> = ({ fundAmount, selectedPaymentMethod }) => {
-    const { getAccessTokenSilently } = useAuth0();
-    const [responseMessage, setResponseMessage] = useState<string | null>(null);
-  
-    const makePayment = async () => {
-      try {
-        // Obtener el access token desde Auth0
-        const token = await getAccessTokenSilently();
-  
-        const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}wallet/fund-wallet/`; 
-  
-        // Configuración de la solicitud con los headers
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`, // Token de acceso en los headers
-            'Content-Type': 'application/json', // El cuerpo será tratado como JSON
-          },
-        };
-  
-        // Realizar la solicitud POST utilizando axios
-        const response = await axios.post(
-          apiUrl, // URL de la API
-          {
-            fundAmount, 
-            selectedPaymentMethod,
-          },
-          config // Configuración con los headers
-        );
-  
-        // Verificar si la solicitud fue exitosa
-        if (response.status === 200) {
-          setResponseMessage('Payment successful!');
-        } else {
-          setResponseMessage(`Payment failed! Status: ${response.status}`);
-        }
-  
-      } catch (error: any) {
-        // Manejo detallado del error
-        if (error.response) {
-          // Errores con respuesta del servidor
-          console.error('Error en la respuesta:', error.response.data);
-          setResponseMessage(`Payment failed! Error: ${error.response.data.message}`);
-        } else if (error.request) {
-          // Errores en la solicitud pero sin respuesta
-          console.error('No se recibió respuesta del servidor:', error.request);
-          setResponseMessage('Payment failed! No response from server.');
-        } else {
-          // Otros errores durante la solicitud
-          console.error('Error al hacer la solicitud:', error.message);
-          setResponseMessage(`Payment failed! Error: ${error.message}`);
-        }
-      }
-    };
-    
+   
     return (
       <form className="p-5 border rounded-lg bg-white">
         <h4 className="font-bold text-xl mb-4">Order View</h4>
@@ -163,10 +154,11 @@ interface FundAmountReviewProps {
             <span className="text-gray-500">{selectedPaymentMethod ?? "Not selected"}</span>
           </li>
         </ul>
-        {responseMessage && <p>{responseMessage}</p>}
       </form>
     );
   };
+
+
 interface FundAmountProps {
     goNext: () => void;
     selectedPaymentMethod: string | null;

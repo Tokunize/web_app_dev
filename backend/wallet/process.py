@@ -141,9 +141,8 @@ wallet_id = "a2bf023e-ed97-5219-aef7-d46e7ae15b38"  # Provide your actual wallet
 
 
 
-
-url = "https://api.circle.com/v1/w3s/wallets?userId=3af845a5"
-
+user_id_from_payload="d3f4c782" 
+url= f"https://api.circle.com/v1/w3s/wallets?userId={user_id_from_payload}"
 headers = {
     "Content-Type": "application/json",
     "Authorization": f"Bearer {apikey}"
@@ -151,30 +150,36 @@ headers = {
 
 response = requests.get(url, headers=headers)
 
-print(response.text)
+response_data = response.json()
+wallets = response_data.get("data", {}).get("wallets", [])
+print(f"Wallets: {wallets}")
 
+wallet_details = wallets[0]
+wallet_id = wallet_details.get("id")
+wallet_address = wallet_details.get("address")
 
-{"data":{"wallets":[{"id":"9e66e539-c98c-5560-8ca2-01fd8a871ada","state":"LIVE","walletSetId":"f3a7f831-9494-5bf3-9625-5d51f9e97fb4","custodyType":"ENDUSER","userId":"user08","address":"0x9e63432feab12d3ea68ac76b5ad108592df92d65","blockchain":"ETH-SEPOLIA","accountType":"SCA","updateDate":"2024-09-25T17:02:47Z","createDate":"2024-09-25T17:02:47Z","scaCore":"circle_6900_singleowner_v1"}]}}
+print(wallet_address)
+# {"data":{"wallets":[{"id":"9e66e539-c98c-5560-8ca2-01fd8a871ada","state":"LIVE","walletSetId":"f3a7f831-9494-5bf3-9625-5d51f9e97fb4","custodyType":"ENDUSER","userId":"user08","address":"0x9e63432feab12d3ea68ac76b5ad108592df92d65","blockchain":"ETH-SEPOLIA","accountType":"SCA","updateDate":"2024-09-25T17:02:47Z","createDate":"2024-09-25T17:02:47Z","scaCore":"circle_6900_singleowner_v1"}]}}
 
 
 # from .wallet.models import Wallet
 
-def saveWalletInBackend(circleId,userId):
+# def saveWalletInBackend(circleId,userId):
     
-    get_wallet_url = f"https://api.circle.com/v1/w3s/wallets?userId=${userId}"
-    headers ={
-        "Content-Type": "Application/json",
-        "Authorization": f"Bearer {apikey}"
-    }
-    response = requests.get(get_wallet_url, headers=headers)
+#     get_wallet_url = f"https://api.circle.com/v1/w3s/wallets?userId=${userId}"
+#     headers ={
+#         "Content-Type": "Application/json",
+#         "Authorization": f"Bearer {apikey}"
+#     }
+#     response = requests.get(get_wallet_url, headers=headers)
 
-    response_data = response.json()
-    wallet_addres = response_data.get("data",{}).get("address")
-    wallet_id = response_data.get("data",{}).get("id")
+#     response_data = response.json()
+#     wallet_addres = response_data.get("data",{}).get("address")
+#     wallet_id = response_data.get("data",{}).get("id")
     
     
 
-    print(response.text)
+#     print(response.text)
 
 
 

@@ -158,16 +158,17 @@ class SaveWalletInBackend(APIView):
 
     def post(self, request):
         apikey = settings.CIRCLE_API_KEY  # Get Circle API key from settings
-        user_id = request.user.id  # Get authenticated user's ID
+        verify_user_id = request.user.id  # Get authenticated user's ID
 
         try:
             payload = request.data
             user_id_from_payload = payload.get('user_id')
+            print(user_id_from_payload, "usuario aqui ")
             # Circle API URL with the provided user ID
             get_wallet_url = f"https://api.circle.com/v1/w3s/wallets?userId={user_id_from_payload}"
             headers = {
                 "Content-Type": "application/json",
-                "Authorization": f"Bearer {apikey}"  # Ensure the API key is correct and properly formatted
+                "Authorization": f"Bearer {apikey}"
             }
 
             # Make the GET request to Circle API
@@ -175,7 +176,7 @@ class SaveWalletInBackend(APIView):
             response_data = response.json()
 
             # Debug the full response
-            print(f"Circle API Response: {response_data}")
+            # print(f"Circle API Response: {response_data}")
 
             wallets = response_data.get("data", {}).get("wallets", [])
             print(f"Wallets: {wallets}")
@@ -187,14 +188,19 @@ class SaveWalletInBackend(APIView):
             # Extract wallet details
             wallet_details = wallets[0]
             wallet_id = wallet_details.get("id")
+            print(wallet_id)
             wallet_address = wallet_details.get("address")
+            print(wallet_address)
+
 
             # Prepare the wallet data to be saved
             wallet_data = {
                 'wallet_id': wallet_id,
                 'wallet_address': wallet_address,
-                'wallet_user_id': user_id  # Associating the wallet with the authenticated user
+                'wallet_user_id': verify_user_id  # Associating the wallet with the authenticated user
             }
+        
+            print("esto es lo que envuii", wallet_data)
 
             # Serialize and save the wallet data
             serializer = WalletSerializer(data=wallet_data)
@@ -217,17 +223,18 @@ class AddFundsWallet(APIView):
 
     def post(self, request):
         user_id = request.user.id
-        amount_fund = request.data.get('fundAmount')  # Aquí usamos paréntesis para get()
+        amount_fund = request.data.get('fundAmount')  # Using get() to avoid KeyError
+        print(amount_fund,"----------------------")
         
-        # Obtener la API key desde settings
+        # Get the API key from settings
         api_key = settings.CIRCLE_API_KEY
 
-        # Verificar si la API key está configurada
+        # Check if the API key is configured
         if not api_key:
             return Response({"error": "API key not configured"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         try:
-            # Obtener la wallet asociada al usuario
+            # Get the user's wallet
             wallet = Wallet.objects.get(wallet_user_id=user_id)
             wallet_address = wallet.wallet_address
         except Wallet.DoesNotExist:
@@ -235,7 +242,7 @@ class AddFundsWallet(APIView):
 
         url = "https://api.circle.com/v1/faucet/drips"
 
-        # Payload para la API de Circle
+        # Payload for the Circle API
         payload = {
             "address": wallet_address,
             "blockchain": "ETH-SEPOLIA",
@@ -252,13 +259,26 @@ class AddFundsWallet(APIView):
 
         try:
             response = requests.post(url, json=payload, headers=headers)
-            response_data = response.json()
 
-            # Verificar si la solicitud fue exitosa
+            # Log the response status code and text for debugging
+            print(f"Response Status Code: {response.status_code}")
+            print(f"Response Text: {response.text}")
+
+            # Check if the response was successful
             if response.status_code not in (200, 201):
-                return Response({"error": response_data}, status=response.status_code)
-            else:
-                return Response(response_data, status=status.HTTP_200_OK)
+                # Try to decode the response as JSON; if it fails, use the text
+                try:
+                    response_data = response.json()
+                    print(response_data)
+                except ValueError:  # JSON decoding error
+                    response_data = {"error": "Invalid response", "details": response.text}
+                return Response(response_data, status=response.status_code)
+
+            # Successful response
+            response_data = response.json()
+            return Response(response_data, status=status.HTTP_200_OK)
             
         except requests.exceptions.RequestException as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+

@@ -135,17 +135,223 @@
 
 
 
+// import { W3SSdk } from '@circle-fin/w3s-pw-web-sdk';
+// import { useEffect, useState } from 'react';
+// import { useAuth0 } from '@auth0/auth0-react';
+// import axios from 'axios';
+
+
+// export const Pin = ({ userToken, encryptionKey, challengeId, user_id }) => {
+//   const [loading, setLoading] = useState(true);
+//   const [errorMessage, setErrorMessage] = useState('');
+//   const { getAccessTokenSilently } = useAuth0();
+
+//   useEffect(() => {
+//     const sdk = new W3SSdk();
+
+//     if (!userToken || !encryptionKey || !challengeId) {
+//       throw new Error('Missing required props');
+//     }
+
+//     // Configurar el SDK con props dinámicas
+//     sdk.setAppSettings({ appId: '966f8613-7c80-5155-bb35-b5bc902cfa34' }); // Reemplaza con tu appId dinámico si es necesario
+//     sdk.setAuthentication({ userToken, encryptionKey });
+
+//     // Establecer localizaciones
+//     sdk.setLocalizations({
+//       common: { continue: 'Next' },
+//       securityIntros: {
+//         headline: 'Set up your {{method}} to recover your pin code if you forget it',
+//         headline2: 'Security Question',
+//       },
+//     });
+
+//     // Ejecutar el desafío
+//     sdk.execute(challengeId, async (error, result) => {
+//       setLoading(false);
+//       if (error) {
+//         setErrorMessage(`Error: ${error?.message ?? 'Unknown error occurred'}`);
+//         console.error(`${error?.code?.toString() || 'Unknown code'}: ${error?.message ?? 'Error!'}`);
+//         return;
+//       }
+
+//       // Manejar el resultado del desafío
+//       if (result) {
+//         console.log(`Challenge: ${result.type}`);
+//         console.log(`status: ${result.status}`);
+//         if (result.status === 'COMPLETE') {
+//           console.log("User ID:", user_id);
+//           saveWalletInBackend(user_id);
+//         }
+//         if ('data' in result) {
+//           console.log("entra quiiii??????");
+          
+//           console.log(`signature: ${result.data?.signature}`);
+//         }
+        
+//         // Llama a la función para guardar la cartera en el backend
+//       }
+//       // saveWalletInBackend(user_id);
+//     });
+
+//     return () => {
+//       // Cleanup si es necesario
+//     };
+//   }, [userToken, encryptionKey, challengeId]); // Ejecutar cuando cambien estas props
+
+//   const saveWalletInBackend = async (user_id) => {
+//     try {
+//       const accessToken = await getAccessTokenSilently();
+//       const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}wallet/save-wallet/`;
+
+//       const config = {
+//         headers: {
+//           'Content-Type': 'application/json',
+//           Authorization: `Bearer ${accessToken}`,
+//         },
+//       };
+
+//       const payload = {
+//         user_id: user_id,
+//       };
+
+//       const response = await axios.post(apiUrl, payload, config);
+//       console.log(response.data);
+//     } catch (err) {
+//       console.log(err);
+//     }
+//   };
+
+//   return (
+//     <div>
+//       {loading ? (
+//         <h1>Iniciando sesión...</h1>
+//       ) : errorMessage ? (
+//         <p>{errorMessage}</p>
+//       ) : (
+//         <p>Session started successfully!</p>
+//       )}
+//     </div>
+//   );
+// };
+
+
+// import { W3SSdk } from '@circle-fin/w3s-pw-web-sdk';
+// import { useEffect, useState } from 'react';
+// import { useAuth0 } from '@auth0/auth0-react';
+// import axios from 'axios';
+
+// export const Pin = ({ userToken, encryptionKey, challengeId, user_id }) => {
+//   const [loading, setLoading] = useState(true);
+//   const [errorMessage, setErrorMessage] = useState('');
+//   const [shouldSaveWallet, setShouldSaveWallet] = useState(false); // State to trigger saveWalletInBackend
+//   const { getAccessTokenSilently } = useAuth0();
+
+//   useEffect(() => {
+//     const sdk = new W3SSdk();
+
+//     if (!userToken || !encryptionKey || !challengeId) {
+//       throw new Error('Missing required props');
+//     }
+
+//     // Configurar el SDK con props dinámicas
+//     sdk.setAppSettings({ appId: '966f8613-7c80-5155-bb35-b5bc902cfa34' }); // Reemplaza con tu appId dinámico si es necesario
+//     sdk.setAuthentication({ userToken, encryptionKey });
+
+//     // Establecer localizaciones
+//     sdk.setLocalizations({
+//       common: { continue: 'Next' },
+//       securityIntros: {
+//         headline: 'Set up your {{method}} to recover your pin code if you forget it',
+//         headline2: 'Security Question',
+//       },
+//     });
+
+//     // Ejecutar el desafío
+//     sdk.execute(challengeId, async (error, result) => {
+//       setLoading(false);
+//       if (error) {
+//         setErrorMessage(`Error: ${error?.message ?? 'Unknown error occurred'}`);
+//         console.error(`${error?.code?.toString() || 'Unknown code'}: ${error?.message ?? 'Error!'}`);
+//         return;
+//       }
+
+//       // Manejar el resultado del desafío
+//       if (result) {
+//         console.log(`Challenge: ${result.type}`);
+//         console.log(`status: ${result.status}`);
+//         if (result.status === 'COMPLETE') {
+//           // setShouldSaveWallet(true); // Set state to trigger saving wallet
+//         }
+//         if ('data' in result) {
+//           console.log(`signature: ${result.data?.signature}`);
+//         }
+//       }
+//     });
+
+//     return () => {
+//       // Cleanup si es necesario
+//     };
+//   }, [userToken, encryptionKey, challengeId]); // Ejecutar cuando cambien estas props
+
+//   // UseEffect for saving wallet after 4 seconds
+//   useEffect(() => {
+//     if (shouldSaveWallet) {
+//       const timer = setTimeout(() => {
+//         saveWalletInBackend(user_id);
+//         setShouldSaveWallet(false); // Reset the state
+//       }, 4000);
+//       return () => clearTimeout(timer); // Cleanup timeout
+//     }
+//   }, [shouldSaveWallet, user_id]); // Depend on shouldSaveWallet and user_id
+
+//   const saveWalletInBackend = async (user_id) => {
+//     try {
+//       const accessToken = await getAccessTokenSilently();
+//       const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}wallet/save-wallet/`;
+
+//       const config = {
+//         headers: {
+//           'Content-Type': 'application/json',
+//           Authorization: `Bearer ${accessToken}`,
+//         },
+//       };
+
+//       const payload = {
+//         user_id: user_id,
+//       };
+
+//       const response = await axios.post(apiUrl, payload, config);
+//       console.log(response.data);
+//     } catch (err) {
+//       console.log(err);
+//     }
+//   };
+
+//   return (
+//     <div>
+//       {loading ? (
+//         <h1>Iniciando sesión...</h1>
+//       ) : errorMessage ? (
+//         <p>{errorMessage}</p>
+//       ) : (
+//         <p>Session started successfully!</p>
+//       )}
+//     </div>
+//   );
+// };
+
 
 import { W3SSdk } from '@circle-fin/w3s-pw-web-sdk';
 import { useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
 
-
-export const Pin = ({ userToken, encryptionKey, challengeId,user_id }) => {
+export const Pin = ({ userToken, encryptionKey, challengeId, user_id }) => {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
-  const {getAccessTokenSilently} = useAuth0()
+  const [shouldSaveWallet, setShouldSaveWallet] = useState(false); // State to trigger saveWalletInBackend
+  const { getAccessTokenSilently } = useAuth0();
 
   useEffect(() => {
     const sdk = new W3SSdk();
@@ -153,11 +359,12 @@ export const Pin = ({ userToken, encryptionKey, challengeId,user_id }) => {
     if (!userToken || !encryptionKey || !challengeId) {
       throw new Error('Missing required props');
     }
-    // Configure the SDK with dynamic props
-    sdk.setAppSettings({ appId: '966f8613-7c80-5155-bb35-b5bc902cfa34' }); // Replace with your dynamic appId if necessary
+
+    // Configurar el SDK con props dinámicas
+    sdk.setAppSettings({ appId: '966f8613-7c80-5155-bb35-b5bc902cfa34' });
     sdk.setAuthentication({ userToken, encryptionKey });
 
-    // Set localizations
+    // Establecer localizaciones
     sdk.setLocalizations({
       common: { continue: 'Next' },
       securityIntros: {
@@ -166,7 +373,7 @@ export const Pin = ({ userToken, encryptionKey, challengeId,user_id }) => {
       },
     });
 
-    // Execute the challenge
+    // Ejecutar el desafío
     sdk.execute(challengeId, async (error, result) => {
       setLoading(false);
       if (error) {
@@ -175,45 +382,58 @@ export const Pin = ({ userToken, encryptionKey, challengeId,user_id }) => {
         return;
       }
 
-      // Handle result here if necessary
+      // Manejar el resultado del desafío
       if (result) {
         console.log(`Challenge: ${result.type}`);
         console.log(`status: ${result.status}`);
+
+        if (result.status === 'IN_PROGRESS') {
+          setShouldSaveWallet(true); // Trigger wallet saving
+        }
+
         if ('data' in result) {
           console.log(`signature: ${result.data?.signature}`);
         }
-        await saveWalletInBackend(user_id);
-
       }
     });
-    return () => {
-      // Cleanup if necessary
-    };
-  }, [userToken, encryptionKey, challengeId]); // Run effect when these props change
 
-  const saveWalletInBackend = async (user_id) =>{
-    try{
-      const accessToken = await getAccessTokenSilently()
+    return () => {
+      // Cleanup si es necesario
+    };
+  }, [userToken, encryptionKey, challengeId]); // Ejecutar cuando cambien estas props
+
+  // UseEffect para guardar la cartera después de 4 segundos
+  useEffect(() => {
+    if (shouldSaveWallet) {
+      const timer = setTimeout(() => {
+        saveWalletInBackend(user_id);
+        setShouldSaveWallet(false); // Reset the state
+      }, 2000);
+      return () => clearTimeout(timer); // Cleanup timeout
+    }
+  }, [shouldSaveWallet, user_id]); // Depend on shouldSaveWallet and user_id
+
+  const saveWalletInBackend = async (user_id) => {
+    try {
+      const accessToken = await getAccessTokenSilently();
       const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}wallet/save-wallet/`;
 
       const config = {
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
       };
 
       const payload = {
-        user_id: user_id,  
+        user_id: user_id,
       };
 
-      const response = await axios.post(apiUrl,payload,config)
-      console.log(response.data);
-    }catch(err){
+      const response = await axios.post(apiUrl, payload, config);
+    } catch (err) {
       console.log(err);
-      
     }
-  }
+  };
 
   return (
     <div>

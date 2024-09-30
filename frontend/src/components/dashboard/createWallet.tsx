@@ -65,13 +65,11 @@ export const CreateWallet = () => {
         },
       };
 
-      const payload = {};
+      const payload = { user_id:"c80724c2" };
 
       const response = await axios.post(apiUrl,payload,config)
-      console.log(response.data);
     }catch(err){
       console.log(err);
-      
     }
   }
 

@@ -5,8 +5,11 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import stripe
 import os
+import requests
+
 from wallet.serializers import WalletSerializer
 from wallet.models import Wallet
+from django.conf import settings  # Make sure to import settings to access the API key
 
 from rest_framework.views import APIView
 from property.models import Property,Token,Transaction,PropertyToken
@@ -228,21 +231,48 @@ class TransactionListview(APIView):
 
     def get(self, request):
         user_id = request.user.id
-               
+        
+        # Get user's transactions
         transactions = Transaction.objects.filter(transaction_owner_code=user_id)
         transaction_serializer = TransactionSerializer(transactions, many=True)
 
-        serializer = self.serializer_class(transactions, many=True)
-        wallets = Wallet.objects.filter(wallet_user_id=user_id)
-        wallet_serializer = WalletSerializer(wallets, many=True)
+        # Get the user's wallet (assuming there is only one)
+        try:
+            wallet = Wallet.objects.get(wallet_user_id=user_id)
+            wallet_serializer = WalletSerializer(wallet)
+            
+            # Fetch the balance for the wallet
+            balance_data = self.get_wallet_balance(wallet.wallet_id)  # Adjust according to your Wallet model field
+
+        except Wallet.DoesNotExist:
+            return Response({"error": "No wallet found for this user"}, status=status.HTTP_404_NOT_FOUND)
 
         response_data = {
             "transactions": transaction_serializer.data,
-            "wallets": wallet_serializer.data
+            "wallet": wallet_serializer.data,
+            "balance": balance_data  # Include balance in the response
         }
 
         return Response(response_data, status=status.HTTP_200_OK)
-    
+
+    def get_wallet_balance(self, wallet_id):
+        print(wallet_id, "hereeeeeee ----------")
+        """Retrieve wallet balance from Circle API."""
+        url = f"https://api.circle.com/v1/w3s/wallets/{wallet_id}/balances"
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {settings.CIRCLE_API_KEY}"  # Use the API key from settings
+        }
+
+        try:
+            response = requests.get(url, headers=headers)
+            # Check if the request was successful
+            if response.status_code == 200:
+                return response.json()  # Return the JSON response directly
+            else:
+                return {"error": response.status_code, "message": response.text}  # Return error details
+        except requests.exceptions.RequestException as e:
+            return {"error": "Request failed", "details": str(e)}  # Handle request exceptions
     def post(self, request):
         tokens_amount = int(request.data["token_amount"])
         property_id = request.data["property_id"]

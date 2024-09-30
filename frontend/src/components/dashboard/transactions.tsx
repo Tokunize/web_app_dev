@@ -25,8 +25,8 @@ import {
 type Transaction = {
   id: number;
   event: string;
-  transaction_amount: string; // Mantén este tipo como string
-  transaction_tokens_amount: string; // Mantén este tipo como string
+  transaction_amount: string; // Keep this type as string
+  transaction_tokens_amount: string; // Keep this type as string
   transaction_owner: string;
   transaction_date: string; 
   created_at:string;
@@ -38,9 +38,9 @@ export const Transaction = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const { getAccessTokenSilently } = useAuth0();
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined); // Cambiar null por undefined
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined); // Cambiar null por undefined
-
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined); // Change null to undefined
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined); // Change null to undefined
+  const [balance, setBalance] = useState<number | null>(null); // State for balance
 
   const getAllTransactions = async () => {
     const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/transactions/`;
@@ -55,6 +55,9 @@ export const Transaction = () => {
       });
       console.log(response.data); // Log the data
       setTransactions(response.data.transactions);
+      // Set the balance from the response
+      const balanceAmount = response.data.balance?.data?.tokenBalances[0]?.amount;
+      setBalance(balanceAmount ? parseFloat(balanceAmount) : null); // Convert to number if exists
       setLoading(false);
     } catch (error) {
       setError("Failed to fetch transactions");
@@ -136,18 +139,18 @@ export const Transaction = () => {
       <div className="flex justify-between bg-white rounded-lg border p-4 mb-4">
         <div className="space-y-3">
             <p className="text-sm text-gray-500">Total Balance</p>
-            <CurrencyConverter amountInUSD={30000} />
+            {/* Display balance or a placeholder if not available */}
+            <CurrencyConverter amountInUSD={balance} />
         </div>
         <span className="space-x-3">
             <AddFundsFlow/>
             <CreateWallet />
             <Button>Withdraw</Button>
-
         </span>
       </div>
       <Button onClick={downloadPDF} className="bg-white border">
         Download PDF
-        <Download className="ml-4" /> {/* Ícono de descarga */}
+        <Download className="ml-4" /> {/* Download icon */}
       </Button>
       <div className="flex justify-between mt-4 mb-4">
         <DatePickerWithRange
