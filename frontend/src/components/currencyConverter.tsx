@@ -1,41 +1,47 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-interface CurrencyConverterProps{
-    amountInUSD : number
+interface CurrencyConverterProps {
+    amountInUSD: number; // amount can now be 0
 }
 
 export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({ amountInUSD }) => {
-    const  [exchangeRate, setExchangeRate] = useState<number|null>(null);
-    const [amounInGBP, setAmountInGBP] = useState<number| null>(null);
+    const [exchangeRate, setExchangeRate] = useState<number | null>(null);
+    const [amountInGBP, setAmountInGBP] = useState<number | null>(null);
 
-    const getExchangeRate = async () =>{
-        const apiUrl = "https://api.exchangerate-api.com/v4/latest/USD"; // Usa una API de tasa de cambio real
-        try{
-            const response = await axios.get(apiUrl)
+    const getExchangeRate = async () => {
+        const apiUrl = "https://api.exchangerate-api.com/v4/latest/USD"; // Uses a real exchange rate API
+        try {
+            const response = await axios.get(apiUrl);
             const rate = response.data.rates.GBP;
-            setExchangeRate(rate)
-        }catch(error){
+            setExchangeRate(rate);
+        } catch (error) {
             console.error("Error fetching exchange rate:", error);
         }
-    }
-    useEffect(()=>{
-        getExchangeRate()
-    },[])
+    };
 
-    useEffect(()=>{
-        if(exchangeRate !== null){
-            setAmountInGBP(amountInUSD * exchangeRate)
+    useEffect(() => {
+        getExchangeRate();
+    }, []);
+
+    useEffect(() => {
+        if (exchangeRate !== null) {
+            setAmountInGBP(amountInUSD * exchangeRate);
+        } else {
+            setAmountInGBP(0); // Set to 0 if exchangeRate is null
         }
+    }, [exchangeRate, amountInUSD]);
 
-    },[exchangeRate, amountInUSD])
-return(
-    <div>
-        {amounInGBP !== null ? (
-            <p className="font-bold"> ${amountInUSD.toFixed(2)} USD <br/> <span className="text-gray-500 text-sm"> = £{amounInGBP.toFixed(2)} GBP</span></p>
-        ): (
-            <p>Loading conversion</p>
-        )}
-    </div>
-)
-}
+    return (
+        <div>
+            {amountInGBP !== null ? (
+                <p className="font-bold">
+                    ${amountInUSD.toFixed(2)} USD <br /> 
+                    <span className="text-gray-500 text-sm">= £{amountInGBP.toFixed(2)} GBP</span>
+                </p>
+            ) : (
+                <p>Loading conversion</p>
+            )}
+        </div>
+    );
+};

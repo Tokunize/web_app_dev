@@ -10,7 +10,6 @@ import { Download } from "lucide-react";
 import { CurrencyConverter } from "../currencyConverter";
 import { AddFundsFlow } from "../funds/addFundsFlow";
 import { CreateWallet } from "./createWallet";
-
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -29,7 +28,7 @@ type Transaction = {
   transaction_tokens_amount: string; // Keep this type as string
   transaction_owner: string;
   transaction_date: string; 
-  created_at:string;
+  created_at: string;
 };
 
 export const Transaction = () => {
@@ -40,7 +39,7 @@ export const Transaction = () => {
   const { getAccessTokenSilently } = useAuth0();
   const [startDate, setStartDate] = useState<Date | undefined>(undefined); // Change null to undefined
   const [endDate, setEndDate] = useState<Date | undefined>(undefined); // Change null to undefined
-  const [balance, setBalance] = useState<number | null>(null); // State for balance
+  const [balance, setBalance] = useState<number>(0); // Default balance to 0
 
   const getAllTransactions = async () => {
     const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/transactions/`;
@@ -55,9 +54,9 @@ export const Transaction = () => {
       });
       console.log(response.data); // Log the data
       setTransactions(response.data.transactions);
-      // Set the balance from the response
+      // Set the balance from the response, defaulting to 0 if not available
       const balanceAmount = response.data.balance?.data?.tokenBalances[0]?.amount;
-      setBalance(balanceAmount ? parseFloat(balanceAmount) : null); // Convert to number if exists
+      setBalance(balanceAmount ? parseFloat(balanceAmount) : 0); // Set to 0 if not exists
       setLoading(false);
     } catch (error) {
       setError("Failed to fetch transactions");
@@ -138,14 +137,14 @@ export const Transaction = () => {
     <div className="p-4">
       <div className="flex justify-between bg-white rounded-lg border p-4 mb-4">
         <div className="space-y-3">
-            <p className="text-sm text-gray-500">Total Balance</p>
-            {/* Display balance or a placeholder if not available */}
-            <CurrencyConverter amountInUSD={balance} />
+          <p className="text-sm text-gray-500">Total Balance</p>
+          {/* Pass balance directly; CurrencyConverter will handle it */}
+          <CurrencyConverter amountInUSD={balance} />
         </div>
         <span className="space-x-3">
-            <AddFundsFlow/>
-            <CreateWallet />
-            <Button>Withdraw</Button>
+          <AddFundsFlow />
+          <CreateWallet />
+          <Button>Withdraw</Button>
         </span>
       </div>
       <Button onClick={downloadPDF} className="bg-white border">

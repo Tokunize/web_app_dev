@@ -236,27 +236,29 @@ class TransactionListview(APIView):
         transactions = Transaction.objects.filter(transaction_owner_code=user_id)
         transaction_serializer = TransactionSerializer(transactions, many=True)
 
-        # Get the user's wallet (assuming there is only one)
-        try:
-            wallet = Wallet.objects.get(wallet_user_id=user_id)
+        # Try to get the user's wallet
+        wallet = Wallet.objects.filter(wallet_user_id=user_id).first()  # Use .first() to avoid exception
+        wallet_data = None
+        balance_data = None
+
+        if wallet is not None:
             wallet_serializer = WalletSerializer(wallet)
-            
+            wallet_data = wallet_serializer.data
+
             # Fetch the balance for the wallet
             balance_data = self.get_wallet_balance(wallet.wallet_id)  # Adjust according to your Wallet model field
-
-        except Wallet.DoesNotExist:
-            return Response({"error": "No wallet found for this user"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            wallet_data = {"message": "No wallet found for this user. You may create one."}
 
         response_data = {
             "transactions": transaction_serializer.data,
-            "wallet": wallet_serializer.data,
-            "balance": balance_data  # Include balance in the response
+            "wallet": wallet_data,
+            "balance": balance_data  # Balance will be None if wallet doesn't exist
         }
 
         return Response(response_data, status=status.HTTP_200_OK)
 
     def get_wallet_balance(self, wallet_id):
-        print(wallet_id, "hereeeeeee ----------")
         """Retrieve wallet balance from Circle API."""
         url = f"https://api.circle.com/v1/w3s/wallets/{wallet_id}/balances"
         headers = {
@@ -273,6 +275,8 @@ class TransactionListview(APIView):
                 return {"error": response.status_code, "message": response.text}  # Return error details
         except requests.exceptions.RequestException as e:
             return {"error": "Request failed", "details": str(e)}  # Handle request exceptions
+
+    
     def post(self, request):
         tokens_amount = int(request.data["token_amount"])
         property_id = request.data["property_id"]

@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { LogoutButton } from "../buttons/logoutBtn";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
+import { CreateWallet } from "./createWallet";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -110,6 +111,7 @@ export const OwnerDashboard = () => {
                         <DropdownMenuItem><LogoutButton/></DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
+                <CreateWallet/>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
