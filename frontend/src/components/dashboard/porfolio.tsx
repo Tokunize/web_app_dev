@@ -1,23 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import OwnerPropertyForm from '@/components/forms/ownerForm';
 import ClipLoader from 'react-spinners/ClipLoader';
 import { Button } from '@/components/ui/button';
-import { OwnerPropertyList } from '@/components/property/ownerPropertyList';
 import { useUser } from '@/context/userProvider';
-import { AddPropertyFlow } from '../addPropertyOwnerFlow';
+import { useNavigate } from 'react-router-dom';
+import { OwnerPropertyListCard } from './ownerPropertyListCard';
 
 interface Property {
   id: number;
   title: string;
+  location: string;
+  tokens: any[];
+  projected_annual_return: string;
+  image: string[];
+  status: string;
+  tokens_available: number;
+  totalTokens: number;
 }
 
 export const Porfolio: React.FC = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const { role } = useUser(); // Usamos el hook para obtener el rol del usuario
-  const [showForm, setShowForm] = useState<boolean>(false);
+  const [searchTerm, setSearchTerm] = useState<string>(''); // Estado para el término de búsqueda
+  const { role } = useUser();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -36,9 +43,9 @@ export const Porfolio: React.FC = () => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`
           }
-        });      
+        });
         console.log(response.data);
-          
+
         setProperties(response.data);
       } catch (err) {
         console.error('Error fetching properties:', err);
@@ -51,36 +58,58 @@ export const Porfolio: React.FC = () => {
     fetchProperties();
   }, []);
 
-  const toggleForm = () => {
-    setShowForm(!showForm); 
-  };
-
-  const handlePropertyCreated = (newProperty: Property) => {
-    setProperties([...properties, newProperty]); 
-    setShowForm(false);  
-  };
+  // Filtrar las propiedades basado en el término de búsqueda
+  const filteredProperties = properties.filter((property) =>
+    property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    property.location.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <section className="p-6 bg-gray-100 min-h-screen">
-      <div className="mb-6 flex justify-between items-center">
-        <div>
-          {role !== 'admin' && (
-            <AddPropertyFlow/>
-          )}
-        </div>
+    <section className="p-6 min-h-screen">
+      <div className="flex justify-between items-center">
+        <h2 className="font-bold text-3xl">Your Listings</h2>
+        {role !== 'admin' && (
+          <Button onClick={() => navigate("/public-property/")}>Sell New Property</Button>
+        )}
       </div>
-      
+
+      {/* Barra de búsqueda */}
+      <div className="my-4">
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search by title or location"
+          className="p-2 w-full border border-gray-300 rounded-lg"
+        />
+      </div>
+
       <div className="mb-6">
         {loading && (
           <div className="flex items-center justify-center h-40">
             <ClipLoader size={50} color="#4A90E2" />
           </div>
         )}
-        {error && <p className="text-red-500 mb-4">Error: {error}</p>}
+        {error && <p className="text-red-500 mb-2">Error: {error}</p>}
       </div>
 
-        <OwnerPropertyList propertyList={properties} role={role} />  
- 
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        {filteredProperties.map((property) => (
+          <OwnerPropertyListCard
+            key={property.id}
+            title={property.title}
+            location={property.location}
+            totalTokens={property.tokens[0]?.total_tokens || 0}  // Se asegura de que el token exista
+            minTokenPrice={property.tokens[0]?.token_price?.toString() || ''} // Asegura que el precio del token esté presente
+            estAnnualReturn={property.projected_annual_return}
+            propertyImgs={property.image || []}
+            id={property.id.toString()}
+            tokensSold={property.tokens[0]?.total_tokens - property.tokens[0]?.tokens_available || 0}
+            status={property.status}
+            tokens_available={property.tokens[0]?.tokens_available || 0} // Tokens disponibles
+          />
+        ))}
+      </div>
     </section>
   );
 };

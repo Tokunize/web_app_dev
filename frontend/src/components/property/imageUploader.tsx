@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useToast } from "@/components/ui/use-toast";
+
 
 const cloudName = 'dhyrv5g3w';
 const uploadPreset = 'ptwmh2mt';
@@ -16,6 +18,7 @@ interface ImageUploaderProps {
 
 export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUploaded, onImageRemoved }) => {
   const [files, setFiles] = useState<ImageFile[]>([]);
+  const { toast } = useToast();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files;
@@ -44,12 +47,10 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUploaded, 
     const fileToRemove = files[index];
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
     
-    // If the file was uploaded, delete it from Cloudinary
+    // Si el archivo fue subido, elimínalo de Cloudinary
     if (fileToRemove.publicId) {
-      console.log("eliminaaaado");
-      
       deleteFromCloudinary(fileToRemove.publicId);
-      onImageRemoved(fileToRemove.publicId); // Notify parent
+      onImageRemoved(fileToRemove.publicId); // Notifica al padre
     }
   };
 
@@ -62,8 +63,18 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUploaded, 
     const response = await fetch(url, { method: 'POST', body: formData });
     if (response.ok) {
       const data = await response.json();
+      toast({
+        title: "Success",
+        description: "Your image is uploaded!",
+        variant: "default",
+      });
       return data;
     } else {
+      toast({
+        title: "Error",
+        description: "Your image was not uploaded, try again!",
+        variant: "default",
+      });
       throw new Error('Failed to upload image');
     }
   };
@@ -72,8 +83,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUploaded, 
     const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/destroy`;
     const formData = new FormData();
     formData.append('public_id', publicId);
-    formData.append('api_key', 'your_api_key'); // Replace with your Cloudinary API key
-    formData.append('upload_preset', uploadPreset);
+    formData.append('api_key', 'your_api_key'); // Reemplaza con tu clave API de Cloudinary
 
     const response = await fetch(url, { method: 'POST', body: formData });
     if (!response.ok) {
@@ -86,10 +96,13 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUploaded, 
       try {
         const uploadPromises = files.map(async ({ file }) => {
           const data = await uploadToCloudinary(file);
-          return data.secure_url;
+          return data.secure_url; // Retorna la URL segura
         });
         const uploadedUrls = await Promise.all(uploadPromises);
-        onImagesUploaded(uploadedUrls);
+        onImagesUploaded(uploadedUrls); // Pasa las URLs subidas al padre
+        
+        // Limpiar la vista previa después de la carga
+        setFiles([]); // Vaciar los archivos después de subir
       } catch (error) {
         console.error('Error uploading images:', error);
       }
@@ -158,4 +171,3 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUploaded, 
     </div>
   );
 };
-

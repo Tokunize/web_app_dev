@@ -30,7 +30,7 @@ class Property(TimeStampedModel):
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=LISTING, help_text="The current status of the property listing.")
     
-    # owner fill form 
+    # owner fill formmm
     property_code = models.CharField(max_length = 50, unique=True, null=True, blank=True)
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)

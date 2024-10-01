@@ -8,7 +8,6 @@ import ProtectedRoute from "./protectedRoutes";
 import CreatePropertyController from "./components/dashboard/createPropertyController";
 import DashboardLayout from "./dashboardLayout";
 import MainLayout from "./mainLayout"; 
-import { GeneralDashboard } from "./components/dashboard/generalDashboard";
 import { Porfolio } from "./components/dashboard/porfolio";
 import { Assests } from "./components/dashboard/assets";
 import { Transaction } from "./components/dashboard/transactions";
@@ -18,6 +17,7 @@ import { Toaster } from "./components/ui/toaster";
 import { InvestorOverview } from "./components/dashboard/investorOverview";
 import AuthenticationPage from "./views/signUpPage2";
 import { OwnerDashboard } from "./components/dashboard/ownerOverview";
+import { PublicPropertyPage } from "./views/publicProperty";
 
 const Layout = () => {
   return (
@@ -34,6 +34,7 @@ const Layout = () => {
           </Route>
           
           <Route path="sign-up/" element={<AuthenticationPage />} />
+          <Route path="public-property/" element={<PublicPropertyPage/>} />
 
           {/*Dshboard with the sidemenu */}
           <Route element={<DashboardLayout />}>
