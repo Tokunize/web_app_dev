@@ -15,6 +15,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import ClipLoader from 'react-spinners/ClipLoader';
 import { useAuth0 } from "@auth0/auth0-react";
+import { createNotification } from "@/components/notificationService";
 
 interface PropertyLocation {
   postcode: string;
@@ -101,14 +102,14 @@ export const PublicPropertyPage: React.FC = () => {
         title: propertyDetails.title,
         bedrooms: propertyDetails.bedroomCount,
         bathrooms: propertyDetails.bathroomCount,
-        price:marketValue,
-        country:propertyLocation?.country,
-        property_type:propertyType,
-        location:propertyLocation?.adminDistrict,
+        price: marketValue,
+        country: propertyLocation?.country,
+        property_type: propertyType,
+        location: propertyLocation?.adminDistrict,
         propertyDetails,
         amenities: selectedAmenities, 
         description,
-        size:propertyDetails.size,
+        size: propertyDetails.size,
         // ownershipPercentage,
         status: "under_review",
         year_built: propertyDetails.yearBuilt,
@@ -128,7 +129,13 @@ export const PublicPropertyPage: React.FC = () => {
         variant: "default",
       });
 
-      navigate("/porfolio/");
+      // Crear notificación después de enviar la propiedad
+      await createNotification(
+        { message: `New property "${propertyDetails.title}" has been created! We are going to review and we will notify when it is ready to publish. Thank you !` }, // Mensaje de la notificación
+        accessToken // Usar el access token para autenticación
+      );
+
+      navigate("/portfolio/");
   
       // Restablecer manualmente los estados a sus valores iniciales
       setPropertyType("");

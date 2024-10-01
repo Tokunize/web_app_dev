@@ -22,5 +22,6 @@ urlpatterns = [
     path('property/',include("property.urls")),
     path('users/', include('users.urls')),
     path('blog/',include('blog.urls') ),
-    path('wallet/', include('wallet.urls'))
+    path('wallet/', include('wallet.urls')),
+    path('notifications/', include('notifications.urls'))
 ]

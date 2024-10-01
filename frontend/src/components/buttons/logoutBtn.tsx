@@ -10,6 +10,7 @@ export const LogoutButton = () => {
 
   return (
     <Button
+      variant="outline"
       className=' duration-300 w-full'
       onClick={()=>{
         removeLocalStorage()

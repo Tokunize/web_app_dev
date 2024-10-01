@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { useUser } from '@/context/userProvider';
 import { useNavigate } from 'react-router-dom';
 import { OwnerPropertyListCard } from './ownerPropertyListCard';
+import { IoMdSearch } from "react-icons/io";
+
 
 interface Property {
   id: number;
@@ -74,13 +76,15 @@ export const Porfolio: React.FC = () => {
       </div>
 
       {/* Barra de búsqueda */}
-      <div className="my-4">
+
+      <div className="relative w-full  mt-5"> 
+        <IoMdSearch className="absolute left-2 top-2 h-6 w-6 text-gray-500" />
         <input
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search by title or location"
-          className="p-2 w-full border border-gray-300 rounded-lg"
+          className="pl-10 p-2 w-full border border-gray-300 rounded-lg" // Añadimos padding a la izquierda para el ícono
         />
       </div>
 

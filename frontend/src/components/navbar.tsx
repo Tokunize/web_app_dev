@@ -99,7 +99,7 @@ export const Navbar = () => {
           </>
         ) : (
           <>
-            <Link to="/sign-up">Sign Up</Link>
+            <Link to="sign-up/">Sign Up</Link>
             <LoginButton />
           </>
         )}

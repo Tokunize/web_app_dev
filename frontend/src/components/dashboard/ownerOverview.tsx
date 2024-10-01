@@ -1,8 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { LogoutButton } from "../buttons/logoutBtn";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../ui/button";
 import { CreateWallet } from "./createWallet";
+import { Notifications } from "../notifications";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -21,6 +21,7 @@ import {
 import { MyAssetsTable } from "./myAssetsTable";
 import { InsightsTable } from "./insightsTable";
 import { Asset } from "@/types";
+import { useUser } from "@/context/userProvider";
 
 
 // Datos de ejemplo para propiedades
@@ -71,6 +72,7 @@ const statusData = [{
 }];
 
 export const OwnerDashboard = () => {
+    const { userImage } = useUser(); // Desestructura el nombre y la imagen del usuario del UserProvider
     const [selectedProperty, setSelectedProperty] = useState(insightsData[0]); // Estado para almacenar la propiedad seleccionada
     const navigate = useNavigate()
     const handleSelectProperty = (property: Asset) => {
@@ -92,26 +94,33 @@ export const OwnerDashboard = () => {
 
     return (
         <section>
-            <div className="flex justify-end mb-4 mr-[50px]">
+           <div className="flex justify-end mb-4 mr-[50px]">
+                <div className="relative flex items-center justify-center mr-4"> {/* Ajustado el contenedor */}
+                   <Notifications/>
+                </div>
                 <DropdownMenu>
-                    <DropdownMenuTrigger className="w-10 h-10 rounded-full ">
+                    <DropdownMenuTrigger className="w-10 h-10 rounded-full">
                         <Avatar>
-                            <AvatarImage src="https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="@shadcn" />
+                            <AvatarImage src={userImage || undefined} alt="@shadcn" />
                             <AvatarFallback>CN</AvatarFallback>
                         </Avatar>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                        <DropdownMenuLabel className="hidden">My Account</DropdownMenuLabel>
+                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>Profile</DropdownMenuItem>
                         <DropdownMenuItem>Account Setting</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => navigate("/")}>
-                            <Button>Marketplace</Button>
+                            Marketplace
                         </DropdownMenuItem>
-                        <DropdownMenuItem><LogoutButton/></DropdownMenuItem>
+                        <DropdownMenuItem>
+                            <CreateWallet />
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                            <LogoutButton />
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
-                <CreateWallet/>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">

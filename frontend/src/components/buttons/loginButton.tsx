@@ -9,7 +9,7 @@ export const LoginButton = () => {
   };
 
   return (
-    <Button onClick={handleLogin}>
+    <Button variant="outline" onClick={handleLogin}>
       Log In
     </Button>
   );

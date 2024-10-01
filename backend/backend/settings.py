@@ -55,7 +55,8 @@ INSTALLED_APPS = [
     'django_filters',
     'users',
     'blog',
-    'wallet'
+    'wallet',
+    'notifications'
 ]
 
 
