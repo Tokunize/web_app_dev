@@ -30,7 +30,7 @@ class Property(TimeStampedModel):
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=LISTING, help_text="The current status of the property listing.")
     
-    # owner fill formmm
+    # owner fill formmmmmmm
     property_code = models.CharField(max_length = 50, unique=True, null=True, blank=True)
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
@@ -44,6 +44,9 @@ class Property(TimeStampedModel):
     size = models.DecimalField(max_digits=6, decimal_places=2, help_text="Total interior square footage of the property.")
     year_built = models.IntegerField(help_text="The year in which the property was originally constructed.")
     
+    ownershipPercentage = models.IntegerField(blank=True, null=True)
+    tenant_turnover = models.DecimalField(blank=True, null=True,max_digits=5, decimal_places=2,)
+    vacancy_rate = models.DecimalField(blank=True, null=True, max_digits=5, decimal_places=2)
     # admin fill form 
     image = ArrayField(models.URLField(max_length=500), blank=True, null=True, help_text="A list of URLs pointing to images of the property.")
     video_urls = ArrayField(models.URLField(max_length=500), blank=True, null=True, help_text="A list of URLs pointing to videos of the property.")
@@ -131,3 +134,18 @@ class Transaction(TimeStampedModel):
     class Meta:
         verbose_name = "Token Transaction"
         verbose_name_plural = "Token Transactions"
+        ordering = ['-transaction_date']  # Ordenar de recientes a más antiguos
+
+
+
+
+class PropertyMetrics(models.Model):
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='metrics')
+    date = models.DateField()
+    tenant_turnover = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    vacancy_rate = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    average_yield = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    net_asset_value = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.property.title} Metrics on {self.date}"

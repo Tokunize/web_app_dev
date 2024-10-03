@@ -65,16 +65,10 @@ export const Navbar = () => {
     }
   }, [isAuthenticated, user, role, getAccessTokenSilently]);
 
-
   const renderAuthenticatedLinks = useMemo(() => {
-    if (role === "investor") {
-      return <Link to="/investor-dashboard/">Dashboard</Link>;
-    } else if ( role ==="owner" || role ==="admin") {
-      return <Link to="/owner-dashboard/">Dashboard</Link>;
-    }
-    return null;
-  }, [role]);
-
+    return <Link to="/dashboard">Dashboard</Link>;
+  }, []);
+  
   const navbarClasses = useMemo(
     () =>
       `h-14 flex items-center justify-between sticky top-0 z-50 bg-white/${

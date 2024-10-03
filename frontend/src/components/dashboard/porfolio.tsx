@@ -6,8 +6,6 @@ import { useUser } from '@/context/userProvider';
 import { useNavigate } from 'react-router-dom';
 import { OwnerPropertyListCard } from './ownerPropertyListCard';
 import { IoMdSearch } from "react-icons/io";
-
-
 interface Property {
   id: number;
   title: string;
@@ -45,10 +43,8 @@ export const Porfolio: React.FC = () => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`
           }
-        });
-        console.log(response.data);
-
-        setProperties(response.data);
+        });        
+        setProperties(response.data.properties);
       } catch (err) {
         console.error('Error fetching properties:', err);
         setError('Failed to fetch properties');
@@ -67,7 +63,7 @@ export const Porfolio: React.FC = () => {
   );
 
   return (
-    <section className="p-6 min-h-screen">
+    <section className="px-6 min-h-screen">
       <div className="flex justify-between items-center">
         <h2 className="font-bold text-3xl">Your Listings</h2>
         {role !== 'admin' && (
@@ -76,8 +72,7 @@ export const Porfolio: React.FC = () => {
       </div>
 
       {/* Barra de búsqueda */}
-
-      <div className="relative w-full  mt-5"> 
+      <div className="relative w-full mt-5"> 
         <IoMdSearch className="absolute left-2 top-2 h-6 w-6 text-gray-500" />
         <input
           type="text"
@@ -98,21 +93,25 @@ export const Porfolio: React.FC = () => {
       </div>
 
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        {filteredProperties.map((property) => (
-          <OwnerPropertyListCard
-            key={property.id}
-            title={property.title}
-            location={property.location}
-            totalTokens={property.tokens[0]?.total_tokens || 0}  // Se asegura de que el token exista
-            minTokenPrice={property.tokens[0]?.token_price?.toString() || ''} // Asegura que el precio del token esté presente
-            estAnnualReturn={property.projected_annual_return}
-            propertyImgs={property.image || []}
-            id={property.id.toString()}
-            tokensSold={property.tokens[0]?.total_tokens - property.tokens[0]?.tokens_available || 0}
-            status={property.status}
-            tokens_available={property.tokens[0]?.tokens_available || 0} // Tokens disponibles
-          />
-        ))}
+        {filteredProperties.length > 0 ? (
+          filteredProperties.map((property) => (
+            <OwnerPropertyListCard
+              key={property.id}
+              title={property.title}
+              location={property.location}
+              totalTokens={property.tokens[0]?.total_tokens || 0}  // Se asegura de que el token exista
+              minTokenPrice={property.tokens[0]?.token_price?.toString() || ''} // Asegura que el precio del token esté presente
+              estAnnualReturn={property.projected_annual_return}
+              propertyImgs={property.image || []}
+              id={property.id.toString()}
+              tokensSold={property.tokens[0]?.total_tokens - property.tokens[0]?.tokens_available || 0}
+              status={property.status}
+              tokens_available={property.tokens[0]?.tokens_available || 0} // Tokens disponibles
+            />
+          ))
+        ) : (
+          <p className=" text-gray-500">No properties found.</p> // Mensaje si no hay propiedades
+        )}
       </div>
     </section>
   );

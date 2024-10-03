@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input"; // Asegúrate de que la ruta sea correcta
 import React from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface PropertyValueProps {
     marketValue: string;
@@ -16,6 +17,7 @@ export const PropertyValue: React.FC<PropertyValueProps> = ({
 }) => {
     const [showPoundSymbol, setShowPoundSymbol] = React.useState<boolean>(false); // Estado para mostrar el símbolo de la libra
     const [showPercentageSymbol, setShowPercentageSymbol] = React.useState<boolean>(false); // Estado para mostrar el símbolo de porcentaje
+    const { toast } = useToast();
 
     const handleMarketValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -31,7 +33,15 @@ export const PropertyValue: React.FC<PropertyValueProps> = ({
 
         // Solo permitir números y eliminar cualquier carácter no numérico
         if (/^\d*$/.test(value)) {
-            setOwnershipPercentage(value);
+            if (parseInt(value) > 100) {
+                toast({
+                    title: "Invalid Ownership Percentage",
+                    description: "You cannot enter more than 100%.",
+                    variant: "destructive", // Toast de error
+                });
+            } else {
+                setOwnershipPercentage(value);
+            }
         }
     };
 
@@ -50,7 +60,7 @@ export const PropertyValue: React.FC<PropertyValueProps> = ({
                 {showPoundSymbol && <span className="text-3xl font-bold">£</span>} {/* Mostrar símbolo de libra */}
             </div>
 
-            <h3 className="text-xl  text-center font-bold">How much ownership would you like to offer to investors?</h3>
+            <h3 className="text-xl text-center font-bold">How much ownership would you like to offer to investors?</h3>
             <div className="flex items-center">
                 <Input
                     value={ownershipPercentage}
@@ -59,6 +69,7 @@ export const PropertyValue: React.FC<PropertyValueProps> = ({
                     onFocus={() => setShowPercentageSymbol(false)} // Ocultar símbolo de porcentaje al enfocar
                     className="max-w-xs text-center border-0 mr-2 text-3xl font-bold"
                     placeholder="0"
+                    max="100" // Limitar el input a un máximo de 100
                 />
                 {showPercentageSymbol && <span className="text-3xl font-bold">%</span>} {/* Mostrar símbolo de porcentaje */}
             </div>

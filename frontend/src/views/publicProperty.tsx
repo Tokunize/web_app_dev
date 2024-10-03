@@ -50,8 +50,8 @@ export const PublicPropertyPage: React.FC = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [images, setImages] = useState<string[]>([]);
   const [description, setDescription] = useState("");
-  const [marketValue, setMarketValue] = useState<string>('789405');
-  const [ownershipPercentage, setOwnershipPercentage] = useState<string>('50');
+  const [marketValue, setMarketValue] = useState<string>('0');
+  const [ownershipPercentage, setOwnershipPercentage] = useState<string>('0');
   
   // Estado para manejar la carga
   const [loading, setLoading] = useState(false);
@@ -110,7 +110,7 @@ export const PublicPropertyPage: React.FC = () => {
         amenities: selectedAmenities, 
         description,
         size: propertyDetails.size,
-        // ownershipPercentage,
+        ownershipPercentage,
         status: "under_review",
         year_built: propertyDetails.yearBuilt,
         image: images
@@ -120,22 +120,19 @@ export const PublicPropertyPage: React.FC = () => {
         `${import.meta.env.VITE_APP_BACKEND_URL}property/create/`,
         finalData,
         config
-      );
-      console.log(response.data);
-        
+      );        
       toast({
         title: "Property submitted!",
         description: "Your property has been successfully submitted.",
         variant: "default",
       });
 
-      // Crear notificación después de enviar la propiedad
       await createNotification(
-        { message: `New property "${propertyDetails.title}" has been created! We are going to review and we will notify when it is ready to publish. Thank you !` }, // Mensaje de la notificación
+        {  message: `Congratulations on submitting your property! We will now review it and notify you when its status changes. Thank you!`  }, // Mensaje de la notificación
         accessToken // Usar el access token para autenticación
       );
 
-      navigate("/portfolio/");
+      navigate("/porfolio/");
   
       // Restablecer manualmente los estados a sus valores iniciales
       setPropertyType("");

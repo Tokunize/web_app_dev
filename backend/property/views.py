@@ -6,13 +6,15 @@ from django.views.decorators.csrf import csrf_exempt
 import stripe
 import os
 import requests
-
+import random
+from datetime import timedelta, date
 from wallet.serializers import WalletSerializer
 from wallet.models import Wallet
 from django.conf import settings  # Make sure to import settings to access the API key
+from django.db.models import Sum
 
 from rest_framework.views import APIView
-from property.models import Property,Token,Transaction,PropertyToken
+from property.models import Property,Token,Transaction,PropertyToken,PropertyMetrics
 from .serializers import (
     PropertySerializerList,
     AllDetailsPropertySerializer,
@@ -24,7 +26,8 @@ from .serializers import (
     TransactionSerializer,
     PropertyTokenPaymentSerializer,
     InvestedPropertiesSerialier,
-    InvestmentOverviewSerializer
+    InvestmentOverviewSerializer,
+    PropertyMetricsSerializer
 )
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
@@ -48,6 +51,7 @@ class PropertyListView(APIView):
     permission_classes = [IsAdminOrOwner]
 
     def get(self, request):
+        print(request.user.email)
         user_role = getattr(request, 'user_role', None)
         user_id = request.user.id
         
@@ -59,12 +63,34 @@ class PropertyListView(APIView):
             except PropertyOwnerProfile.DoesNotExist:
                 return Response({'error': 'Profile not found'}, status=404)
 
-            properties = Property.objects.filter(owner_profile=profile.id).exclude()
+            # Get all properties owned by the owner
+            properties = Property.objects.filter(owner_profile=profile.id)
         else:
             return Response({'error': 'Unauthorized'}, status=401)
-        
-        serializer = PropertySerializerList(properties, many=True)
-        return Response(serializer.data)
+
+        # Filter published properties for total price calculation
+        published_properties = properties.filter(status='published')
+
+        # Calculate the total price of published properties
+        total_price = published_properties.aggregate(total_price=Sum('price'))['total_price'] or 0
+
+        # Prepare the response data
+        properties_data = []
+        for property_instance in properties:
+            # Get metrics associated with each property
+            metrics = PropertyMetrics.objects.filter(property=property_instance)
+            metrics_data = PropertyMetricsSerializer(metrics, many=True).data  # Serialize the metrics
+            
+            # Serialize the property data
+            property_data = PropertySerializerList(property_instance).data
+            property_data['metrics'] = metrics_data  # Add metrics to the property data
+            
+            properties_data.append(property_data)  # Collect all properties with metrics
+
+        return Response({
+            'total_value_tokenized': total_price,
+            'properties': properties_data  # Include properties with metrics
+        })
     
 
 class PublicPropertyList(APIView):
@@ -128,6 +154,20 @@ class PropertyCreateUpdateView(APIView):
     authentication_classes = [Auth0JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
+    def create_property_with_metrics(self, property_instance):
+        # Generate random data for the last year
+        start_date = date.today() - timedelta(days=365)
+        for i in range(12):  # Generate data for each month
+            metrics_date = start_date + timedelta(days=i * 30)  # Assuming months of 30 days
+            PropertyMetrics.objects.create(
+                property=property_instance,
+                date=metrics_date,
+                tenant_turnover=random.uniform(5.0, 15.0),  # Random turnover between 5% and 15%
+                vacancy_rate=random.uniform(1.0, 10.0),  # Random vacancy rate between 1% and 10%
+                average_yield=random.uniform(3.0, 7.0),  # Random average yield between 3% and 7%
+                net_asset_value=random.uniform(100000, 500000)  # Random net asset value
+            )
+
     def post(self, request):
         data = request.data
         user_id = request.user.id
@@ -138,21 +178,24 @@ class PropertyCreateUpdateView(APIView):
             return Response({'error': f'Owner profile not found for user ID {user_id}.'}, status=404)
         
         data['owner_profile'] = owner_profile.id
+        
         serializer = CreatePropertySerializer(data=data, context={'request': request})
         if serializer.is_valid():
             if 'owner' in request.user.rol:
-                print("User role: owner")
-                property_instance, created = Property.objects.update_or_create(
-                    id=serializer.validated_data.get('id'),  # Usar el ID si está disponible
-                    defaults={**serializer.validated_data, 'owner_profile': owner_profile, 'owner_fields_completed': True}
-                )
-                
+
+                # Create the property instance using the serializer
+                property_instance = serializer.save(owner_fields_completed=True)
+
+                # Generate metrics for the created property
+                self.create_property_with_metrics(property_instance)
+
                 property_serializer = PropertySerializerList(property_instance)
-                
+
                 return Response({
                     'message': 'Property data saved successfully. Awaiting admin review.',
-                    'property': property_serializer.data  # Incluye la propiedad en la respuesta
+                    'property': property_serializer.data  # Include the property in the response
                 }, status=200)
+
             return Response({'error': 'Only owners can create properties.'}, status=403)
 
         return Response(serializer.errors, status=400)
@@ -278,46 +321,58 @@ class TransactionListview(APIView):
 
     
     def post(self, request):
-        tokens_amount = int(request.data["token_amount"])
+        # Obtener el monto de la inversión y el id de la propiedad
+        investment_amount = float(request.data["investmentAmount"])
         property_id = request.data["property_id"]
 
+        # Validar que se haya proporcionado un ID de propiedad
         if not property_id:
             return Response({'error': 'Property ID is required'}, status=status.HTTP_400_BAD_REQUEST)
-        if tokens_amount > 10000: 
-            #THE TOTAL TOKENS -----
+
+        # Limitar la inversión a un máximo de 10,000
+        if investment_amount > 10000: 
             return Response({
-                'error': 'You cannot buy more than 10000 tokens. If you need further information, please contact us, thank you.'
+                'error': 'You cannot invest more than 10000 units. If you need further information, please contact us, thank you.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
+        # Obtener la instancia de la propiedad
         property_instance = get_object_or_404(Property, id=property_id)
         tokens_property = property_instance.tokens.all()
 
+        # Verificar si la propiedad tiene tokens asociados
         if tokens_property.exists():
             selected_token = tokens_property.first()
         else:
             return Response({'error': 'No tokens found for this property'}, status=status.HTTP_404_NOT_FOUND)
 
-        # Check if enough tokens are available
+        # Calcular la cantidad de tokens que puede comprar con la inversión
+        token_price = selected_token.token_price
+        tokens_amount = investment_amount / token_price
+
+        # Verificar si hay suficientes tokens disponibles
         if selected_token.tokens_available < tokens_amount:
             return Response({'error': 'Not enough tokens available'}, status=status.HTTP_400_BAD_REQUEST)
 
-        #CALCULATE THE TOKEN PRICE
-        total_token_price = tokens_amount * selected_token.token_price
-        # Reduce the available tokens
+        # Calcular el precio total de los tokens comprados (sería el mismo investment_amount en este caso)
+        total_token_price = tokens_amount * token_price
+        print("tokens", tokens_amount)
+        print("total token price", total_token_price)
+
+        # Reducir los tokens disponibles
         selected_token.tokens_available -= tokens_amount
         selected_token.save()
 
-        # Create the transaction
+        # Crear la transacción
         Transaction.objects.create(
             property_id=property_instance,
             transaction_owner_code=request.user,
-            transaction_tokens_amount = tokens_amount,
-            transaction_amount = total_token_price,
+            transaction_tokens_amount=tokens_amount,
+            transaction_amount=total_token_price,
             token_code=selected_token,
             event=Transaction.Event.BUY
         )
 
-        # Register or update the PropertyToken
+        # Registrar o actualizar el PropertyToken
         property_token, created = PropertyToken.objects.get_or_create(
             property_code=property_instance,
             token_code=selected_token,
@@ -325,12 +380,12 @@ class TransactionListview(APIView):
             defaults={'number_of_tokens': tokens_amount}
         )
 
+        # Si el PropertyToken ya existía, actualizar el número de tokens
         if not created:
             property_token.number_of_tokens += tokens_amount
             property_token.save()
 
         return Response({'message': 'Transaction completed successfully'}, status=status.HTTP_201_CREATED)
-        
 
 
 class SinglePropertyTransactionListView(APIView):
@@ -432,3 +487,122 @@ def session_status(request):
         })
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+
+# class PropertyCreateUpdateView(APIView):
+#     authentication_classes = [Auth0JWTAuthentication]
+#     permission_classes = [IsAuthenticated]
+
+#     def post(self, request):
+#         data = request.data
+#         user_id = request.user.id
+#         try:
+#             owner_profile = PropertyOwnerProfile.objects.get(user_id=user_id)
+#             print(f"Owner Profile found: ID {owner_profile.id} for user ID {user_id}")
+#         except PropertyOwnerProfile.DoesNotExist:
+#             return Response({'error': f'Owner profile not found for user ID {user_id}.'}, status=404)
+        
+#         data['owner_profile'] = owner_profile.id
+#         serializer = CreatePropertySerializer(data=data, context={'request': request})
+#         if serializer.is_valid():
+#             if 'owner' in request.user.rol:
+#                 print("User role: owner")
+#                 property_instance, created = Property.objects.update_or_create(
+#                     id=serializer.validated_data.get('id'),  # Usar el ID si está disponible
+#                     defaults={**serializer.validated_data, 'owner_profile': owner_profile, 'owner_fields_completed': True}
+#                 )
+                
+#                 property_serializer = PropertySerializerList(property_instance)
+                
+#                 return Response({
+#                     'message': 'Property data saved successfully. Awaiting admin review.',
+#                     'property': property_serializer.data  # Incluye la propiedad en la respuesta
+#                 }, status=200)
+#             return Response({'error': 'Only owners can create properties.'}, status=403)
+
+#         return Response(serializer.errors, status=400)
+
+#     def put(self, request):
+#         data = request.data
+#         user_id = request.user.id
+#         property_id = data.get('id')
+#         try:
+#             property_instance = Property.objects.get(id=property_id)
+#         except Property.DoesNotExist:
+#             return Response({'error': 'Property not found.'}, status=404)
+
+#         if 'admin' in request.user.rol:
+#             serializer = CreatePropertySerializer(property_instance, data=data, partial=True, context={'request': request})
+
+#             if serializer.is_valid():
+#                 for field in serializer.validated_data:
+#                     setattr(property_instance, field, serializer.validated_data[field])
+#                 property_instance.admin_fields_completed = True
+#                 property_instance.save()
+
+#                 return Response({'message': 'Property updated successfully by admin.'}, status=200)
+
+#             return Response(serializer.errors, status=400)
+
+#         # Si el usuario es propietario (owner)
+#         elif 'owner' in request.user.rol:
+#             try:
+#                 owner_profile = PropertyOwnerProfile.objects.get(user_id=user_id)
+#             except PropertyOwnerProfile.DoesNotExist:
+#                 return Response({'error': 'Owner profile is required for owners to update properties.'}, status=404)
+#             if property_instance.owner_profile != owner_profile:
+#                 return Response({'error': 'You can only update your own properties.'}, status=403)
+#             data['owner_profile'] = owner_profile.id
+#             if property_instance.admin_fields_completed:
+#                 return Response({'error': 'Admin fields are already completed. No further changes allowed.'}, status=400)
+#             serializer = CreatePropertySerializer(property_instance,  data=data, partial=True, context={'request': request})
+
+#             if serializer.is_valid():
+
+#                 for field in serializer.validated_data:
+#                     setattr(property_instance, field, serializer.validated_data[field])
+#                 property_instance.owner_fields_completed = True  # Se puede ajustar según la lógica que quieras aplicar
+#                 property_instance.save()
+
+#                 return Response({'message': 'Property updated successfully by owner.'}, status=200)
+
+#             return Response(serializer.errors, status=400)
+
+#         return Response({'error': 'Only admins or owners can update properties.'}, status=403)
+
+
+
+# class PropertyListView(APIView):
+#     permission_classes = [IsAdminOrOwner]
+
+#     def get(self, request):
+#         user_role = getattr(request, 'user_role', None)
+#         user_id = request.user.id
+        
+#         if user_role == 'admin':
+#             properties = Property.objects.all()
+#         elif user_role == 'owner':
+#             try:
+#                 profile = PropertyOwnerProfile.objects.get(user_id=user_id)
+#             except PropertyOwnerProfile.DoesNotExist:
+#                 return Response({'error': 'Profile not found'}, status=404)
+
+#             # Obtener todas las propiedades del propietario
+#             properties = Property.objects.filter(owner_profile=profile.id)
+#         else:
+#             return Response({'error': 'Unauthorized'}, status=401)
+
+#         # Filtrar las propiedades publicadas para el cálculo de la suma de precios
+#         published_properties = properties.filter(status='published')
+
+#         # Calcular la suma del precio de las propiedades publicadas
+#         total_price = published_properties.aggregate(total_price=Sum('price'))['total_price'] or 0
+
+#         # Serializar todas las propiedades del propietario
+#         serializer = PropertySerializerList(properties, many=True)
+
+#         return Response({
+#             'total_value_tokunized': total_price,
+#             'properties': serializer.data
+#         })

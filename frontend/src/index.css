@@ -91,7 +91,7 @@
   padding-left: 50px; 
 }
 
-.custom-landing-carousel group {
+.custom-landing-carousel .group {
   display: none;
 } 
 
@@ -99,3 +99,4 @@
   display: flex !important;
   flex-direction: column !important;
 }
+

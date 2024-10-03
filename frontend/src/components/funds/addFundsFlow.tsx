@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogFooter,DialogTrigger, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import cardIcon from "../../assets/cardIcon.svg";
 import yellowCardIcon from "../../assets/yellowCardIcon.svg";
 import axios from "axios"
 import checkBoxSuccesIcon from "../../assets/bigCheckBox.svg";
 import { useAuth0 } from '@auth0/auth0-react';
+import { useToast } from "../ui/use-toast";
+import { Icons } from "@/components/icons";
 
 
 export const AddFundsFlow: React.FC = () => {
@@ -14,6 +16,8 @@ export const AddFundsFlow: React.FC = () => {
     const [fundMethod, setFundMethod] = useState<string | null>(null);
     const [fundAmount, setFundAmount] = useState<number | null>(null);
     const [responseMessage, setResponseMessage] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false); // New loading state
+    const { toast } = useToast();
 
     const goNext = () => setStep((prev) => prev + 1);
     const goBack = () => {
@@ -29,43 +33,53 @@ export const AddFundsFlow: React.FC = () => {
         setStep(1);
     };
 
-    const makePayment = async () => {
+    const addFunds = async () => {
+        setIsLoading(true); // Set loading to true when starting the request
         try {
             const token = await getAccessTokenSilently();
             const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}wallet/fund-wallet/`;
-    
+
             const config = {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
             };
-    
+
             const response = await axios.post(
                 apiUrl,
                 { fundAmount, selectedPaymentMethod: fundMethod },
                 config
             );
-    
-            if (response.status === 200) {
-                setResponseMessage('Payment successful!');
-                goNext();  // Solo avanzamos si el pago fue exitoso
-                setStep(4);  // Ir directamente al paso 4 (final) si el pago es exitoso
 
+            if (response.status === 204) {
+                toast({
+                    title: "Success!",
+                    description: "Your wallet was topped up. It may take a few minutes to update your balance.",
+                    variant: "default",
+                });
+                goNext();
+                setStep(4);
             } else {
-                setResponseMessage(`Payment failed! Status: ${response.status}`);
+                toast({
+                    title: "Error!",
+                    description: "Payment failed!",
+                    variant: "destructive",
+                });
             }
         } catch (error: any) {
             if (error.response) {
-                console.error('Error en la respuesta:', error.response.data);
+                console.error('Error in response:', error.response.data);
                 setResponseMessage(`Payment failed! Error: ${error.response.data.message}`);
             } else if (error.request) {
-                console.error('No se recibió respuesta del servidor:', error.request);
+                console.error('No response from server:', error.request);
                 setResponseMessage('Payment failed! No response from server.');
             } else {
-                console.error('Error al hacer la solicitud:', error.message);
+                console.error('Request error:', error.message);
                 setResponseMessage(`Payment failed! Error: ${error.message}`);
             }
+        } finally {
+            setIsLoading(false); // Stop the loading state
         }
     };
 
@@ -120,15 +134,27 @@ export const AddFundsFlow: React.FC = () => {
                         </Button>
                     )}
                     {step === 3 && (
-                        <Button onClick={makePayment}> {/* Ejecutar makePayment en lugar de goNext */}
-                            Confirm
+                        <Button onClick={addFunds} disabled={isLoading}>
+                            {isLoading ? (
+                                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                                "Confirm"
+                            )}
                         </Button>
+                    )}
+                    {step === 4 &&(
+                     <DialogClose asChild>
+                        <Button type="button" variant="secondary">
+                          Close
+                        </Button>
+                      </DialogClose>
                     )}
                 </DialogFooter>
             </DialogContent>
         </Dialog>
     );
 };
+
 
 
 interface FundAmountReviewProps {
@@ -246,15 +272,13 @@ export const FundMethodType: React.FC<FundMethodTypeProps> = ({ onPaymentSelect 
     return (
         <article className="space-y-5">
             <h4 className="font-bold text-xl">Select Payment Type</h4>
-
-            <span
+            {/* <span
                 className={`flex items-center hover:bg-[#C8E870] p-2 rounded-lg ${selectedPayment === 'e-wallet' ? 'bg-[#C8E870]' : ''}`}
                 onClick={() => handlePaymentSelect("e-wallet")}
             >
                 <img alt="E-Wallet icon" className="h-8" src={cardIcon} />
                 <p className="pl-4">E-Wallet</p>
-            </span>
-
+            </span> */}
             <span
                 className={`flex items-center hover:bg-[#C8E870] p-2 rounded-lg ${selectedPayment === 'bank-card' ? 'bg-[#C8E870]' : ''}`}
                 onClick={() => handlePaymentSelect("bank-card")}

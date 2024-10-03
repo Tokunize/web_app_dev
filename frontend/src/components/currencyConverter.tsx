@@ -36,11 +36,11 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({ amountInUS
         <div>
             {amountInGBP !== null ? (
                 <p className="font-bold">
-                    ${amountInUSD.toFixed(2)} USD <br /> 
-                    <span className="text-gray-500 text-sm">= £{amountInGBP.toFixed(2)} GBP</span>
+                    ${amountInUSD?.toFixed(2) || 0.00} USD <br /> 
+                    <span className="text-xs text-muted-foreground">= £{amountInGBP?.toFixed(2) || 0.00} GBP</span>
                 </p>
             ) : (
-                <p>Loading conversion</p>
+                <p>Loading conversion...</p>
             )}
         </div>
     );

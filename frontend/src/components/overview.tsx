@@ -93,7 +93,7 @@ export const Overview: React.FC = () => {
           <p className="text-gray-700 mb-5">
             {property.description || 'Description not available'}
           </p>
-          <PropertyModal />
+          {/* <PropertyModal /> */}
         </div>
   
         <div className="mt-[40px] featureContainer">
@@ -114,7 +114,7 @@ export const Overview: React.FC = () => {
           <p className="text-gray-700 mb-4">
             {property.details || 'Description not available'}
           </p>
-          <PropertyModal />
+          {/* <PropertyModal /> */}
         </div>
   
         <div className="my-[40px]">

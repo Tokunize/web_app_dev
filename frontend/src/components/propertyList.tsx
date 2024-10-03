@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import { PropertyFilters } from './propertyFilters';
 import { PropertyListCard } from './propertyListCard';
+import ClipLoader from 'react-spinners/ClipLoader';
 
-
-const sortProperties = (properties: any[], sortBy: string) => {  
-  return properties.sort((a, b) => {    
+const sortProperties = (properties: any[], sortBy: string) => {
+  return properties.sort((a, b) => {
     switch (sortBy) {
       case 'price_asc':
         return (a.tokens[0].token_price) - (b.tokens[0].token_price);
@@ -21,7 +21,6 @@ const sortProperties = (properties: any[], sortBy: string) => {
   });
 };
 
-
 export const PropertyList: React.FC = () => {
   const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -33,14 +32,13 @@ export const PropertyList: React.FC = () => {
   });
 
   useEffect(() => {
-    const backendUrl = import.meta.env.VITE_APP_BACKEND_URL
+    const backendUrl = import.meta.env.VITE_APP_BACKEND_URL;
 
     const fetchProperties = async () => {
       try {
         const apiUrl = `${backendUrl}property/properties/public/`;
-        const response = await axios.get(apiUrl);        
+        const response = await axios.get(apiUrl);
         setProperties(response.data);
-        
       } catch (err) {
         setError('Failed to fetch properties');
         console.error(err);
@@ -59,23 +57,31 @@ export const PropertyList: React.FC = () => {
     }));
   };
 
-  const filteredProperties = properties.filter(property => {
-    const meetsLocation = !filters.location || property.location === filters.location;
-    const meetsPropertyType = !filters.property_type || property.property_type === filters.property_type;
-    return meetsLocation && meetsPropertyType;
-  });
+  // Memoize filtered properties
+  const filteredProperties = useMemo(() => {
+    return properties.filter(property => {
+      const meetsLocation = !filters.location || property.location === filters.location;
+      const meetsPropertyType = !filters.property_type || property.property_type === filters.property_type;
+      return meetsLocation && meetsPropertyType;
+    });
+  }, [properties, filters.location, filters.property_type]);
 
-  const sortedProperties = sortProperties(filteredProperties, filters.sort_by);
+  // Memoize sorted properties
+  const sortedProperties = useMemo(() => {
+    return sortProperties(filteredProperties, filters.sort_by);
+  }, [filteredProperties, filters.sort_by]);
 
   return (
     <div className="py-10">
       <PropertyFilters
-        locations={[...new Set(properties.map(p => p.location))]} 
+        locations={[...new Set(properties.map(p => p.location))]}
         onFilterChange={handleFilterChange}
-        propertyTypes={[...new Set(properties.map(p => p.property_type))]}  // Dynamically generate property types from data
+        propertyTypes={[...new Set(properties.map(p => p.property_type))]}
       />
       {loading ? (
-        <p>Loading...</p>
+        <div className="flex items-center justify-center h-40">
+          <ClipLoader size={40} color="#A0CC29" />
+        </div>
       ) : error ? (
         <p>{error}</p>
       ) : (
@@ -87,13 +93,13 @@ export const PropertyList: React.FC = () => {
               location={property.location}
               minTokenPrice={property.tokens[0].token_price}
               estAnnualReturn={property.projected_annual_return}
-              propertyImgs={property.image.slice(1,5)}  
-              id={property.id}  
-              tokensSold={property.tokensSold}
+              propertyImgs={property.image}
+              id={property.id}
+              tokensSold={property.tokens[0].tokensSold}
               totalTokens={property.tokens[0].total_tokens}
-              createdDay = {property.created_at}
-              status = {property.status}
-              tokens_available = {property.tokens[0].tokens_available}
+              createdDay={property.created_at}
+              status={property.status}
+              tokens_available={property.tokens[0].tokens_available}
             />
           ))}
         </div>

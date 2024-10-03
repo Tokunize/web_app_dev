@@ -1,5 +1,6 @@
 export interface Asset {
-    image?: string; // Make it optional if needed
+    id:number;
+    image?: string[]; // Cambia a string[] para representar un array de URLs de imagen
     title: string;
     location: string;
     average_yield: number;
@@ -7,4 +8,8 @@ export interface Asset {
     tenant_turnover: number;
     net_asset_value: number;
     net_operating_value: number;
+    status:string;
+    ownershipPercentage:number;
+    price:string;
+    projected_annual_return:string;
 }

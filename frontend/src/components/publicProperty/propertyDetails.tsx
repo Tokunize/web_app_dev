@@ -1,21 +1,22 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 
 interface PropertyDetailsProps {
     propertyDetails: {
         bedroomCount: number;
         bathroomCount: number;
         size: string;
-        title: string; // Add title to the propertyDetails type
-        yearBuilt: string; // Add yearBuilt to the propertyDetails type
+        title: string;
+        yearBuilt: string;
     };
     setPropertyDetails: React.Dispatch<React.SetStateAction<{
         bedroomCount: number;
         bathroomCount: number;
         size: string;
-        title: string; // Add title to the setState type
-        yearBuilt: string; // Add yearBuilt to the setState type
+        title: string;
+        yearBuilt: string;
     }>>;
 }
 
@@ -24,6 +25,7 @@ export const PropertyDetails: React.FC<PropertyDetailsProps> = ({
     setPropertyDetails
 }) => {
     const { bedroomCount, bathroomCount, size, title, yearBuilt } = propertyDetails;
+    const { toast } = useToast(); // Use the toast hook
 
     const handleIncrementBedroom = () => {
         setPropertyDetails((prev) => ({
@@ -65,11 +67,26 @@ export const PropertyDetails: React.FC<PropertyDetailsProps> = ({
     };
 
     const handleYearBuiltChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setPropertyDetails((prev) => ({ ...prev, yearBuilt: e.target.value }));
+        const value = e.target.value;
+        const currentYear = new Date().getFullYear(); // Get the current year
+
+        // Validate the year input
+        if (value && (isNaN(Number(value)) || Number(value) > currentYear)) {
+            toast({
+                title: "Invalid Year Built",
+                description: `Year Built cannot be greater than ${currentYear}.`,
+                variant: "destructive", // You can adjust the variant as needed
+            });
+            // Don't update the year if invalid
+            return;
+        }
+
+        // Update property details if valid
+        setPropertyDetails((prev) => ({ ...prev, yearBuilt: value }));
     };
 
     return (
-        <article className="p-4 space-y-5">
+        <div className="p-4 space-y-5">
             <h2 className="font-bold text-4xl mb-[60px]">Share some basic details about your property</h2>
             
             {/* Title */}
@@ -83,6 +100,8 @@ export const PropertyDetails: React.FC<PropertyDetailsProps> = ({
                 />
             </div>
 
+          
+
             {/* Year Built */}
             <div className="flex items-center justify-between">
                 <label className="text-lg">Year Built</label>
@@ -91,6 +110,7 @@ export const PropertyDetails: React.FC<PropertyDetailsProps> = ({
                     onChange={handleYearBuiltChange}
                     placeholder="Enter year built"
                     className="max-w-xs"
+
                 />
             </div>
 
@@ -124,6 +144,6 @@ export const PropertyDetails: React.FC<PropertyDetailsProps> = ({
                     className="max-w-xs"
                 />
             </div>
-        </article>
+        </div>
     );
 };

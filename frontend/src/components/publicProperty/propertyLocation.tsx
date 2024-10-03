@@ -3,7 +3,8 @@ import axios from 'axios';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { AlertCircle, MapPin, Globe, Compass } from "lucide-react";
+import { MapPin, Globe, Compass } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 export const ChoosePropertyLocation: React.FC<{
     propertyLocation: { postcode: string; country: string; adminDistrict: string } | null;
@@ -12,7 +13,7 @@ export const ChoosePropertyLocation: React.FC<{
     const [postcode, setPostcode] = useState("");
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+    const {toast} = useToast()
 
     const handlePostcodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPostcode(e.target.value);
@@ -23,20 +24,28 @@ export const ChoosePropertyLocation: React.FC<{
             const response = await axios.get(`https://api.postcodes.io/postcodes/${postcode}/validate`);
             return response.data.result;
         } catch (err) {
-            setError("Error validating postcode. Please try again.");
+            toast({
+                title: "Error!",
+                description: "Error validating postcode. Please try again.",
+                variant: "destructive",
+              });
+            // setError("Error validating postcode. Please try again.");
             return false;
         }
     };
 
     const fetchPostcodeData = async () => {
         setLoading(true);
-        setError("");
         setData(null);
 
         const isValid = await validatePostcode();
 
-        if (!isValid) {
-            setError("Invalid postcode. Please enter a valid postcode.");
+        if (!isValid){
+            toast({
+            title: "Error!",
+            description: "Error validating postcode. Please try again.",
+            variant: "destructive",
+          });
             setLoading(false);
             return;
         }
@@ -52,7 +61,11 @@ export const ChoosePropertyLocation: React.FC<{
                 adminDistrict: response.data.result.admin_district,
             });
         } catch (err) {
-            setError("Error fetching data. Please try again.");
+            toast({
+                title: "Error!",
+                description: "Error fetching data. Please try again.",
+                variant: "destructive",
+              });
         } finally {
             setLoading(false);
         }
@@ -78,13 +91,6 @@ export const ChoosePropertyLocation: React.FC<{
                     </div>
                 </CardContent>
             </Card>
-
-            {error && (
-                <div className="flex items-center mt-4 text-red-500">
-                    <AlertCircle className="mr-2" />
-                    <p>{error}</p>
-                </div>
-            )}
 
             {data && (
                 <Card className="mt-6 p-4 shadow-lg border">

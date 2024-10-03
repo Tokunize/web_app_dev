@@ -4,8 +4,9 @@ import { Button } from '../ui/button';
 export const LogoutButton = () => {
   const { logout } = useAuth0();
   const removeLocalStorage = () =>{
-    localStorage.removeItem("user_role")
+    localStorage.removeItem("userRole")
     localStorage.removeItem("accessToken")
+    localStorage.removeItem("id")
   }
 
   return (

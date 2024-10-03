@@ -10,6 +10,8 @@ import useFetchPropertyDetails from "@/components/property/getDetailsHook";
 import { useAuth0 } from '@auth0/auth0-react';
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../ui/use-toast';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) => {
   const navigate = useNavigate()
@@ -18,7 +20,7 @@ export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
   const [investmentAmount, setInvestmentAmount] = useState<string>("0"); // New state for amount
 
-
+  const {toast} = useToast()
   const { data: propertyData, loading, error } = useFetchPropertyDetails(property_id, "payment");
 
   const goNext = () => setStep((prev) => prev + 1);
@@ -41,7 +43,7 @@ export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) 
       const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/transactions/`; 
 
       const data = {
-        token_amount: investmentAmount,
+        investmentAmount: investmentAmount,
         property_id: property_id
       };
 
@@ -55,14 +57,27 @@ export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) 
       const response = await axios.post(apiUrl, data, config);
       setStep(5); // Move to the summary step (or the next appropriate step)
       console.log(response.data);
+      toast({
+        title: "Transaction successful!",
+        description: "Congratulations on your investment.",
+        variant: "default",
+    });
+    
     } catch (error) {
       console.error(error);
+      toast({
+        title: "Transaction successful!",
+          description: error.message || "An unexpected error occurred.", // Asegúrate de mostrar un mensaje adecuado
+        variant: "default",
+    });
       console.log('An error occurred while processing your purchase.');
     }
   }
 
   const renderStep = () => {
-    if (loading) return <div>Loading...</div>;
+    if (loading) return  <div className="flex items-center justify-center h-40">
+    <ClipLoader size={50} color="#A0CC29" />
+  </div>
     if (error) return <div>Error: {error}</div>;
     
     if (!propertyData) return <div>No property data available.</div>;
@@ -140,7 +155,7 @@ export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) 
             </Button>
           )}
           {step === 5 && (
-            <Button className="w-full" onClick={() =>{navigate("/overview/")}}>
+            <Button className="w-full" onClick={() =>{navigate("/dashboard/")}}>
               Check My Wallet
             </Button>
           )}

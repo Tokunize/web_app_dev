@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useToast } from "@/components/ui/use-toast";
-
+import { Button } from '../ui/button';
 
 const cloudName = 'dhyrv5g3w';
 const uploadPreset = 'ptwmh2mt';
@@ -63,18 +63,8 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUploaded, 
     const response = await fetch(url, { method: 'POST', body: formData });
     if (response.ok) {
       const data = await response.json();
-      toast({
-        title: "Success",
-        description: "Your image is uploaded!",
-        variant: "default",
-      });
       return data;
     } else {
-      toast({
-        title: "Error",
-        description: "Your image was not uploaded, try again!",
-        variant: "default",
-      });
       throw new Error('Failed to upload image');
     }
   };
@@ -93,19 +83,40 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUploaded, 
 
   const handleUpload = async () => {
     if (files.length > 0) {
+      // Show loading toast
+      toast({
+        title: "Uploading...",
+        description: "Your images are being uploaded, please wait.",
+        variant: "default", // You can create a variant for loading in your toast component
+      });
+
       try {
         const uploadPromises = files.map(async ({ file }) => {
           const data = await uploadToCloudinary(file);
-          return data.secure_url; // Retorna la URL segura
+          return data.secure_url; // Return the secure URL
         });
         const uploadedUrls = await Promise.all(uploadPromises);
-        onImagesUploaded(uploadedUrls); // Pasa las URLs subidas al padre
+        onImagesUploaded(uploadedUrls); // Pass the uploaded URLs to the parent
         
-        // Limpiar la vista previa después de la carga
-        setFiles([]); // Vaciar los archivos después de subir
+        // Clean up after upload
+        setFiles([]); // Clear files after upload
+
+        // Show success toast
+        toast({
+          title: "Success",
+          description: "Your images have been uploaded!",
+          variant: "default",
+        });
       } catch (error) {
         console.error('Error uploading images:', error);
-      }
+
+        // Show error toast
+        toast({
+          title: "Error",
+          description: "Your images were not uploaded, try again!",
+          variant: "destructive", // Use a different variant for errors
+        });
+      } 
     }
   };
 
@@ -129,9 +140,16 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUploaded, 
           <p className="text-gray-400 text-sm mt-2">PNG, JPG, GIF up to 5MB</p>
         </label>
       </div>
-
       {files.length > 0 && (
-        <div className="w-full max-w-4xl mt-6">
+        <Button
+          className="mt-3 px-4 focus:outline-none transition-colors duration-300"
+          onClick={handleUpload}
+        >
+          Save Images
+        </Button>
+      )}
+      {files.length > 0 && (
+        <div className="w-full max-w-4xl">
           <h2 className="text-xl font-semibold text-gray-700 mb-4">Image Previews</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {files.map((file, index) => (
@@ -157,16 +175,6 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUploaded, 
             ))}
           </div>
         </div>
-      )}
-
-      {files.length > 0 && (
-        <button
-          type="button"
-          className="mt-6 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none transition-colors duration-300"
-          onClick={handleUpload}
-        >
-          Upload All
-        </button>
       )}
     </div>
   );

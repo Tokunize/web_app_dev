@@ -14,10 +14,9 @@ import { Transaction } from "./components/dashboard/transactions";
 import { Blog } from "./views/blog";
 import { SingleArticleView } from "./views/singleArticleView";
 import { Toaster } from "./components/ui/toaster";
-import { InvestorOverview } from "./components/dashboard/investorOverview";
 import AuthenticationPage from "./views/signUpPage2";
-import { OwnerDashboard } from "./components/dashboard/ownerOverview";
 import { PublicPropertyPage } from "./views/publicProperty";
+import Dashboard from "./dashboard";
 
 const Layout = () => {
   return (
@@ -50,31 +49,18 @@ const Layout = () => {
                 <ProtectedRoute roleRequired="investor" element={<Transaction/>} />
               }
             />
+            <Route
+              path="dashboard/"
+              element={
+                <ProtectedRoute roleRequired="investor,admin,owner" element={<Dashboard/>} />
+              }
+            />
              <Route
               path="investments/"
               element={
                 <ProtectedRoute roleRequired="investor" element={<Assests/>} />
               }
             />
-         
-            <Route
-              path="investor-dashboard/"
-              element={
-                <ProtectedRoute roleRequired="investor" element={<InvestorOverview />} />
-              }
-            />
-            <Route
-              path="owner-dashboard/"
-              element={
-                <ProtectedRoute roleRequired="owner" element={<OwnerDashboard />} />
-              }
-            />
-            {/* <Route
-              path="investment-dashboard"
-              element={
-                <ProtectedRoute roleRequired="investor" element={<InvestorDashboard />} />
-              }
-            /> */}
             <Route
               path="dashboard-property/:propertyId"
               element={

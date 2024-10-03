@@ -52,7 +52,6 @@ export const Transaction = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      console.log(response.data); // Log the data
       setTransactions(response.data.transactions);
       // Set the balance from the response, defaulting to 0 if not available
       const balanceAmount = response.data.balance?.data?.tokenBalances[0]?.amount;
@@ -126,7 +125,7 @@ export const Transaction = () => {
   };
 
   if (loading) {
-    return <div>Loading the wallet...</div>;
+    return <div>Loading...</div>;
   }
 
   if (error) {
@@ -143,7 +142,6 @@ export const Transaction = () => {
         </div>
         <span className="space-x-3">
           <AddFundsFlow />
-          <CreateWallet />
           <Button>Withdraw</Button>
         </span>
       </div>

@@ -11,8 +11,8 @@ interface PropertyListCardProps {
   estAnnualReturn: string;
   propertyImgs: string[];
   id: string;
-  tokensSold: number;
-  totalTokens: number;
+  tokensSold: number | undefined;  // Permitir undefined temporalmente
+  totalTokens: number | undefined;  // Permitir undefined temporalmente
   createdDay: string;
   status: string;  
   tokens_available: number;
@@ -25,8 +25,8 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
   estAnnualReturn,
   propertyImgs,
   id,
-  tokensSold,
-  totalTokens,
+  tokensSold = 0,  // Asignar 0 como valor predeterminado
+  totalTokens = 0,  // Asignar 0 como valor predeterminado
   createdDay,
   status,
   tokens_available
@@ -34,22 +34,28 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
   const [badgeType, setBadgeType] = useState<string | null>(null);
 
   useEffect(() => {
-
     const createdDate = new Date(createdDay);
     const now = new Date();
-    const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(now.getMonth() - 6); // Corrected to 6 months
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(now.getDate() - 7); // Cambiado a 7 días para una semana
 
-    if (createdDate >= sixMonthsAgo && status === "published") {
+    // Calcular los tokens vendidos
+    const soldTokens = totalTokens ? totalTokens - tokens_available : 0; // Asegúrate de que totalTokens no sea undefined
+    const soldPercentage = totalTokens > 0 ? (soldTokens / totalTokens) * 100 : 0; // Evita división por cero
+
+    console.log(soldPercentage, "porcentaje vendido");
+
+    if(soldPercentage > 80){
+      setBadgeType('Almost Gone!');
+    }
+    else if (createdDate >= oneWeekAgo && status === "published") {
       setBadgeType('New');
     } else if (status === "coming_soon") {
       setBadgeType('Coming Soon');
-    } else if ((tokensSold / totalTokens) * 100 >= 80) {
-      setBadgeType('Almost Gone!');
     } else {
       setBadgeType(null);
     }
-  }, [tokensSold, totalTokens, createdDay]);
+  }, [tokens_available, totalTokens, createdDay, status]); // Dependencias actualizadas
 
   return (
     <article className="relative rounded-lg overflow-hidden mt-6">
@@ -101,7 +107,7 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
       <div className="py-3">
         <div className="flex items-center justify-end">
           <div className="float-right text-sm text-gray-500 flex items-center ">
-            {status ==="published" ? (
+            {status === "published" ? (
               <>
                 <span><img src={token} alt="token" className="inline-block h-[20px] w-[20px] mr-2" /></span> {tokens_available} Tokens Left
               </>

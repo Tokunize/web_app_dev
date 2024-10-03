@@ -26,10 +26,10 @@ import { Asset } from "@/types";
 
 interface InsightsTableProps {
     assetsData: Asset[];
-    onSelectProperty: (property: Asset) => void; // Asegúrate de que esto sea correcto
+    onSelectProperty: (property: Asset) => void; 
 }
 
-export const InsightsTable: React.FC<InsightsTableProps> = ({ assetsData, onSelectProperty }) => {
+export const InsightsTable: React.FC<InsightsTableProps> = React.memo(({ assetsData, onSelectProperty }) => {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const [rowSelection, setRowSelection] = React.useState({});
@@ -42,14 +42,19 @@ export const InsightsTable: React.FC<InsightsTableProps> = ({ assetsData, onSele
         return new Intl.NumberFormat("en-UK", { style: "currency", currency: "GBP" }).format(value);
     };
 
-    const columns: ColumnDef<Asset>[] = [
+    const columns: ColumnDef<Asset>[] = React.useMemo(() => [
         {
             accessorKey: "title",
             header: "Property Info",
             cell: ({ row }) => (
                 <div className="flex items-center w-[175px]">
                     {row.original.image && (
-                        <img src={row.original.image} alt={row.original.title} className="w-12 h-12 mr-4 rounded-full" />
+                        <img 
+                            src={row.original.image} 
+                            alt={row.original.title} 
+                            className="w-12 h-12 mr-4 rounded-full" 
+                            loading="lazy"  // Use lazy loading for images
+                        />
                     )}
                     <div>
                         <div className="font-bold">{row.original.title}</div>
@@ -110,7 +115,7 @@ export const InsightsTable: React.FC<InsightsTableProps> = ({ assetsData, onSele
                 return <div>{formatCurrency(value)}</div>;
             },
         },
-    ];
+    ], [sorting]);
 
     const table = useReactTable({
         data: assetsData,
@@ -201,4 +206,4 @@ export const InsightsTable: React.FC<InsightsTableProps> = ({ assetsData, onSele
             </div>
         </div>
     );
-};
+});

@@ -2,7 +2,7 @@ from rest_framework import serializers
 from property.models import(
     Property,
     Token,
-    Transaction,PropertyToken
+    Transaction,PropertyToken,PropertyMetrics
 )
 
 #SERIALZERS FOR TOKENS 
@@ -21,8 +21,8 @@ class PropertySerializerList(serializers.ModelSerializer):
                     'id', 'title', 'status', 'location', 'image', 
                     'active','property_code',
                     'projected_annual_return', 'property_type', 'created_at',
-                    'bedrooms', 'bathrooms', 'price', 'size', 'year_built',
-                    'country', 'description','amenities', 'tokens'
+                    'bedrooms', 'bathrooms', 'price', 'size', 'year_built',"ownershipPercentage",
+                    'country', 'description','amenities', 'tokens','vacancy_rate', 'tenant_turnover'
                 ]
         
 #SERIALZIZERS FOR SINGLE PORPERTY PAGE AND OVERVIEW, FINATIAL, DOCUMENTS, ACTIVITY AND IMAEGES
@@ -198,7 +198,8 @@ class InvestedPropertiesSerialier(serializers.ModelSerializer):
             "projected_annual_cash_flow",
             "legal_documents_url",
             "location",
-            "updated_at"
+            "updated_at",
+            "ownershipPercentage"
         ]
 
     def get_user_tokens(self, obj):
@@ -235,3 +236,9 @@ class InvestmentOverviewSerializer(serializers.ModelSerializer):
             "location": obj.location 
         }
 
+
+class PropertyMetricsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PropertyMetrics
+        fields = '__all__'

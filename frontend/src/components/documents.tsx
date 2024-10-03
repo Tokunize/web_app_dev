@@ -1,9 +1,13 @@
 import externalLink from "../assets/external-link.svg"
 import download from "../assets/download.svg"
+import { SmallSignUpForm } from "./property/smallSignUp";
 
 export const Documents = () => {
   const accessToken = localStorage.getItem("accessToken")
 
+  if (!accessToken) {
+    return <div className="flex items-center justify-center h-[50vh]"><SmallSignUpForm /></div>
+  }
   return (
     <div className="glass-container">
     <section className="p-4">
@@ -41,7 +45,6 @@ export const Documents = () => {
         </li>
       </ul>
     </section>
-    {!accessToken  && <div className="preview-panel-wrap"></div>}
     </div>
   );
 };

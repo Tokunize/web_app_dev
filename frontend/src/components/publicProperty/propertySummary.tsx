@@ -30,8 +30,8 @@ export const PropertySummary: React.FC<PropertySummaryProps> = ({ propertyType, 
     return (
         <div className="flex flex-col">
             <div className="flex-grow p-4">
-                <h2 className="font-bold text-3xl">It’s time to publish!</h2>
-                <span className="text-gray-500 text-sm">Before you publish, make sure to review the details.</span>
+                <h2 className="font-bold text-3xl">It’s time to send your property!</h2>
+                <span className="text-gray-500 text-sm">Before you send us your property, make sure to review the details.</span>
                 <Card className="max-w-sm mx-auto mt-5 shadow-lg hover:shadow-xl transition-shadow duration-300"> {/* Sombra añadida aquí */}
                     <CardHeader>
                         <CardTitle className="text-lg hidden font-bold">Property Summary</CardTitle>

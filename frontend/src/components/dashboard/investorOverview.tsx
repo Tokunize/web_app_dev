@@ -10,6 +10,8 @@ import { RiskOverview } from "../graphs/riskGraph";
 import { PerformanceGraph } from "../graphs/performanceGraph";
 import { MyAssetsTable } from "./myAssetsTable";
 
+
+
 interface Investment {
   properties: {
     location: string;
@@ -23,6 +25,7 @@ export const InvestorOverview = () => {
   const { getAccessTokenSilently } = useAuth0();
   const [investments, setInvestments] = useState<Investment | null>(null);
   const [loading, setLoading] = useState(true);
+
 
   const getInvestmentSummary = async () => {
     const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/investment-summary/`;
@@ -49,7 +52,7 @@ export const InvestorOverview = () => {
   }, [getAccessTokenSilently]);
 
   if (loading) {
-    return <p>Loading data...</p>;
+    return <p>Loading ...</p>;
   }
 
   const yieldData = investments?.properties.map((property) => ({
@@ -99,6 +102,16 @@ export const InvestorOverview = () => {
     fill: uniquePropertyColors[index],
   }));
 
+  const chartData2 = [
+    { month: "January", value: 3.2 },
+    { month: "February", value: 3.9 },
+    { month: "March", value: 3.5 },
+    { month: "April", value: 3.7 },
+    { month: "May", value: 3.1 },
+    { month: "June", value: 3.8 },
+];
+
+
   return (
     <section className="bg-gray-100">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
@@ -107,7 +120,7 @@ export const InvestorOverview = () => {
             <CardTitle className="text-sm font-medium">Current Rent Balance</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$45,231.89</div>
+            <div className="text-2xl font-bold">$232,222</div>
             <p className="text-xs text-muted-foreground">+20.1% from last month</p>
           </CardContent>
         </Card>
@@ -117,8 +130,8 @@ export const InvestorOverview = () => {
             <CardTitle className="text-sm font-medium">Total Rental Income</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{investments?.total_invested}</div>
-            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+            <div className="text-2xl font-bold">$898,322</div>
+            <p className="text-xs text-muted-foreground">+0.4% from last month</p>
           </CardContent>
         </Card>
 
@@ -161,7 +174,10 @@ export const InvestorOverview = () => {
           <RiskOverview />
         </Card>
         <Card>
-          {/* <PerformanceGraph/> */}
+          <PerformanceGraph  
+            description=""
+            title={"S&P 500 Chart"}
+            data={chartData2}/>
         </Card>
       </div>
     </section>
