@@ -27,7 +27,7 @@ export const PublicPropertyPage: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { getAccessTokenSilently } = useAuth0();
-  
+
   // Estado para manejar el progreso del paso
   const [step, setStep] = useState(1);
   // Estado para manejar los datos de la propiedad
@@ -55,6 +55,9 @@ export const PublicPropertyPage: React.FC = () => {
   
   // Estado para manejar la carga
   const [loading, setLoading] = useState(false);
+  
+  // Estado para manejar la visibilidad del modal de salida
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const goNext = () => setStep((prev) => Math.min(prev + 1, 8));
   const goBack = () => setStep((prev) => Math.max(prev - 1, 1));
@@ -167,7 +170,21 @@ export const PublicPropertyPage: React.FC = () => {
       setLoading(false); // Desactivar el loader al finalizar
     }
   };
-  
+
+  // Manejar la salida y mostrar el modal
+  const handleExit = () => {
+    setIsModalOpen(true);
+  };
+
+  const confirmExit = () => {
+    // Navegar a la pantalla anterior
+    navigate(-1);
+  };
+
+  const cancelExit = () => {
+    setIsModalOpen(false);
+  };
+
   const renderStep = () => {
     switch (step) {
       case 1:
@@ -221,7 +238,7 @@ export const PublicPropertyPage: React.FC = () => {
     <section className="flex flex-col h-screen space-y-5">
       <header className="flex justify-between px-[20px] md:px-[80px] mt-[40px]">
         <img alt="tokunize-logo" className="w-32" src={logo} />
-        <Button variant="outline" onClick={onSubmit}>Save & Exit</Button>
+        <Button variant="outline" onClick={handleExit}>Exit</Button>
       </header>
 
       <main className="flex-grow h-[400px] px-[20px] md:px-[80px] md:w-[70%] mx-auto md:mt-[0px]">
@@ -260,6 +277,20 @@ export const PublicPropertyPage: React.FC = () => {
           )}
         </div>
       </footer>
+
+      {/* Modal de confirmación */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-80">
+            <h2 className="text-lg font-semibold">Confirm Exit</h2>
+            <p className="mt-2">Are you sure you want to exit? You will lose your progress.</p>
+            <div className="flex justify-end mt-4">
+              <Button variant="outline" onClick={cancelExit} className="mr-2">Cancel</Button>
+              <Button onClick={confirmExit} className="bg-red-500 text-white">Exit</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

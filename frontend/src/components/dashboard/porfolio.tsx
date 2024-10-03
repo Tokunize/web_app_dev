@@ -86,7 +86,7 @@ export const Porfolio: React.FC = () => {
       <div className="mb-6">
         {loading && (
           <div className="flex items-center justify-center h-40">
-            <ClipLoader size={50} color="#4A90E2" />
+            <ClipLoader size={50} color="#C8E870" />
           </div>
         )}
         {error && <p className="text-red-500 mb-2">Error: {error}</p>}
