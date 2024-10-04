@@ -32,12 +32,13 @@ export const PropertyList: React.FC = () => {
   });
 
   useEffect(() => {
-    const backendUrl = import.meta.env.VITE_APP_BACKEND_URL;
 
     const fetchProperties = async () => {
       try {
-        const apiUrl = `${backendUrl}property/properties/public/`;
+        const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/properties/public/`;
         const response = await axios.get(apiUrl);
+        console.log(response.data);
+        
         setProperties(response.data);
       } catch (err) {
         setError('Failed to fetch properties');
