@@ -53,6 +53,8 @@ export const Transaction = () => {
         },
       });
       setTransactions(response.data.transactions);
+      console.log(response.data);
+      
       // Set the balance from the response, defaulting to 0 if not available
       const balanceAmount = response.data.balance?.data?.tokenBalances[0]?.amount;
       setBalance(balanceAmount ? parseFloat(balanceAmount) : 0); // Set to 0 if not exists

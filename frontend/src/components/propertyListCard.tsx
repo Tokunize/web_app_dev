@@ -25,7 +25,6 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
   estAnnualReturn,
   propertyImgs,
   id,
-  tokensSold = 0,  // Asignar 0 como valor predeterminado
   totalTokens = 0,  // Asignar 0 como valor predeterminado
   createdDay,
   status,
@@ -42,8 +41,6 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
     // Calcular los tokens vendidos
     const soldTokens = totalTokens ? totalTokens - tokens_available : 0; // Asegúrate de que totalTokens no sea undefined
     const soldPercentage = totalTokens > 0 ? (soldTokens / totalTokens) * 100 : 0; // Evita división por cero
-
-    console.log(soldPercentage, "porcentaje vendido");
 
     if(soldPercentage > 80){
       setBadgeType('Almost Gone!');

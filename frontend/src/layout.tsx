@@ -2,7 +2,6 @@
 import { Marketplace } from "./views/marketplace";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { SingleProperty } from "./views/singleProperty";
-import { SignUpPage } from "./views/signUpPage";
 import { UserProvider } from "./context/userProvider";
 import ProtectedRoute from "./protectedRoutes";
 import CreatePropertyController from "./components/dashboard/createPropertyController";
@@ -14,9 +13,9 @@ import { Transaction } from "./components/dashboard/transactions";
 import { Blog } from "./views/blog";
 import { SingleArticleView } from "./views/singleArticleView";
 import { Toaster } from "./components/ui/toaster";
-import AuthenticationPage from "./views/signUpPage2";
 import { PublicPropertyPage } from "./views/publicProperty";
 import Dashboard from "./dashboard";
+import SignUpController from "./components/singUpFlow.tsx/singUpController";
 
 const Layout = () => {
   return (
@@ -32,7 +31,7 @@ const Layout = () => {
             <Route path="blog/article/:id/" element={<SingleArticleView/>} />
           </Route>
           
-          <Route path="sign-up/" element={<AuthenticationPage />} />
+          <Route path="sign-up/" element={<SignUpController />} />
           <Route path="public-property/" element={<PublicPropertyPage/>} />
 
           {/*Dshboard with the sidemenu */}

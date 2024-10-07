@@ -38,7 +38,10 @@ export const InvestorOverview = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       };
+      
       const response = await axios.get<Investment>(apiUrl, config);
+      console.log(response.data);
+
       setInvestments(response.data);
     } catch (error) {
       console.log(error);
