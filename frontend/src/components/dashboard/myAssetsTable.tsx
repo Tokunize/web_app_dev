@@ -22,11 +22,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import PositiveNumber from "../../assets/positiveNUmber.svg";
+import { AcceptProperty } from "../acceptProperty";
+import { useUser } from "@/context/userProvider";
+import { formatDistanceToNow, parseISO } from 'date-fns'; // Import necessary functions from date-fns
+import { RejectPropertyForm } from "../forms/rejectPropertyForm";
 
 // Interface for the Asset attributes (optional fields)
 interface Asset {
   image?: string;
   title?: string;
+  id?:number;
   user_tokens?: number;
   projected_rental_yield?: number;
   net_asset_value?: number;
@@ -43,6 +48,7 @@ interface Asset {
   equity_listed?: number;
   upcoming_rent_amount?: number;
   upcoming_date_rent?: string;
+  ownershipPercentage?: number;
 }
 
 // The main functional component
@@ -50,6 +56,7 @@ export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData })
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
+  const {role } = useUser()
 
   // Helper function to safely convert a value to number
   const toNumber = (value: unknown): number => {
@@ -80,6 +87,17 @@ export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData })
           ),
         });
       }
+
+      asset.ownershipPercentage && columns.push({
+        accessorKey: "ownershipPercentage",
+        header: () => (
+            <span>Ownership (%)</span>
+        ),
+        cell: ({ row }) => {
+          const value = toNumber(row.getValue("ownershipPercentage"));
+          return <div>{value.toFixed(2)}%</div>;
+        },
+      });
 
       asset.projected_rental_yield != null && columns.push({
         accessorKey: "projected_rental_yield",
@@ -159,11 +177,11 @@ export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData })
         cell: ({ row }) => {
           const value = row.getValue("property_status") as string;
           const statusClasses = {
-            active: ["text-green-600", "bg-green-600"],
-            under_review: ["text-red-400", "bg-yellow-300"],
-            coming_soon: ["text-gray-600", "bg-gray-600"],
-            sold: ["text-red-800", "bg-red-800"],
-            default: ["text-gray-500", "bg-gray-500"],
+            "published": ["text-green-600", "bg-green-600"],
+            "under_review": ["text-red-400", "bg-yellow-300"],
+            "coming_soon": ["text-gray-600", "bg-gray-600"],
+            "sold": ["text-red-800", "bg-red-800"],
+            "default": ["text-gray-500", "bg-gray-500"],
           };
           const [textColor, dotColor] = statusClasses[value as keyof typeof statusClasses] || statusClasses.default;
           
@@ -173,6 +191,18 @@ export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData })
               <span className="font-medium">{value}</span>
             </div>
           );
+        },
+      });
+
+      asset.listing_date && columns.push({
+        accessorKey: "listing_date",
+        header: "Listing Date ",
+        cell: ({ row }) => {
+          const dateValue = row.getValue("listing_date") as string;
+          const formattedDate = formatDistanceToNow(parseISO(dateValue), {
+            addSuffix: true, // Add 'ago' suffix
+          });
+          return <div className="font-medium w-[150px]">{formattedDate}</div>;
         },
       });
 
@@ -188,7 +218,6 @@ export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData })
         });
       };
 
-      addDateColumn("listing_date", "Listing Date");
       addDateColumn("upcoming_date_rent", "Date");
 
       // Equity Listed column with sorting toggle
@@ -210,6 +239,33 @@ export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData })
           return <div>{value.toFixed(2)}%</div>;
         },
       });
+
+      if (role === "admin") {
+        columns.push({
+          accessorKey: "actions",
+          header: "Actions",
+          cell: ({ row }) => {
+            const propertyStatus = row.getValue("property_status") as string;
+
+            // Only show actions if property is under review
+            if (propertyStatus === "under_review") {
+              const handleReject = () => {
+                console.log(`Rejected property: ${row.original.title}`);
+                // Logic to reject the property can go here
+              };
+
+              return (
+                <div className="flex space-x-2">
+                  <AcceptProperty allPropertiesUnderReview={assetsData} />
+                  <Button variant="destructive" onClick={handleReject}>
+                    Reject
+                  </Button>
+                </div>
+              );
+            }
+            return null; // Do not render anything if not under review
+          },
+        });}
     }
     return columns; // Returning the memoized columns
   }, [assetsData]); // Depend on assetsData
@@ -243,8 +299,8 @@ export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData })
           className="max-w-sm"
         />
       </div>
-      <div className="rounded-md border overflow-x-hidden">
-        <Table>
+      <div className="rounded-md border">
+        <Table >
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

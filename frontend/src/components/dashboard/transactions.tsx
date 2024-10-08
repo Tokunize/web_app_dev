@@ -9,7 +9,6 @@ import * as React from "react";
 import { Download } from "lucide-react"; 
 import { CurrencyConverter } from "../currencyConverter";
 import { AddFundsFlow } from "../funds/addFundsFlow";
-import { CreateWallet } from "./createWallet";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,

@@ -16,6 +16,7 @@ interface Property {
   status: string;
   tokens_available: number;
   totalTokens: number;
+  rejection_reason: string;
 }
 
 export const Porfolio: React.FC = () => {
@@ -43,7 +44,9 @@ export const Porfolio: React.FC = () => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`
           }
-        });        
+        });      
+    console.log(response.data.properties);
+              
         setProperties(response.data.properties);
       } catch (err) {
         console.error('Error fetching properties:', err);
@@ -106,6 +109,7 @@ export const Porfolio: React.FC = () => {
               id={property.id.toString()}
               tokensSold={property.tokens[0]?.total_tokens - property.tokens[0]?.tokens_available || 0}
               status={property.status}
+              rejection_reason={property.rejection_reason}
               tokens_available={property.tokens[0]?.tokens_available || 0} // Tokens disponibles
             />
           ))

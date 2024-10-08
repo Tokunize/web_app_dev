@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Carousel } from "flowbite-react";
 import token from "../../assets/token.svg";
 import { useUser } from '@/context/userProvider';
-import { useNavigate } from 'react-router-dom'; // Importa useNavigate
+import { useNavigate } from 'react-router-dom';
 
 interface PropertyListCardProps {
     title: string;
@@ -15,6 +15,7 @@ interface PropertyListCardProps {
     totalTokens: number;
     status: string;
     tokens_available: number;
+    rejection_reason: string
 }
 
 export const OwnerPropertyListCard: React.FC<PropertyListCardProps> = ({
@@ -25,11 +26,12 @@ export const OwnerPropertyListCard: React.FC<PropertyListCardProps> = ({
     propertyImgs,
     status,
     tokens_available,
-    id
+    id,
+    rejection_reason
 }) => {
     const [badgeType, setBadgeType] = useState<string | null>(null);
     const { role } = useUser();
-    const navigate = useNavigate(); // Utiliza useNavigate
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (status === "under_review") {
@@ -38,6 +40,8 @@ export const OwnerPropertyListCard: React.FC<PropertyListCardProps> = ({
             setBadgeType('Published');
         } else if (status === "coming_soon") {
             setBadgeType('Coming Soon');
+        } else if (status === "rejected") {
+            setBadgeType('Rejected');
         } else {
             setBadgeType(null);
         }
@@ -52,7 +56,9 @@ export const OwnerPropertyListCard: React.FC<PropertyListCardProps> = ({
                         <span
                             className={`mr-2 w-2 h-2 rounded-full ${
                                 badgeType === 'Under Review' ? 'bg-yellow-500' : 
-                                badgeType === 'Coming Soon' ? 'bg-blue-500' : 'bg-green-500'
+                                badgeType === 'Coming Soon' ? 'bg-blue-500' : 
+                                badgeType === 'Rejected' ? 'bg-red-500' : 
+                                'bg-green-500'
                             }`}
                         />
                         {badgeType}
@@ -63,7 +69,7 @@ export const OwnerPropertyListCard: React.FC<PropertyListCardProps> = ({
                 {status !== "published" && role === "admin" && (
                     <div className="absolute top-4 right-4 z-20">
                         <span className="bg-blue-500 text-white text-xs font-semibold py-1 px-2 rounded-md shadow-md cursor-pointer" 
-                            onClick={() => navigate(`/dashboard-property/${id}`)} // Navegación programática
+                            onClick={() => navigate(`/dashboard-property/${id}`)} 
                         >
                             Update
                         </span>
@@ -76,12 +82,17 @@ export const OwnerPropertyListCard: React.FC<PropertyListCardProps> = ({
                     className="custom-landing-carousel"
                 >
                     {propertyImgs.map((img, index) => (
-                        <img
-                            key={index}
-                            src={img}
-                            alt={`${title} image ${index + 1}`}
-                            className="w-full h-full object-cover"
-                        />
+                        <div key={index} className={`relative w-full h-full ${status === 'rejected' ? 'overlay' : ''}`}>
+                            <img
+                                src={img}
+                                alt={`${title} image ${index + 1}`}
+                                className={`w-full h-full object-cover ${status === 'rejected' ? 'opacity-60' : ''}`}
+                            />
+                            {/* Overlay gris si está rechazado */}
+                            {status === 'rejected' && (
+                                <div className="absolute inset-0 bg-gray-500 opacity-50"></div>
+                            )}
+                        </div>
                     ))}
                 </Carousel>
             </div>
@@ -113,6 +124,11 @@ export const OwnerPropertyListCard: React.FC<PropertyListCardProps> = ({
                     <div className="flex justify-between">
                         <p className="font-medium">{estAnnualReturn}%</p>
                         <span className="text-gray-500">Est. annual returns</span>
+                    </div>
+                )}
+                 {status === "rejected" && rejection_reason && (
+                    <div className="mt-2 p-2 border-red-500 text-red-700 bg-red-100 rounded  text-sm">
+                        <strong>Property Status:</strong> {rejection_reason}
                     </div>
                 )}
             </div>

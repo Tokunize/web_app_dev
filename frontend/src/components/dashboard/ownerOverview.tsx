@@ -50,7 +50,6 @@ export const OwnerDashboard = () => {
                     }
                 });
                 console.log(response.data);
-                
                 setValueTokunized(response.data.total_value_tokenized);
                 setProperties(response.data.properties);
     

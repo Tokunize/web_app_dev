@@ -38,8 +38,9 @@ export const PropertyList: React.FC = () => {
         const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/properties/public/`;
         const response = await axios.get(apiUrl);
         console.log(response.data);
-        
-        setProperties(response.data);
+
+        const pusblisedProperties = response.data.filter((property) => property.status === "published")
+        setProperties(pusblisedProperties);
       } catch (err) {
         setError('Failed to fetch properties');
         console.error(err);

@@ -16,6 +16,7 @@ import { Toaster } from "./components/ui/toaster";
 import { PublicPropertyPage } from "./views/publicProperty";
 import Dashboard from "./dashboard";
 import SignUpController from "./components/singUpFlow.tsx/singUpController";
+import { PropertyManagement } from "./components/dashboard/propertyManagment";
 
 const Layout = () => {
   return (
@@ -39,7 +40,13 @@ const Layout = () => {
             <Route
               path="porfolio/"
               element={
-                <ProtectedRoute roleRequired="owner,admin" element={<Porfolio />} />
+                <ProtectedRoute roleRequired="owner" element={<Porfolio />} />
+              }
+            />
+             <Route
+              path="property-managment/"
+              element={
+                <ProtectedRoute roleRequired="admin" element={<PropertyManagement />} />
               }
             />
             <Route
