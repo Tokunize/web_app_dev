@@ -7,7 +7,7 @@ export const LoadingSpinner: React.FC = () => {
   useEffect(() => {
     // Cambiar la opacidad después de 2 segundos
     const timer = setTimeout(() => {
-    }, 1000);
+    }, 500);
 
     // Limpieza del timer
     return () => clearTimeout(timer);
@@ -16,7 +16,7 @@ export const LoadingSpinner: React.FC = () => {
   return (
     <div className="flex justify-center mt-4">
       <div className="loader">
-        <img src={loadingSpinner} alt="spinner-loading" className="spinner h-8 animate-spin" />
+        <img src={loadingSpinner} alt="spinner-loading" className="spinner h-6 animate-spin" />
       </div>
     </div>
   );

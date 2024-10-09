@@ -7,8 +7,7 @@ import { PropertyAccordion } from "@/components/propertyAccordion";
 import { PurchaseForm } from "@/components/forms/buyPropertyForm";
 import { useUser } from "@/context/userProvider";
 import { BackButton } from "@/components/buttons/backButton";
-import ClipLoader from 'react-spinners/ClipLoader';
-
+import { LoadingSpinner } from "@/components/dashboard/loadingSpinner";
 interface PropertyResponse {
   image: string[];
   video_urls: string[];
@@ -66,7 +65,7 @@ export const SingleProperty: React.FC = () => {
   }, [id]);
 
   if (loading) return <div className="flex items-center justify-center h-40">
-  <ClipLoader size={50} color="#A0CC29" />
+  <LoadingSpinner />
 </div>;
   if (error) return <div>{error}</div>;
 

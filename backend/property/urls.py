@@ -9,7 +9,8 @@ from .views import (
     TransactionListview,
     InvestedProperties,
     SinglePropertyTransactionListView,
-    UserInvestmentSummaryAPIView
+    UserInvestmentSummaryAPIView,
+    PropertyStatusUpdateView
 )
 
 urlpatterns = [
@@ -19,6 +20,9 @@ urlpatterns = [
 
     path('create/', PropertyCreateUpdateView.as_view(), name='property-create-update'),
     path('<int:pk>/', PropertyDetailView.as_view(), name='property-detail'),
+
+    path('properties/<int:propertyId>/status/', PropertyStatusUpdateView.as_view(), name='property-status-update'),
+
     
     # Property filtering and unique values
     path('properties/filter/', PropertyFilterView.as_view(), name='property-filter'),

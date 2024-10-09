@@ -47,6 +47,8 @@ class Property(TimeStampedModel):
     ownershipPercentage = models.IntegerField(blank=True, null=True)
     tenant_turnover = models.DecimalField(blank=True, null=True,max_digits=5, decimal_places=2,)
     vacancy_rate = models.DecimalField(blank=True, null=True, max_digits=5, decimal_places=2)
+    rejection_reason = models.TextField(blank=True, null=True)  # Campo para el motivo de rechazo
+
     # admin fill form 
     image = ArrayField(models.URLField(max_length=500), blank=True, null=True, help_text="A list of URLs pointing to images of the property.")
     video_urls = ArrayField(models.URLField(max_length=500), blank=True, null=True, help_text="A list of URLs pointing to videos of the property.")

@@ -12,6 +12,11 @@ class TokenSerializer(serializers.ModelSerializer):
         model = Token
         fields = '__all__'
 
+class UpdatePropertyStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Property
+        fields = ['status, rejection_reason']  # Asegúrate de incluir solo los campos que deseas actualizar
+
 #SERIALIZER FOR THE PROPERTY ON MARKETPLACE LANDING PAGE
 class PropertySerializerList(serializers.ModelSerializer):
     tokens = TokenSerializer(many=True, read_only=True) 
@@ -22,7 +27,7 @@ class PropertySerializerList(serializers.ModelSerializer):
                     'active','property_code',
                     'projected_annual_return', 'property_type', 'created_at',
                     'bedrooms', 'bathrooms', 'price', 'size', 'year_built',"ownershipPercentage",
-                    'country', 'description','amenities', 'tokens','vacancy_rate', 'tenant_turnover'
+                    'country', 'description','amenities', 'tokens','vacancy_rate', 'tenant_turnover', "rejection_reason", "projected_rental_yield"
                 ]
         
 #SERIALZIZERS FOR SINGLE PORPERTY PAGE AND OVERVIEW, FINATIAL, DOCUMENTS, ACTIVITY AND IMAEGES

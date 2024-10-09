@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import { PropertyFilters } from './propertyFilters';
 import { PropertyListCard } from './propertyListCard';
-import ClipLoader from 'react-spinners/ClipLoader';
+import { LoadingSpinner } from './dashboard/loadingSpinner';
 
 const sortProperties = (properties: any[], sortBy: string) => {
   return properties.sort((a, b) => {
@@ -82,7 +82,7 @@ export const PropertyList: React.FC = () => {
       />
       {loading ? (
         <div className="flex items-center justify-center h-40">
-          <ClipLoader size={40} color="#A0CC29" />
+          <LoadingSpinner />
         </div>
       ) : error ? (
         <p>{error}</p>

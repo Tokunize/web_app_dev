@@ -27,7 +27,8 @@ from .serializers import (
     PropertyTokenPaymentSerializer,
     InvestedPropertiesSerialier,
     InvestmentOverviewSerializer,
-    PropertyMetricsSerializer
+    PropertyMetricsSerializer,
+    UpdatePropertyStatusSerializer
 )
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
@@ -38,6 +39,24 @@ from django.http import JsonResponse
 from .filters import PropertyFilter
 from users.authentication import Auth0JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny,BasePermission
+from notifications.models import ActivityLog
+
+
+def log_activity(event_type, involved_address, contract_address=None, payload=None):
+    """
+    Registra un evento en el log de actividad.
+
+    :param event_type: Tipo de evento (e.g., 'transaction', 'new_property', etc.)
+    :param involved_address: Dirección involucrada en el evento.
+    :param contract_address: (Opcional) Dirección del contrato involucrado.
+    :param payload: (Opcional) Datos adicionales en formato JSON.
+    """
+    ActivityLog.objects.create(
+        event_type=event_type,
+        contract_address=contract_address,
+        involved_address=involved_address,
+        payload=payload
+    )
 
 class IsAdminOrOwner(BasePermission):
     def has_permission(self, request, view):
@@ -47,6 +66,7 @@ class IsAdminOrOwner(BasePermission):
             return True
         return False
     
+
 class PropertyListView(APIView):
     permission_classes = [IsAdminOrOwner]
 
@@ -91,7 +111,38 @@ class PropertyListView(APIView):
             'total_value_tokenized': total_price,
             'properties': properties_data  # Include properties with metrics
         })
+
+class PropertyStatusUpdateView(APIView):
+    authentication_classes = [Auth0JWTAuthentication]
+    permission_classes = [IsAuthenticated]  # Cambia esto si necesitas permisos diferentes
+
+    def put(self, request, propertyId):
+        property_instance = get_object_or_404(Property, id=propertyId)
+        
+        # Verificar si se está actualizando el estado a "rejected"
+        new_status = request.data.get('status')
+        rejection_reason = request.data.get('rejection_reason')
+
+        # Validar que si el estado es "rejected", el motivo de rechazo sea proporcionado
+        if new_status == 'rejected' and not rejection_reason:
+            return Response({'error': 'Rejection reason must be provided when status is rejected.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        
+        # Actualizar el estado y el motivo de rechazo si aplica
+        if new_status == 'rejected':
+            request.data['rejection_reason'] = rejection_reason  # Establece el motivo de rechazo
+
+        # Serializar y guardar los datos
+        serializer = UpdatePropertyStatusSerializer(property_instance, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     
+
 
 class PublicPropertyList(APIView):
     permission_classes = [AllowAny]
@@ -190,6 +241,15 @@ class PropertyCreateUpdateView(APIView):
                 self.create_property_with_metrics(property_instance)
 
                 property_serializer = PropertySerializerList(property_instance)
+
+                log_activity(
+                    event_type='new_property',
+                    involved_address=request.user.email,
+                    # contract_address=selected_token.token_contract_address,  # O lo que aplique
+                    payload={
+                        'property_id': property_instance.id,
+                    }
+                )
 
                 return Response({
                     'message': 'Property data saved successfully. Awaiting admin review.',
@@ -355,15 +415,13 @@ class TransactionListview(APIView):
 
         # Calcular el precio total de los tokens comprados (sería el mismo investment_amount en este caso)
         total_token_price = tokens_amount * token_price
-        print("tokens", tokens_amount)
-        print("total token price", total_token_price)
-
+   
         # Reducir los tokens disponibles
         selected_token.tokens_available -= tokens_amount
         selected_token.save()
 
         # Crear la transacción
-        Transaction.objects.create(
+        transaction = Transaction.objects.create(
             property_id=property_instance,
             transaction_owner_code=request.user,
             transaction_tokens_amount=tokens_amount,
@@ -384,6 +442,19 @@ class TransactionListview(APIView):
         if not created:
             property_token.number_of_tokens += tokens_amount
             property_token.save()
+        
+        log_activity(
+            event_type='transaction',
+            involved_address=request.user.email,
+            # contract_address=selected_token.token_contract_address,  # O lo que aplique
+            payload={
+                'transaction_id': transaction.id,
+                'property_id': property_instance.id,
+                'amount_invested': investment_amount,
+                'tokens_purchased': tokens_amount,
+            }
+        )
+
 
         return Response({'message': 'Transaction completed successfully'}, status=status.HTTP_201_CREATED)
 
