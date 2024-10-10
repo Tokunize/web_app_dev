@@ -20,8 +20,9 @@ cryptography = "*"
 python-decouple = "*"
 cloudinary = "*"
 stripe = "*"
+web3 = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.12.3"
+python_version = "3.12.4"
