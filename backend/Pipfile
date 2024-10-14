@@ -21,6 +21,7 @@ python-decouple = "*"
 cloudinary = "*"
 stripe = "*"
 web3 = "*"
+tzdata = "*"
 
 [dev-packages]
 
