@@ -100,3 +100,13 @@
   flex-direction: column !important;
 }
 
+.investorCarousel button{
+  position: relative;
+  bottom: -30px !important;
+}
+
+.investorCarousel .carousel-indicator{
+  background-color: gray !important;  /* Cambiar color de fondo de los indicadores a gris */
+  color: white !important; /* Cambiar el color del texto en los indicadores */
+}
+

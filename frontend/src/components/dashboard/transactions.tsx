@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
+
+import { useState } from "react";
 import { TransactionTable } from "../transactionsTable";
-import axios from "axios";
-import { useAuth0 } from "@auth0/auth0-react";
 import { DatePickerWithRange } from "./DatePickerRange";
 import { jsPDF } from "jspdf"; // Import jsPDF
 import autoTable from "jspdf-autotable";
-import * as React from "react";
 import { Download } from "lucide-react"; 
 import { CurrencyConverter } from "../currencyConverter";
 import { AddFundsFlow } from "../funds/addFundsFlow";
@@ -19,54 +17,40 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { LoadingSpinner } from "./loadingSpinner";
+import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
 
 type Transaction = {
   id: number;
   event: string;
-  transaction_amount: string; // Keep this type as string
-  transaction_tokens_amount: string; // Keep this type as string
+  transaction_amount: string;
+  transaction_tokens_amount: string;
   transaction_owner: string;
-  transaction_date: string; 
+  transaction_date: string;
   created_at: string;
 };
 
 export const Transaction = () => {
-  const [position, setPosition] = React.useState("all");
+  const [position, setPosition] = useState("all");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const { getAccessTokenSilently } = useAuth0();
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined); // Change null to undefined
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined); // Change null to undefined
-  const [balance, setBalance] = useState<number>(0); // Default balance to 0
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [balance, setBalance] = useState<number>(0);
 
-  const getAllTransactions = async () => {
-    const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/transactions/`;
-    try {
-      setLoading(true);
-      const accessToken = await getAccessTokenSilently();
-      const response = await axios.get(apiUrl, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      setTransactions(response.data.transactions);
-      console.log(response.data);
-      
-      // Set the balance from the response, defaulting to 0 if not available
-      const balanceAmount = response.data.balance?.data?.tokenBalances[0]?.amount;
-      setBalance(balanceAmount ? parseFloat(balanceAmount) : 0); // Set to 0 if not exists
-      setLoading(false);
-    } catch (error) {
-      setError("Failed to fetch transactions");
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    getAllTransactions();
-  }, []);
+  // Use the custom hook to fetch transactions
+  const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/transactions/`;
+  
+  // Destructure data, loading, and error from useGetAxiosRequest
+  const { loading, error } = useGetAxiosRequest<{
+    transactions: Transaction[];
+    balance: { data: { tokenBalances: { amount: string }[] } };
+  }>(apiUrl, (data) => {
+    setTransactions(data.transactions);
+    const balanceAmount = data.balance?.data?.tokenBalances[0]?.amount;
+    setBalance(balanceAmount ? parseFloat(balanceAmount) : 0);
+  }, (error) => {
+    console.error("Failed to fetch transactions:", error);
+  });
 
   // Filter transactions based on selected dates and position
   const filteredTransactions = transactions.filter((transaction) => {
@@ -75,14 +59,14 @@ export const Transaction = () => {
       (!startDate || transactionDate >= startDate) &&
       (!endDate || transactionDate <= endDate);
 
-    // Log the transaction event for debugging
-    console.log("Filtering by event:", transaction.event, "Selected:", position);
-
     const isEventMatch =
-      position === "all" || transaction.event.toLowerCase() === position.toLowerCase(); // Case-insensitive match
+      position === "all" || transaction.event.toLowerCase() === position.toLowerCase();
 
     return isDateInRange && isEventMatch;
   });
+
+  if (loading) return <LoadingSpinner />;
+  if (error) return <div>Error: {error}</div>;
 
   const downloadPDF = () => {
     const doc = new jsPDF();
@@ -126,7 +110,7 @@ export const Transaction = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div><LoadingSpinner/></div>;
   }
 
   if (error) {
@@ -140,6 +124,7 @@ export const Transaction = () => {
           <p className="text-sm text-gray-500">Total Balance</p>
           {/* Pass balance directly; CurrencyConverter will handle it */}
           <CurrencyConverter amountInUSD={balance} />
+          <br/> 
         </div>
         <span className="space-x-3">
           <AddFundsFlow />

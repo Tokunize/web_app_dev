@@ -21,42 +21,31 @@ import {
 export const description = "A mixed bar chart"
 
 const chartData = [
-  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-  { browser: "firefox", visitors: 187, fill: "var(--color-firefox)" },
-  { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
-  { browser: "other", visitors: 90, fill: "var(--color-other)" },
+  { browser: "chrome", risk: 3.5, fill: "var(--color-chrome)" },
+  { browser: "safari", risk: 2.4, fill: "var(--color-safari)" },
 ]
 
 const chartConfig = {
-  visitors: {
-    label: "Visitors",
+  risk: {
+    label: "Risk",
   },
   chrome: {
-    label: "Chrome",
+    label: "Mansion House",
     color: "hsl(var(--chart-1))",
   },
   safari: {
-    label: "Safari",
+    label: "Apartment",
     color: "hsl(var(--chart-2))",
   },
   firefox: {
-    label: "Firefox",
+    label: "House",
     color: "hsl(var(--chart-3))",
-  },
-  edge: {
-    label: "Edge",
-    color: "hsl(var(--chart-4))",
-  },
-  other: {
-    label: "Other",
-    color: "hsl(var(--chart-5))",
   },
 } satisfies ChartConfig
 
-export const  RiskOverview =() => {
+export const RiskOverview = () => {
   return (
-    <Card>
+    <Card className="w-full max-w-lg"> {/* Ajustar el tamaño del Card */}
       <CardHeader>
         <CardTitle>Risk Overview</CardTitle>
         <CardDescription>January - June 2024</CardDescription>
@@ -68,25 +57,25 @@ export const  RiskOverview =() => {
             data={chartData}
             layout="vertical"
             margin={{
-              left: 0,
+              left: 50, // Aumentar el margen para dar más espacio a las etiquetas
             }}
           >
             <YAxis
               dataKey="browser"
               type="category"
               tickLine={false}
-              tickMargin={10}
+              tickMargin={15} // Aumentar el tickMargin
               axisLine={false}
               tickFormatter={(value) =>
                 chartConfig[value as keyof typeof chartConfig]?.label
               }
             />
-            <XAxis dataKey="visitors" type="number" hide />
+            <XAxis dataKey="risk" type="number" hide />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
-            <Bar dataKey="visitors" layout="vertical" radius={5} />
+            <Bar dataKey="risk" layout="vertical" radius={5} />
           </BarChart>
         </ChartContainer>
       </CardContent>

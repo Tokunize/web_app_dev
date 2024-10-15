@@ -81,7 +81,7 @@ export const Notifications: React.FC = () => {
         </button>
       </PopoverTrigger>
 
-      <PopoverContent side="bottom" align="end" className="mt-2 max-h-80 w-[100%] bg-white shadow-lg rounded-lg overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+      <PopoverContent side="bottom" align="end" className="max-w-sm mt-2 max-h-80 w-[100%] bg-white shadow-lg rounded-lg overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
         <div className="font-bold text-gray-800 p-4">
           Notifications
         </div>

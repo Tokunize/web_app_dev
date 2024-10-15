@@ -13,9 +13,9 @@ import { PropertyDescription } from "@/components/publicProperty/propertyDescrip
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import ClipLoader from 'react-spinners/ClipLoader';
 import { useAuth0 } from "@auth0/auth0-react";
 import { createNotification } from "@/components/notificationService";
+import { LoadingSpinner } from "@/components/dashboard/loadingSpinner";
 
 interface PropertyLocation {
   postcode: string;
@@ -244,7 +244,7 @@ export const PublicPropertyPage: React.FC = () => {
       <main className="flex-grow h-[400px] px-[20px] md:px-[80px] md:w-[70%] mx-auto md:mt-[0px]">
         {loading ? (
           <div className="flex justify-center items-center h-full">
-            <ClipLoader size={50} color="#4A90E2" />
+            <LoadingSpinner />
           </div>
         ) : (
           renderStep()

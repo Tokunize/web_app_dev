@@ -35,11 +35,14 @@ export const PropertyList: React.FC = () => {
 
     const fetchProperties = async () => {
       try {
+        
         const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/properties/public/`;
         const response = await axios.get(apiUrl);
         console.log(response.data);
+        console.log(apiUrl);
+        
 
-        const pusblisedProperties = response.data.filter((property) => property.status === "published")
+        const pusblisedProperties = response.data.filter((property) => property.status === "published" || property.status === "coming_soon")
         setProperties(pusblisedProperties);
       } catch (err) {
         setError('Failed to fetch properties');

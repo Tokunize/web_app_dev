@@ -2,17 +2,14 @@
 import * as React from "react";
 import {
   ColumnDef,
-  ColumnFiltersState,
   SortingState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -25,7 +22,7 @@ import PositiveNumber from "../../assets/positiveNUmber.svg";
 import { AcceptProperty } from "../acceptProperty";
 import { useUser } from "@/context/userProvider";
 import { formatDistanceToNow, parseISO } from 'date-fns'; // Import necessary functions from date-fns
-import { RejectPropertyForm } from "../forms/rejectPropertyForm";
+import { useNavigate } from "react-router-dom";
 
 // Interface for the Asset attributes (optional fields)
 interface Asset {
@@ -51,12 +48,19 @@ interface Asset {
   ownershipPercentage?: number;
 }
 
+const formatStatus = (status: string): string => {
+  return status
+    .replace(/_/g, ' ') // Replace underscores with spaces
+    .split(' ') // Split the string into words
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+    .join(' '); // Join the words back into a string
+};
 // The main functional component
 export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData }) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
   const {role } = useUser()
+  const navigate = useNavigate()
 
   // Helper function to safely convert a value to number
   const toNumber = (value: unknown): number => {
@@ -188,7 +192,7 @@ export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData })
           return (
             <div className={`flex items-center w-[140px] ${textColor}`}>
               <div className={`w-2 h-2 rounded-full mr-2 ${dotColor}`}></div>
-              <span className="font-medium">{value}</span>
+              <span className="font-medium">{formatStatus(value)}</span> {/* Use formatStatus here */}
             </div>
           );
         },
@@ -249,9 +253,8 @@ export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData })
 
             // Only show actions if property is under review
             if (propertyStatus === "under_review") {
-              const handleReject = () => {
-                console.log(`Rejected property: ${row.original.title}`);
-                // Logic to reject the property can go here
+              const handleReject = () => {                
+               navigate(`/dashboard-property/${row.original.id}/`)
               };
 
               return (
@@ -275,30 +278,18 @@ export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData })
     data: assetsData,
     columns: memoizedAssetsData,
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     onRowSelectionChange: setRowSelection,
     state: {
       sorting,
-      columnFilters,
       rowSelection,
     },
   });
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
-        {/* Filter by title */}
-        <Input
-          placeholder="Filter properties by title..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)}
-          className="max-w-sm"
-        />
-      </div>
       <div className="rounded-md border">
         <Table >
           <TableHeader>

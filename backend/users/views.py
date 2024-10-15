@@ -18,7 +18,7 @@ def hola_view(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         print(data)
-        email = data.get('email', 'No email provided')
+        email = data.get('email', 'No email provideddd')
         name = data.get('name', 'No name provided')
         role = data.get('role', 'No role provided')
 

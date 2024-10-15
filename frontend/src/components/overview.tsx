@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { FaBath, FaBed, FaRulerCombined } from 'react-icons/fa';
 import { Progress } from "@/components/ui/progress";
-import { PropertyModal } from './modal';
 import "../styles/singleProperty.css";
 import { MapView } from "@/components/mapView";
 import { Graphic } from './graph';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import "../styles/overview.css"
+import { LoadingSpinner } from './dashboard/loadingSpinner';
 
 interface PropertyData {
   title: string;
@@ -45,7 +45,9 @@ export const Overview: React.FC = () => {
     fetchProperty();
   }, [id]);
 
-  if (!property) return <div>Loading...</div>;
+  if (!property) return <div className="flex items-center justify-center h-screen">
+  < LoadingSpinner/>
+ </div>;
 
   return (
     <section className='pl-5'>    
