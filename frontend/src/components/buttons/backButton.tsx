@@ -5,7 +5,7 @@ export const BackButton: React.FC = () =>{
     const navigate = useNavigate()
     return(
         <div className="flex items-center space-x-2">
-          <span className="bg-[#A0CC29] rounded-full p-1" onClick={()=>{
+          <span className="bg-[#A0CC29] rounded-full p-1 cursor-pointer" onClick={()=>{
             navigate(-1)
           }}>
             <FaArrowLeft className="text-white" />

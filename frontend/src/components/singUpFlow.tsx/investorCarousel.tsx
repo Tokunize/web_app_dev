@@ -27,7 +27,7 @@ export const InvestorCarousel: React.FC = () => {
     return (
       <article className="p-6 min-w-[800px] flex flex-col w-full custom-landing-carousel">
         <h4 className="font-bold text-2xl mb-[40px] text-left">I am an accredited investor,</h4>
-        <Carousel slideInterval={5000} className="w-[500px]  h-[480px] mb-[80px]">
+        <Carousel slideInterval={5000} className="w-[500px] investorCarousel  h-[480px] mb-[80px]">
           {slides.map((slide, index) => (
             <div key={index} className="flex flex-col justify-center items-center text-center h-full p-6">
               <h2 className="text-2xl font-semibold mb-4">{slide.title}</h2>

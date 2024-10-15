@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaArrowRight } from 'react-icons/fa';
 import { Carousel } from "flowbite-react";
 import token from "../assets/token.svg";
+import shareIcon from "../assets/Share.png";
 
 interface PropertyListCardProps {
   title: string;
@@ -42,10 +42,9 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
     const soldTokens = totalTokens ? totalTokens - tokens_available : 0; // Asegúrate de que totalTokens no sea undefined
     const soldPercentage = totalTokens > 0 ? (soldTokens / totalTokens) * 100 : 0; // Evita división por cero
 
-    if(soldPercentage > 80){
+    if (soldPercentage > 80) {
       setBadgeType('Almost Gone!');
-    }
-    else if (createdDate >= oneWeekAgo && status === "published") {
+    } else if (createdDate >= oneWeekAgo && status === "published") {
       setBadgeType('New');
     } else if (status === "coming_soon") {
       setBadgeType('Coming Soon');
@@ -76,16 +75,19 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
           Coming Soon
         </div>
       )}
+
+      {/* Share Icon */}
       {status === "published" && (
         <Link
           to={`/property-details/${id}`}
-          className="absolute top-4 right-4 transform rotate-[-45deg] bg-white bg-opacity-50 p-2 rounded-full shadow-lg z-10"
+          className="absolute top-4 right-4 h-8 w-8 p-2 bg-white bg-opacity-50 rounded-full hover:bg-accent hover:text-accent-foreground shadow-lg duration-300 z-10"
         >
-          <FaArrowRight className="text-gray-800" />
+          <img src={shareIcon} alt="share" className="h-full" />
         </Link>
       )}
 
-      <div className="h-64 relative">
+      {/* Link for Image Carousel */}
+      <Link to={`/property-details/${id}`} className="h-64 relative block hover:opacity-80 transition-opacity duration-300">
         <Carousel
           indicators={true}  // Show indicators for slides
           slide={false}
@@ -100,7 +102,8 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
             />
           ))}
         </Carousel>
-      </div>
+      </Link>
+
       <div className="py-3">
         <div className="flex items-center justify-end">
           <div className="float-right text-sm text-gray-500 flex items-center ">

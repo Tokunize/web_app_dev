@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import { Graphic } from "./graph";
 import { TransactionTable } from "./transactionsTable";
 import { SmallSignUpForm } from "./property/smallSignUp";
-import ClipLoader from "react-spinners/ClipLoader"; // Importa el spinner
+import { LoadingSpinner } from "./dashboard/loadingSpinner";
 
 // Define the type for transactions
 interface Transaction {
@@ -22,54 +22,59 @@ interface ActivityProps {
 export const Activity: React.FC<ActivityProps> = ({ property_id, data }) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [activityData, setActivityData] = useState<any[]>([]);
 
+  // Memoize activity data to prevent unnecessary recalculations
+
+  // Fetch transactions only when accessToken and property_id are available
   useEffect(() => {
-    setActivityData(data);
-
     const fetchTransactions = async () => {
-      try {
-        setLoading(true);
-        const accessToken = localStorage.getItem("accessToken");
-        
-        if (!accessToken) {
-          // No token found, show sign-up form
-          setLoading(false);
-          return;
-        }
+      setLoading(true);
+      const accessToken = localStorage.getItem("accessToken");
 
-        const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/${property_id}/tokens-transactions/`;
+      // If no token, stop loading and show sign-up form
+      if (!accessToken) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/transactions/${property_id}/`;
         const config = {
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`  // Añade el token a los encabezados
-          }
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`, // Añade el token a los encabezados
+          },
         };
         const response = await axios.get(apiUrl, config);
-
         setTransactions(response.data);
       } catch (err) {
-        console.error('Error fetching transactions:', err);
+        console.error("Error fetching transactions:", err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchTransactions();
-  }, [property_id, data]);
+  }, [property_id]);
 
-  const accessToken = localStorage.getItem("accessToken");
+  // Memoize accessToken to prevent unnecessary re-renders
+  const accessToken = useMemo(() => localStorage.getItem("accessToken"), []);
 
+  // Conditionally render based on loading and access token
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <ClipLoader size={50} color="#4A90E2" />
+        <LoadingSpinner />
       </div>
     );
   }
 
   if (!accessToken) {
-    return <div className="flex items-center justify-center h-[50vh]"><SmallSignUpForm /></div>
+    return (
+      <div className="flex items-center justify-center h-[50vh]">
+        <SmallSignUpForm />
+      </div>
+    );
   }
 
   return (
@@ -98,10 +103,12 @@ export const Activity: React.FC<ActivityProps> = ({ property_id, data }) => {
         {/* Recent Transactions Section */}
         <div className="bg-white py-4 border-b">
           <h4 className="text-2xl font-bold mb-2">Recent Transactions</h4>
-          <p className="text-gray-700">
-            Details of recent transactions for this token.
-          </p>
-          <TransactionTable transactions={transactions} />
+          <p className="text-gray-700">Details of recent transactions for this token.</p>
+          {transactions.length > 0 ? (
+            <TransactionTable transactions={transactions} />
+          ) : (
+            <p className="text-gray-500">No recent transactions available.</p>
+          )}
         </div>
       </div>
     </section>

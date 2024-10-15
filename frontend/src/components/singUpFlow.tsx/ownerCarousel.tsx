@@ -34,7 +34,7 @@ export const OwnerFlowCarousel: React.FC<OwnerFlowCarouselProps> = ({ onConfirm 
 
     return (
         <article className="w-full p-6 flex flex-col custom-landing-carousel">
-            <Carousel slideInterval={5000} className="w-full h-[480px] mb-[80px]">
+            <Carousel slideInterval={5000} className="w-full investorCarousel h-[480px] mb-[80px]">
                 {slides.map((slide, index) => (
                     <div key={index} className="flex flex-col justify-center items-center text-center h-full p-6">
                         <h2 className="text-2xl font-semibold mb-2">{slide.title}</h2>

@@ -1,63 +1,41 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import ClipLoader from 'react-spinners/ClipLoader';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/context/userProvider';
 import { useNavigate } from 'react-router-dom';
 import { OwnerPropertyListCard } from './ownerPropertyListCard';
 import { IoMdSearch } from "react-icons/io";
+import { LoadingSpinner } from './loadingSpinner';
+import { useGetAxiosRequest } from '@/hooks/getAxiosRequest';
+
+interface Token {
+  total_tokens: number;
+  token_price: number;
+  tokens_available: number;
+}
+
 interface Property {
   id: number;
   title: string;
   location: string;
-  tokens: any[];
+  tokens: Token[]; // Cambia aquí para reflejar el tipo correcto
   projected_annual_return: string;
   image: string[];
   status: string;
-  tokens_available: number;
-  totalTokens: number;
   rejection_reason: string;
 }
 
 export const Porfolio: React.FC = () => {
   const [properties, setProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>(''); // Estado para el término de búsqueda
   const { role } = useUser();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchProperties = async () => {
-      const accessToken = localStorage.getItem('accessToken');
-
-      if (!accessToken) {
-        setError('Access token not found in local storage');
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-        const response = await axios.get(`${import.meta.env.VITE_APP_BACKEND_URL}property/properties/private/`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`
-          }
-        });      
-    console.log(response.data.properties);
-              
-        setProperties(response.data.properties);
-      } catch (err) {
-        console.error('Error fetching properties:', err);
-        setError('Failed to fetch properties');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProperties();
-  }, []);
+  // Usar el hook personalizado para obtener las propiedades
+  const { error, loading } = useGetAxiosRequest<{ properties: Property[] }>(
+    `${import.meta.env.VITE_APP_BACKEND_URL}property/properties/private/`,
+    (data) => setProperties(data.properties),
+    (error) => console.error('Error fetching your portfolio:', error)
+  );
 
   // Filtrar las propiedades basado en el término de búsqueda
   const filteredProperties = properties.filter((property) =>
@@ -75,7 +53,7 @@ export const Porfolio: React.FC = () => {
       </div>
 
       {/* Barra de búsqueda */}
-      <div className="relative w-full mt-5"> 
+      <div className="relative w-full mt-5">
         <IoMdSearch className="absolute left-2 top-2 h-6 w-6 text-gray-500" />
         <input
           type="text"
@@ -89,9 +67,10 @@ export const Porfolio: React.FC = () => {
       <div className="mb-6">
         {loading && (
           <div className="flex items-center justify-center h-40">
-            <ClipLoader size={50} color="#C8E870" />
+            <LoadingSpinner />
           </div>
         )}
+        
         {error && <p className="text-red-500 mb-2">Error: {error}</p>}
       </div>
 
@@ -114,7 +93,7 @@ export const Porfolio: React.FC = () => {
             />
           ))
         ) : (
-          <p className=" text-gray-500">No properties found.</p> // Mensaje si no hay propiedades
+          !loading && <p className="text-gray-500">No properties found.</p> // Mensaje solo si no hay propiedades y no está cargando
         )}
       </div>
     </section>

@@ -7,7 +7,7 @@ export const Herobanner = () => {
       style={{ backgroundImage: `url(${bannerImg})` }}
       >
       <h3 className="text-white tracking-wide font-bold text-3xl leading-relaxed">
-        Invest in Rental Properties, <br/> Without the Headache.
+        Invest in commercial<br/> real estate with <span className="text-[#C8E870]">ease </span>
       </h3>
     </article>
   );

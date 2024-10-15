@@ -8,7 +8,7 @@ import { LogoutButton } from "./buttons/logoutBtn";
 import { Link } from "react-router-dom";
 import Logo from "../assets/img/logo.jpg";
 import { useUser } from "../context/userProvider";
-
+import { UserNavbar } from "./dashboard/useNavbar";
 
 export const Navbar = () => {
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -66,6 +66,10 @@ export const Navbar = () => {
   }, [isAuthenticated, user, role, getAccessTokenSilently]);
 
   const renderAuthenticatedLinks = useMemo(() => {
+    // return <Link to="/dashboard">Dashboard</Link>;
+    return <UserNavbar/>
+  }, []);
+  const renderAuthenticatedLinksMobiles = useMemo(() => {
     return <Link to="/dashboard">Dashboard</Link>;
   }, []);
   
@@ -84,12 +88,10 @@ export const Navbar = () => {
       </div>
 
       <div className="hidden md:flex items-center space-x-4 mr-10">
-        <Link to="/">Home</Link>
         <Link to="/blog/">Learn</Link>
         {isAuthenticated ? (
           <>
             {renderAuthenticatedLinks}
-            <LogoutButton />
           </>
         ) : (
           <>
@@ -112,7 +114,7 @@ export const Navbar = () => {
               <Link to="/blog/">Learn</Link>
               {isAuthenticated ? (
                 <>
-                  {renderAuthenticatedLinks}
+                  {renderAuthenticatedLinksMobiles}
                   <LogoutButton />
                 </>
               ) : (

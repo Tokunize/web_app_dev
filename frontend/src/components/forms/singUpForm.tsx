@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaArrowCircleLeft, FaCheckCircle } from "react-icons/fa";
+import { FaArrowCircleLeft, FaCheckCircle, FaEye, FaEyeSlash } from "react-icons/fa"; // Importamos los nuevos íconos
 import { MdError } from "react-icons/md";
 import "../../styles/singUp.css"; // Asegúrate de que esta ruta sea correcta
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -201,7 +201,7 @@ export function SignUpForm({
                     className="absolute inset-y-0 right-0 flex items-center pr-3"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? '👁️' : '🙈'}
+                    {showPassword ? <FaEyeSlash /> : <FaEye />} {/* Íconos cambiados aquí */}
                   </button>
                 </div>
               </FormControl>

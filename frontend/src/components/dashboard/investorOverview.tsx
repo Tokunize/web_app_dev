@@ -1,16 +1,13 @@
-"use client"
+"use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import axios from "axios";
-import { useAuth0 } from "@auth0/auth0-react";
-import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { PropertyValueGraph } from "../graphs/propertyValueGraph";
 import { PieGraph } from "../graphs/pieGraph";
 import { RiskOverview } from "../graphs/riskGraph";
 import { PerformanceGraph } from "../graphs/performanceGraph";
 import { MyAssetsTable } from "./myAssetsTable";
-
-
+import { LoadingSpinner } from "./loadingSpinner";
+import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";  // Importamos el hook personalizado
 
 interface Investment {
   properties: {
@@ -22,89 +19,57 @@ interface Investment {
 }
 
 export const InvestorOverview = () => {
-  const { getAccessTokenSilently } = useAuth0();
-  const [investments, setInvestments] = useState<Investment | null>(null);
-  const [loading, setLoading] = useState(true);
-
-
-  const getInvestmentSummary = async () => {
-    const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/investment-summary/`;
-
-    try {
-      const accessToken = await getAccessTokenSilently();
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-      };
-      
-      const response = await axios.get<Investment>(apiUrl, config);
-      console.log(response.data);
-
-      setInvestments(response.data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    getInvestmentSummary();
-  }, [getAccessTokenSilently]);
+  const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/investment-summary/`;
+  const { data: investments, loading, error } = useGetAxiosRequest<Investment>(apiUrl);
 
   if (loading) {
-    return <p>Loading ...</p>;
+    return <div><LoadingSpinner/></div>
   }
 
+  if (error) {
+    return <p>Error: {error}</p>
+  }
+
+  // Transformamos los datos recibidos para pasarlos a las gráficas y tablas
   const yieldData = investments?.properties.map((property) => ({
     image: property.yield_data.image,
-    title:property.yield_data.title,
+    title: property.yield_data.title,
     projected_rental_yield: property.yield_data.projected_rental_yield,
     projected_appreciation: 1.2,
     location: property.location,
   }));
 
-  const getRandomColor = () => {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  };
+  const predefinedColors = [
+    "#299D90",
+    "#C3DF6D",
+    "#667085", // Color 1
+    "#EAFBBE", // Color 2
+    "#D0D5DD", // Color 3
+    "#83A621", // Color 4
+    "#C8E870", // Color 5
+    "#A6F4C5", // Color 6
+    "#FFFAEA"  // Color 7
+  ];
 
-  const getUniqueColors = (count: number) => {
-    const colors = new Set<string>();
-    while (colors.size < count) {
-      colors.add(getRandomColor());
-    }
-    return Array.from(colors);
-  };
-
+  // Datos para la gráfica de ubicaciones geográficas
   const geographyData = investments?.properties.map(property => property.location) || [];
   const totalLocations = geographyData.length;
-
-  const uniqueColors = getUniqueColors(totalLocations);
-
   const chartData = geographyData.map((location, index) => ({
     location,
     percentage: Math.round((1 / totalLocations) * 100),
-    fill: uniqueColors[index],
+    fill: predefinedColors[index % predefinedColors.length],
   }));
 
+  // Datos para la gráfica de tipos de propiedades
   const propertyTypeData = investments?.properties.map(property => property.property_type) || [];
   const totalPropertyTypes = propertyTypeData.length;
-
-  const uniquePropertyColors = getUniqueColors(totalPropertyTypes);
-
   const propertyChartData = propertyTypeData.map((type, index) => ({
     location: type,
     percentage: Math.round((1 / totalPropertyTypes) * 100),
-    fill: uniquePropertyColors[index],
+    fill: predefinedColors[index % predefinedColors.length],
   }));
 
+  // Datos para la gráfica de performance
   const chartData2 = [
     { month: "January", value: 3.2 },
     { month: "February", value: 3.9 },
@@ -112,11 +77,10 @@ export const InvestorOverview = () => {
     { month: "April", value: 3.7 },
     { month: "May", value: 3.1 },
     { month: "June", value: 3.8 },
-];
-
+  ];
 
   return (
-    <section className="bg-gray-100">
+    <section className="">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
         <Card className="callout-card">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -153,7 +117,7 @@ export const InvestorOverview = () => {
           <PropertyValueGraph />
         </Card>
         <Card className="px-4">
-        <MyAssetsTable assetsData={yieldData || []} />
+          <MyAssetsTable assetsData={yieldData || []} />
         </Card>
       </div>
 
@@ -176,12 +140,11 @@ export const InvestorOverview = () => {
         <Card>
           <RiskOverview />
         </Card>
-        <Card>
-          <PerformanceGraph  
-            description=""
-            title={"S&P 500 Chart"}
-            data={chartData2}/>
-        </Card>
+        <PerformanceGraph  
+          description=""
+          title={"S&P 500 Chart"}
+          data={chartData2}
+        />
       </div>
     </section>
   );

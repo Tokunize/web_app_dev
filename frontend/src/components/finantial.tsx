@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import ClipLoader from 'react-spinners/ClipLoader'; // Importa el spinner
 import { SmallSignUpForm } from './property/smallSignUp';
-
+import { LoadingSpinner } from './dashboard/loadingSpinner';
 interface FinantialProps {
   data: {
     annual_cash_flow: string;
@@ -42,8 +41,8 @@ export const Finantial: React.FC<FinantialProps> = ({ data, loading, error }) =>
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <ClipLoader size={50} color="#4A90E2" />
-      </div>
+      < LoadingSpinner/>
+     </div>
     );
   }
 
