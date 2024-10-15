@@ -30,7 +30,6 @@ export const SingleProperty: React.FC = () => {
 
   const backendUrl = import.meta.env.VITE_APP_BACKEND_URL;
 
-  // Function to fetch property data
   const fetchPropertyData = async () => {
     try {
       const [propertyResponse, overviewResponse] = await Promise.all([
@@ -77,31 +76,64 @@ export const SingleProperty: React.FC = () => {
         </Button>
       </div>
 
-      <div className="flex flex-row h-auto md:h-[580px] gap-4">
-        {/* First image goes here */}
-        <div className="w-1/2 flex justify-center items-center">
-          {isDataLoaded && propertyImages[0] && (
-            <img
-              src={propertyImages[0]}
-              alt="First Property Image"
-              className="object-cover w-full h-full rounded-tl-xl"
-            />
-          )}
+      <div className="flex flex-row h-[580px] gap-4">
+  {/* Primera imagen */}
+  <div className="w-1/2 flex justify-center items-center h-full">
+    {isDataLoaded && propertyImages[0] && (
+      <img
+        src={propertyImages[0]}
+        alt="First Property Image"
+        className="object-cover w-full h-full rounded-tl-xl rounded-bl-xl"
+      />
+    )}
+  </div>
+
+  {/* Galería de imágenes en la segunda columna */}
+  <div className="w-1/2 grid grid-cols-2 grid-rows-2 gap-4 h-full">
+    {propertyImages.length > 1 && (
+      <>
+        {/* Imagen de la derecha, fila 1, columna 1 */}
+        <div className="h-[100%] cover rounded-tr-xl">
+          <img
+            src={propertyImages[1]}
+            alt="Property Image 2"
+            className="w-full h-full object-cover"
+          />
         </div>
 
-        {/* Other images */}
-        <div className="w-1/2 grid h-[580px] grid-cols-2 gap-4 overflow-hidden">
-          {isDataLoaded && propertyImages.slice(1).map((image, index) => (
-            <div key={index + 1} className="imageContainer h-[100%] overflow-hidden">
-              <img
-                src={image}
-                alt={`Property Image ${index + 2}`}
-                className="object-cover w-full h-full"
-              />
-            </div>
-          ))}
+        {/* Imagen de la derecha, fila 1, columna 2 */}
+        <div className="h-[100%] cover">
+          <img
+            src={propertyImages[2]}
+            alt="Property Image 3"
+            className="w-full h-full object-cover rounded-tr-xl"
+          />
         </div>
-      </div>
+
+        {/* Imagen de la derecha, fila 2, columna 1 */}
+        <div className="h-[100%] cover">
+          <img
+            src={propertyImages[3]}
+            alt="Property Image 4"
+            className="w-full h-full object-cover "
+          />
+        </div>
+
+        {/* Imagen de la derecha, fila 2, columna 2 */}
+        <div className="h-[100%] cover rounded-br-xl">
+          <img
+            src={propertyImages[4]}
+            alt="Property Image 5"
+            className="w-full h-full object-cover rounded-br-xl"
+          />
+        </div>
+      </>
+    )}
+  </div>
+</div>
+
+
+
 
       <div className="flex justify-between mt-8">
         <div className="md:w-[65%]">

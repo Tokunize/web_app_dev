@@ -119,7 +119,7 @@ export const PublicPropertyPage: React.FC = () => {
         image: images
       };
   
-      const response = await axios.post(
+      await axios.post(
         `${import.meta.env.VITE_APP_BACKEND_URL}property/create/`,
         finalData,
         config

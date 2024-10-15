@@ -203,32 +203,32 @@ export const OwnerDashboard = () => {
             </div>
 
             <div className="grid border-0 grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className="border-none shadow-0">
+                <Card className="border-none shadow-none">
                     <h2 className="text-md mb-2 font-normal text-gray-500">Upcoming Rent Payments</h2>
                     <MyAssetsTable assetsData={performanceData} onSelectProperty={handleSelectProperty} />
                 </Card>
-                <Card className="border-0  shadow-0">
+                <Card className="border-0  shadow-none">
                     <h2 className="text-md mb-2 font-normal text-gray-500">Property Status</h2>
                     <MyAssetsTable assetsData={statusData} onSelectProperty={handleSelectProperty} />
                 </Card>
             </div>
 
             <div className="grid border-0 grid-cols-1 gap-4">
-                <Card className="border-0  shadow-0">
+                <Card className="border-0  shadow-none">
                     <h2 className="text-md mb-2 font-normal text-gray-500">Performance Insights</h2>
                     <InsightsTable assetsData={insightsData} onSelectProperty={handleSelectProperty} />
                 </Card>
             </div>
 
             <div className="grid border-0 grid-cols-1 md:grid-cols-2 gap-4 my-4">
-                <Card className="border-0  shadow-0">
+                <Card className="border-0  shadow-none">
                     <PerformanceGraph
                         title="Average Yield"
                         description={`Showing yield average for ${selectedProperty ? selectedProperty.title : 'selected property'} in the last year`}
                         data={property_yield}
                     />
                 </Card>
-                <Card className="border-0  shadow-0">
+                <Card className="border-0  shadow-none">
                     <PerformanceGraph
                         title="Net Asset Value (NAV)"
                         description={`Net Asset Value of ${selectedProperty ? selectedProperty.title : 'selected property'} in the last year`}
@@ -237,14 +237,14 @@ export const OwnerDashboard = () => {
                 </Card>
             </div>
             <div className="grid border-0 grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className="border-0  shadow-0">
+                <Card className="border-0  shadow-none">
                     <PerformanceGraph
                         title="Vacancy Rate"
                         description={`Vacancy rate for ${selectedProperty ? selectedProperty.title : 'selected property'} in the last year`}
                         data={vacancyRate}
                     />
                 </Card>
-                <Card className="border-0  shadow-0">
+                <Card className="border-0  shadow-none">
                     <PerformanceGraph
                         title="Tenant Turnover"
                         description={`Tenant turnover  for ${selectedProperty ? selectedProperty.title : 'selected property'} in the last year`}

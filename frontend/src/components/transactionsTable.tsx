@@ -27,6 +27,7 @@ type Transaction = {
   transaction_tokens_amount: string; // Mantén este tipo como string
   transaction_owner: string;
   created_at:string;
+  transaction_owner_email:string
 };
 
 interface TransactionTableProps {
@@ -57,10 +58,10 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({ transactions
       },
     },
     {
-      accessorKey: "transaction_owner",
+      accessorKey: "transaction_owner_email",
       header: "Owner",
       cell: ({ row }) => {
-        const owner = row.getValue<string>("transaction_owner");
+        const owner = row.getValue<string>("transaction_owner_email");
         return <div className="lowercase">{owner}</div>;
       },
     },

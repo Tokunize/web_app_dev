@@ -8,7 +8,6 @@ import coin from "./assets/coin.svg";
 import overview from "./assets/grid.svg"
 import { UserNavbar } from "./components/dashboard/useNavbar";
 
-
 const DashboardLayout: React.FC = () => {
   const { role } = useUser(); 
 
@@ -31,8 +30,8 @@ const DashboardLayout: React.FC = () => {
   return (
     <div className="flex min-h-screen">
       <SideMenu data={menuData} onMenuClick={() => {}} />
-      <div className="flex-grow p-5 mt-[64px] md:mt-[34px]">
-        <div className="flex justify-end mb-5">
+      <div className="flex-grow p-5 mt-[64px] md:mt-[0px]">
+        <div className="flex justify-end mb-5 px-4">
           <UserNavbar/>
         </div>
         <Outlet />

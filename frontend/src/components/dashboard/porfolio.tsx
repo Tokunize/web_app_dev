@@ -3,9 +3,9 @@ import { Button } from '@/components/ui/button';
 import { useUser } from '@/context/userProvider';
 import { useNavigate } from 'react-router-dom';
 import { OwnerPropertyListCard } from './ownerPropertyListCard';
-import { IoMdSearch } from "react-icons/io";
 import { LoadingSpinner } from './loadingSpinner';
 import { useGetAxiosRequest } from '@/hooks/getAxiosRequest';
+import { FilterInput } from '../filterInput';
 
 interface Token {
   total_tokens: number;
@@ -17,7 +17,7 @@ interface Property {
   id: number;
   title: string;
   location: string;
-  tokens: Token[]; // Cambia aquí para reflejar el tipo correcto
+  tokens: Token[];
   projected_annual_return: string;
   image: string[];
   status: string;
@@ -33,7 +33,10 @@ export const Porfolio: React.FC = () => {
   // Usar el hook personalizado para obtener las propiedades
   const { error, loading } = useGetAxiosRequest<{ properties: Property[] }>(
     `${import.meta.env.VITE_APP_BACKEND_URL}property/properties/private/`,
-    (data) => setProperties(data.properties),
+    (data) =>{ 
+      console.log(data);
+      
+      setProperties(data.properties)},
     (error) => console.error('Error fetching your portfolio:', error)
   );
 
@@ -52,17 +55,13 @@ export const Porfolio: React.FC = () => {
         )}
       </div>
 
-      {/* Barra de búsqueda */}
-      <div className="relative w-full mt-5">
-        <IoMdSearch className="absolute left-2 top-2 h-6 w-6 text-gray-500" />
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search by title or location"
-          className="pl-10 p-2 w-full border border-gray-300 rounded-lg" // Añadimos padding a la izquierda para el ícono
+      <div className="absolute  top-[64px] md:top-[34px] w-1/2 ">
+        <FilterInput
+          filterValue={searchTerm} 
+          onFilterChange={setSearchTerm} 
         />
       </div>
+    
 
       <div className="mb-6">
         {loading && (

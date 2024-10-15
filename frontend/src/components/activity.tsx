@@ -1,17 +1,19 @@
-import { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import { useMemo } from "react";
 import { Graphic } from "./graph";
 import { TransactionTable } from "./transactionsTable";
 import { SmallSignUpForm } from "./property/smallSignUp";
 import { LoadingSpinner } from "./dashboard/loadingSpinner";
+import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
 
 // Define the type for transactions
 interface Transaction {
-  id: string;
+  id: number;
   event: string;
-  transaction_price: number;
-  tokens_quantity: number;
+  transaction_amount: string; // Mantén este tipo como string
+  transaction_tokens_amount: string; // Mantén este tipo como string
   transaction_owner: string;
+  created_at:string;
+  transaction_owner_email:string
 }
 
 interface ActivityProps {
@@ -19,43 +21,11 @@ interface ActivityProps {
   data: any; // Ajusta el tipo según la estructura de `data`
 }
 
-export const Activity: React.FC<ActivityProps> = ({ property_id, data }) => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  // Memoize activity data to prevent unnecessary recalculations
-
-  // Fetch transactions only when accessToken and property_id are available
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      setLoading(true);
-      const accessToken = localStorage.getItem("accessToken");
-
-      // If no token, stop loading and show sign-up form
-      if (!accessToken) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/transactions/${property_id}/`;
-        const config = {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`, // Añade el token a los encabezados
-          },
-        };
-        const response = await axios.get(apiUrl, config);
-        setTransactions(response.data);
-      } catch (err) {
-        console.error("Error fetching transactions:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTransactions();
-  }, [property_id]);
+export const Activity: React.FC<ActivityProps> = ({ property_id }) => {
+  // Usar el hook para obtener transacciones
+  const { data: transactions, loading, error } = useGetAxiosRequest<Transaction[]>(
+    `${import.meta.env.VITE_APP_BACKEND_URL}property/transactions/${property_id}/`  
+  );
 
   // Memoize accessToken to prevent unnecessary re-renders
   const accessToken = useMemo(() => localStorage.getItem("accessToken"), []);
@@ -104,11 +74,13 @@ export const Activity: React.FC<ActivityProps> = ({ property_id, data }) => {
         <div className="bg-white py-4 border-b">
           <h4 className="text-2xl font-bold mb-2">Recent Transactions</h4>
           <p className="text-gray-700">Details of recent transactions for this token.</p>
-          {transactions.length > 0 ? (
+          {transactions && transactions.length > 0 ? (
+            
             <TransactionTable transactions={transactions} />
           ) : (
             <p className="text-gray-500">No recent transactions available.</p>
           )}
+          {error && <p className="text-red-500">{error}</p>} {/* Mostrar errores si existen */}
         </div>
       </div>
     </section>
