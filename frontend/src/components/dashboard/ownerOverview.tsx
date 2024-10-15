@@ -4,14 +4,23 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { MyAssetsTable } from "./myAssetsTable";
 import { InsightsTable } from "./insightsTable";
 import { Asset } from "@/types";
-import { CurrencyConverter } from "../currencyConverter";
 import { LoadingSpinner } from "./loadingSpinner";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
+import infoIcon from "../../assets/infoIcon.svg";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { FilterInput } from "../filterInput";
 
 export const OwnerDashboard = () => {
     const [selectedProperty, setSelectedProperty] = useState<Asset | null>(null);
     const [valueTokenized, setValueTokenized] = useState<number>(0);
     const [properties, setProperties] = useState<Asset[]>([]);
+    const [filteredProperties, setFilteredProperties] = useState<Asset[]>([]);
+    const [filterValue, setFilterValue] = useState<string>(""); // Estado para el filtro
     const [property_yield, setPropertyYield] = useState<{ month: string, value: number }[]>([]);
     const [vacancyRate, setVacancyRate] = useState<{ month: string, value: number }[]>([]);
     const [netAssetValue, setNetAssetValue] = useState<{ month: string, value: number }[]>([]);
@@ -42,6 +51,7 @@ export const OwnerDashboard = () => {
         (data) => {
             setValueTokenized(data.total_value_tokenized);
             setProperties(data.properties);
+            setFilteredProperties(data.properties); // Inicializar propiedades filtradas
             if (data.properties.length > 0) {
                 setSelectedProperty(data.properties[0]);
             }
@@ -83,17 +93,29 @@ export const OwnerDashboard = () => {
         setState(newMetricData);
     };
 
+    const handleFilterChange = (value: string) => {
+        setFilterValue(value);
+        if (value) {
+            const filtered = properties.filter(property =>
+                property.title.toLowerCase().includes(value.toLowerCase())
+            );
+            setFilteredProperties(filtered);
+        } else {
+            setFilteredProperties(properties);
+        }
+    };
+
     const statusData = useMemo(() =>
-        properties.map(property => ({
+        filteredProperties.map(property => ({
             image: property.image?.[0] || 'default_image_url.jpg',
             title: property.title,
             location: property.location,
             property_status: property.status,
             equity_listed: property.ownershipPercentage
-        })), [properties]);
+        })), [filteredProperties]);
 
     const performanceData = useMemo(() =>
-        properties
+        filteredProperties
             .filter(property => property.status === 'published')
             .map(property => ({
                 image: property.image?.[0] || 'default_image_url.jpg',
@@ -102,10 +124,10 @@ export const OwnerDashboard = () => {
                 upcoming_rent_amount: 45,
                 upcoming_date_rent: "29 Sep 2024"
             }))
-        , [properties]);
+        , [filteredProperties]);
 
     const insightsData = useMemo(() =>
-        properties
+        filteredProperties
             .filter(property => property.status === "published")
             .map(property => ({
                 id: property.id,
@@ -118,7 +140,7 @@ export const OwnerDashboard = () => {
                 net_asset_value: parseFloat(property.price),
                 net_operating_value: 200000
             }))
-        , [properties]);
+        , [filteredProperties]);
 
     if (balanceLoading || propertiesLoading) return <div className="flex items-center h-full justify-center"><LoadingSpinner/></div>;
     if (balanceError || propertiesError) return <div>Error: {balanceError || propertiesError}</div>;
@@ -138,20 +160,31 @@ export const OwnerDashboard = () => {
                         </p>
                     </CardContent>
                 </Card> */}
+            <div className="absolute w-1/2  top-[64px] md:top-[34px]">
+                <FilterInput onFilterChange={handleFilterChange} filterValue={filterValue} />
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <Card className="callout-card">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
+                    <CardHeader className="flex flex-row items-center space-y-0 space-x-2">
+                        <CardTitle className="text-xs font-medium  text-gray-500">
                             Total Value Tokenized
                         </CardTitle>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger className="p-0 mt-0"><img alt="info-icon" src={infoIcon}  /></TooltipTrigger>
+                                <TooltipContent>
+                                <p className="max-w-xs">The  total value of all your  tokenized properties</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            <CurrencyConverter amountInUSD={valueTokenized} />
+                            {/* <CurrencyConverter amountInUSD={valueTokenized} /> */}
+                            <p className="font-bold">
+                                £{valueTokenized?.toFixed(2) || 0.00} <br /> 
+                            </p>
                         </div>
-                        <p className="text-xs text-muted-foreground">
-                            +20.1% from last month
-                        </p>
                     </CardContent>
                 </Card>
                 <Card className="callout-card">
@@ -170,32 +203,32 @@ export const OwnerDashboard = () => {
             </div>
 
             <div className="grid border-0 grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className="border-none">
-                    <h2 className="text-md font-semibold text-gray-500">Upcoming Rent Payments</h2>
+                <Card className="border-none shadow-0">
+                    <h2 className="text-md mb-2 font-normal text-gray-500">Upcoming Rent Payments</h2>
                     <MyAssetsTable assetsData={performanceData} onSelectProperty={handleSelectProperty} />
                 </Card>
-                <Card className="border-0">
-                    <h2 className="text-md font-semibold text-gray-500">Property Status</h2>
+                <Card className="border-0  shadow-0">
+                    <h2 className="text-md mb-2 font-normal text-gray-500">Property Status</h2>
                     <MyAssetsTable assetsData={statusData} onSelectProperty={handleSelectProperty} />
                 </Card>
             </div>
 
             <div className="grid border-0 grid-cols-1 gap-4">
-                <Card className="border-0">
-                    <h2 className="text-md font-semibold text-gray-500">Performance Insights</h2>
+                <Card className="border-0  shadow-0">
+                    <h2 className="text-md mb-2 font-normal text-gray-500">Performance Insights</h2>
                     <InsightsTable assetsData={insightsData} onSelectProperty={handleSelectProperty} />
                 </Card>
             </div>
 
             <div className="grid border-0 grid-cols-1 md:grid-cols-2 gap-4 my-4">
-                <Card className="border-0">
+                <Card className="border-0  shadow-0">
                     <PerformanceGraph
                         title="Average Yield"
                         description={`Showing yield average for ${selectedProperty ? selectedProperty.title : 'selected property'} in the last year`}
                         data={property_yield}
                     />
                 </Card>
-                <Card className="border-0">
+                <Card className="border-0  shadow-0">
                     <PerformanceGraph
                         title="Net Asset Value (NAV)"
                         description={`Net Asset Value of ${selectedProperty ? selectedProperty.title : 'selected property'} in the last year`}
@@ -204,14 +237,14 @@ export const OwnerDashboard = () => {
                 </Card>
             </div>
             <div className="grid border-0 grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className="border-0">
+                <Card className="border-0  shadow-0">
                     <PerformanceGraph
                         title="Vacancy Rate"
                         description={`Vacancy rate for ${selectedProperty ? selectedProperty.title : 'selected property'} in the last year`}
                         data={vacancyRate}
                     />
                 </Card>
-                <Card className="border-0">
+                <Card className="border-0  shadow-0">
                     <PerformanceGraph
                         title="Tenant Turnover"
                         description={`Tenant turnover  for ${selectedProperty ? selectedProperty.title : 'selected property'} in the last year`}
@@ -449,18 +482,18 @@ export const OwnerDashboard = () => {
 
 //             <div className="grid border-0 grid-cols-1 md:grid-cols-2 gap-4">
 //                 <Card className="border-none">
-//                     <h2 className="text-md font-semibold text-gray-500">Upcoming Rent Payments</h2>
+//                     <h2 className="text-md font-normal text-gray-500">Upcoming Rent Payments</h2>
 //                     <MyAssetsTable assetsData={performanceData} onSelectProperty={handleSelectProperty} />
 //                 </Card>
 //                 <Card className="border-0">
-//                     <h2 className="text-md font-semibold text-gray-500">Property Status</h2>
+//                     <h2 className="text-md font-normal text-gray-500">Property Status</h2>
 //                     <MyAssetsTable assetsData={statusData} onSelectProperty={handleSelectProperty} />
 //                 </Card>
 //             </div>
 
 //             <div className="grid border-0 grid-cols-1 gap-4">
 //                 <Card className="border-0">
-//                     <h2 className="text-md font-semibold text-gray-500">Performance Insights</h2>
+//                     <h2 className="text-md font-normal text-gray-500">Performance Insights</h2>
 //                     <InsightsTable assetsData={insightsData} onSelectProperty={handleSelectProperty} />
 //                 </Card>
 //             </div>

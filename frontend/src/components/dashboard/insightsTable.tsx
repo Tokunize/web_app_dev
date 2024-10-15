@@ -1,17 +1,14 @@
 import * as React from "react";
 import {
     ColumnDef,
-    ColumnFiltersState,
     SortingState,
     flexRender,
     getCoreRowModel,
-    getFilteredRowModel,
     getPaginationRowModel,
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
     Table,
     TableBody,
@@ -31,7 +28,6 @@ interface InsightsTableProps {
 
 export const InsightsTable: React.FC<InsightsTableProps> = React.memo(({ assetsData, onSelectProperty }) => {
     const [sorting, setSorting] = React.useState<SortingState>([]);
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const [rowSelection, setRowSelection] = React.useState({});
 
     const toNumber = (value: unknown): number => {
@@ -121,30 +117,18 @@ export const InsightsTable: React.FC<InsightsTableProps> = React.memo(({ assetsD
         data: assetsData,
         columns,
         onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
         onRowSelectionChange: setRowSelection,
         state: {
             sorting,
-            columnFilters,
             rowSelection,
         },
     });
 
     return (
         <div className="w-full">
-            <div className="flex items-center py-4">
-                {/* Filter by title */}
-                <Input
-                    placeholder="Filter properties by title..."
-                    value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-                    onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)}
-                    className="max-w-sm"
-                />
-            </div>
             <div className="rounded-md border overflow-x-hidden">
                 <Table>
                     <TableHeader>
@@ -162,17 +146,20 @@ export const InsightsTable: React.FC<InsightsTableProps> = React.memo(({ assetsD
                         {table.getRowModel().rows.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow 
-                                    key={row.id} 
-                                    data-state={row.getIsSelected() && "selected"}
-                                    onClick={() => onSelectProperty(row.original)}
-                                    className={`cursor-pointer hover:bg-gray-100 ${row.getIsSelected() ? 'bg-[#C8E870]' : ''}`} // Apply green background for selected rows
+                                key={row.id} 
+                                data-state={row.getIsSelected() && "selected"}
+                                onClick={() => {
+                                    onSelectProperty(row.original); // Llama al callback con la propiedad seleccionada
+                                    setRowSelection({ [row.id]: true }); // Marca la fila como seleccionada
+                                }}
+                                className={`cursor-pointer hover:bg-[#F4FAE2] ${row.getIsSelected() ? 'bg-[#F4FAE2] !important' : ''}`} // Aplicar color de fondo para filas seleccionadas
                                 >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
+                                {row.getVisibleCells().map((cell) => (
+                                    <TableCell key={cell.id}>
+                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                    </TableCell>
+                                ))}
+                            </TableRow>
                             ))
                         ) : (
                             <TableRow>

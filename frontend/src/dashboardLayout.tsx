@@ -31,7 +31,7 @@ const DashboardLayout: React.FC = () => {
   return (
     <div className="flex min-h-screen">
       <SideMenu data={menuData} onMenuClick={() => {}} />
-      <div className="flex-grow p-5 mt-[60px] md:mt-0">
+      <div className="flex-grow p-5 mt-[64px] md:mt-[34px]">
         <div className="flex justify-end mb-5">
           <UserNavbar/>
         </div>

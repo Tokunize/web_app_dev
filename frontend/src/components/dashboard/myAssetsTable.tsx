@@ -2,17 +2,14 @@
 import * as React from "react";
 import {
   ColumnDef,
-  ColumnFiltersState,
   SortingState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -61,7 +58,6 @@ const formatStatus = (status: string): string => {
 // The main functional component
 export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData }) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
   const {role } = useUser()
   const navigate = useNavigate()
@@ -282,30 +278,18 @@ export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData })
     data: assetsData,
     columns: memoizedAssetsData,
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     onRowSelectionChange: setRowSelection,
     state: {
       sorting,
-      columnFilters,
       rowSelection,
     },
   });
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
-        {/* Filter by title */}
-        <Input
-          placeholder="Filter properties by title..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)}
-          className="max-w-sm"
-        />
-      </div>
       <div className="rounded-md border">
         <Table >
           <TableHeader>
