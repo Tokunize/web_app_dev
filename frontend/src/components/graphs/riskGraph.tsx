@@ -2,7 +2,13 @@
 
 import { TrendingUp } from "lucide-react"
 import { Bar, BarChart, XAxis, YAxis } from "recharts"
-
+import infoIcon from "../../assets/infoIcon.svg";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Card,
   CardContent,
@@ -49,9 +55,17 @@ const chartConfig = {
 export const RiskOverview = () => {
   return (
     <Card className="w-full"> {/* Ajustar el tamaño del Card */}
-      <CardHeader>
+      <CardHeader className="flex flex-row space-x-3">
         <CardTitle>Risk Overview</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger className="p-0 mt-0"><img alt="info-icon" src={infoIcon}  /></TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-xs">A Sharpe ratio greater than 1.0 is considered acceptable to good. A ratio higher than 2.0 is rated as very good. A ratio of 3.0 or higher is considered excellent. A ratio under 1.0 is considered sub-optimal.”</p>
+                </TooltipContent>
+              </Tooltip>
+          </TooltipProvider>
+        <CardDescription className="hidden">January - June 2024</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
