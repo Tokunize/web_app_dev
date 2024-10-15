@@ -282,3 +282,67 @@ class AddFundsWallet(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+
+class CheckWalletBalance(APIView):
+    authentication_classes = [Auth0JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    apikey = settings.CIRCLE_API_KEY  # Asumiendo que usas settings para tu configuración
+
+    def get(self, request):
+        user_id = request.user.id
+
+        # Busca el wallet_id asociado al usuario
+        try:
+            wallet = Wallet.objects.get(wallet_user_id=user_id)
+            wallet_id = wallet.wallet_id
+        except Wallet.DoesNotExist:
+            return Response({"error": "Wallet not found for this user."}, status=404)
+
+        # Construye la URL para la solicitud a la API
+        url = f"https://api.circle.com/v1/w3s/wallets/{wallet_id}/balances"
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.apikey}"  # Reemplaza con tu API key
+        }
+
+        # Realiza la solicitud a la API
+        response = requests.get(url, headers=headers)
+
+        # Verifica si la solicitud fue exitosa
+        if response.status_code == 200:
+            balances = response.json()  # Analiza la respuesta JSON
+            return Response(balances, status=200)
+        else:
+            print("Error:", response.status_code, response.text)
+            return Response({"error": "Failed to retrieve balances."}, status=response.status_code)
+
+
+"""
+class CreateTranfersCircle(ApiView):
+    def post(self,request):
+        
+    apikey = settings.CIRCLE_API_KEY  # Asumiendo que usas settings para tu configuración
+
+    First inicitialize user sesion
+    circle apiUrl = ""
+
+    headers = {
+        "Content-Type" : "Application/json"
+        "Authorization": f"Bearer {self.apikey}"
+    }
+
+    response = request.post(apiUrl, headers=headers)
+
+    if response.status_code == 200:
+        received_data = response.json()
+        user_token = received_data.user_token
+        print(user_token)
+    else:
+        print("Error:", response.status_code, response.text)
+        return Response({"error": "Failed to retrieve balances."}, status=response.status_code)
+    
+    now,make here the request.post para crear la transferencia, usando el user_token que se ha obtenido desde la request que se ha echo 
+
+    
+"""

@@ -60,6 +60,8 @@ def log_activity(event_type, involved_address, contract_address=None, payload=No
 
 class IsAdminOrOwner(BasePermission):
     def has_permission(self, request, view):
+        print(request.user.rol, "aquiiiiii")
+        print(f"User Role: {getattr(request, 'user_role', None)}")  # Verifica el user_role
         if request.user_role== 'admin':
             return True
         if request.user_role == 'owner':
@@ -68,6 +70,7 @@ class IsAdminOrOwner(BasePermission):
     
 
 class PropertyListView(APIView):
+    authentication_classes = [Auth0JWTAuthentication]
     permission_classes = [IsAdminOrOwner]
 
     def get(self, request):
@@ -476,6 +479,16 @@ class SinglePropertyTransactionListView(APIView):
         serializer = self.serializer_class(transactions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
+class PublicSinglePropertyTransactionListView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = TransactionSerializer
+
+    def get(self,request,property_id):        
+        # Filtrar  propiedad
+        transactions = Transaction.objects.filter(property_id=property_id)        
+        serializer = self.serializer_class(transactions, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
 
 class InvestedProperties(APIView):
     authentication_classes = [Auth0JWTAuthentication]
@@ -491,8 +504,6 @@ class InvestedProperties(APIView):
         
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-
-
 
 
 class UserInvestmentSummaryAPIView(APIView):

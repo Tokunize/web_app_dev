@@ -131,6 +131,7 @@ class Auth0JWTAuthentication(authentication.BaseAuthentication):
         try:
             decoded_token = jwt.decode(token, public_key, algorithms=['RS256'], audience='https://my-endpoints/users')
             user_sub = decoded_token.get('sub')
+            print("--------------", decoded_token)
 
             if not user_sub:
                 raise AuthenticationFailed('Token does not contain user id (sub).')
@@ -141,6 +142,8 @@ class Auth0JWTAuthentication(authentication.BaseAuthentication):
                 defaults={
                     'email': decoded_token.get('email', ''),
                     'name': decoded_token.get('name', ''),
+                    'rol': decoded_token.get('https://tokunize.com/role', '')  # Add this line
+
                     # Add any other fields from the token if needed
                 }
             )
@@ -148,10 +151,12 @@ class Auth0JWTAuthentication(authentication.BaseAuthentication):
             if created:
                 print(f'New user {user.email} created during authentication')
             
-            request.user_role = user.rol
+
+            request.user_role = decoded_token.get('https://tokunize.com/role', '')
             # request.user_role = user_rol
             # request.user_id = user_sub
-
+            print("-----", user.id)
+            print("auth", user.rol)
             return (user, token)
 
         except jwt.ExpiredSignatureError:
