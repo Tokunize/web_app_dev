@@ -22,7 +22,10 @@ export const description = "A mixed bar chart"
 
 const chartData = [
   { browser: "chrome", risk: 3.5, fill: "var(--color-chrome)" },
+  { browser: "safari", risk: 1.4, fill: "var(--color-safari)" },
+  { browser: "chrome", risk: 2.5, fill: "var(--color-chrome)" },
   { browser: "safari", risk: 2.4, fill: "var(--color-safari)" },
+  { browser: "chrome", risk: 3.0, fill: "var(--color-chrome)" },
 ]
 
 const chartConfig = {
@@ -45,7 +48,7 @@ const chartConfig = {
 
 export const RiskOverview = () => {
   return (
-    <Card className="w-full max-w-lg"> {/* Ajustar el tamaño del Card */}
+    <Card className="w-full"> {/* Ajustar el tamaño del Card */}
       <CardHeader>
         <CardTitle>Risk Overview</CardTitle>
         <CardDescription>January - June 2024</CardDescription>
@@ -56,6 +59,8 @@ export const RiskOverview = () => {
             accessibilityLayer
             data={chartData}
             layout="vertical"
+            barSize={30}
+            barGap={0}
             margin={{
               left: 50, // Aumentar el margen para dar más espacio a las etiquetas
             }}

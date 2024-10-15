@@ -53,7 +53,7 @@ const Legend = ({ data }: { data: { location: string; fill: string, percentage:n
 export const PieGraph = ({ data, title,footerDescription }: PieGraphProps) => {
   const description = `Updated: ${formatDate(new Date())}`; // Set the description with the current date
   return (
-    <Card className="flex border-0 flex-col ">
+    <Card className="flex border-0 shadow-none flex-col ">
       <CardHeader className="items-center pb-0 hidden">
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription> {/* Use the description here */}

@@ -40,7 +40,7 @@ export const PerformanceGraph: React.FC<PerformanceGraphProps> = ({
   data,
 }) => {
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>

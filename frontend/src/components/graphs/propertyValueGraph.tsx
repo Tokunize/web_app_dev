@@ -108,12 +108,12 @@ const chartConfig = {
     )
   
     return (
-      <Card>
+      <Card className="h-[450px]">
         <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
-          <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-            <CardTitle>Total Portfolio Value</CardTitle>
-            <CardDescription>
-              Showing total porfolio value for the last 3 months
+          <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-3">
+            <CardTitle className="text-lg font-normal text-gray-500">Total Portfolio Value</CardTitle>
+            <CardDescription className="hidden">
+              Showing total porfolio value
             </CardDescription>
           </div>
         </CardHeader>

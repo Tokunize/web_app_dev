@@ -2,8 +2,6 @@
 import { useState } from "react";
 import { TransactionTable } from "../transactionsTable";
 import { DatePickerWithRange } from "./DatePickerRange";
-import { jsPDF } from "jspdf"; // Import jsPDF
-import autoTable from "jspdf-autotable";
 import { Download } from "lucide-react"; 
 import { CurrencyConverter } from "../currencyConverter";
 import { AddFundsFlow } from "../funds/addFundsFlow";
@@ -40,7 +38,6 @@ export const Transaction = () => {
   // Use the custom hook to fetch transactions
   const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/transactions/`;
   
-  // Destructure data, loading, and error from useGetAxiosRequest
   const { loading, error } = useGetAxiosRequest<{
     transactions: Transaction[];
     balance: { data: { tokenBalances: { amount: string }[] } };
@@ -52,7 +49,6 @@ export const Transaction = () => {
     console.error("Failed to fetch transactions:", error);
   });
 
-  // Filter transactions based on selected dates and position
   const filteredTransactions = transactions.filter((transaction) => {
     const transactionDate = new Date(transaction.created_at);
     const isDateInRange =
@@ -68,61 +64,49 @@ export const Transaction = () => {
   if (loading) return <LoadingSpinner />;
   if (error) return <div>Error: {error}</div>;
 
-  const downloadPDF = () => {
-    const doc = new jsPDF();
-    doc.setFontSize(20);
-    doc.text("Transaction Report", 20, 20);
-    doc.setFontSize(12);
-
-    const tableColumn = [
+  // Función para descargar CSV en lugar de PDF
+  const downloadCSV = () => {
+    const headers = [
       "ID",
       "Event",
       "Price",
       "Tokens",
       "Owner",
-      "Created At",
+      "Created At"
     ];
-    const tableRows: string[][] = [];
 
-    filteredTransactions.forEach((transaction) => {
-      const transactionData = [
-        transaction.id.toString(),
-        transaction.event,
-        (transaction.transaction_amount ? parseFloat(transaction.transaction_amount).toFixed(2) : "N/A"),
-        transaction.transaction_tokens_amount !== undefined ? transaction.transaction_tokens_amount.toString() : "N/A",
-        transaction.transaction_owner,
-        new Date(transaction.created_at).toLocaleDateString(),
-      ];
-      tableRows.push(transactionData);
-    });
+    const csvRows = [
+      headers.join(","), // Crear el encabezado del archivo CSV
+      ...filteredTransactions.map((transaction) =>
+        [
+          transaction.id,
+          transaction.event,
+          (transaction.transaction_amount ? parseFloat(transaction.transaction_amount).toFixed(2) : "N/A"),
+          transaction.transaction_tokens_amount !== undefined ? transaction.transaction_tokens_amount : "N/A",
+          transaction.transaction_owner,
+          new Date(transaction.created_at).toLocaleDateString()
+        ].join(",") // Unir los datos de cada transacción con comas
+      ),
+    ];
 
-    if (tableRows.length > 0) {
-      autoTable(doc, {
-        head: [tableColumn],
-        body: tableRows,
-        startY: 30,
-      });
-    } else {
-      doc.text("No transactions to display.", 20, 30);
-    }
-
-    doc.save("transactions.pdf");
+    // Crear un blob con el contenido del CSV
+    const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    
+    // Crear un enlace para descargar el archivo CSV
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "transactions.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link); // Eliminar el enlace después de descargar
   };
-
-  if (loading) {
-    return <div><LoadingSpinner/></div>;
-  }
-
-  if (error) {
-    return <div className="text-red-500">{error}</div>; // Styled error message
-  }
 
   return (
     <div className="p-4">
       <div className="flex justify-between bg-white rounded-lg border p-4 mb-4">
         <div className="space-y-3">
           <p className="text-sm text-gray-500">Total Balance</p>
-          {/* Pass balance directly; CurrencyConverter will handle it */}
           <CurrencyConverter amountInUSD={balance} />
           <br/> 
         </div>
@@ -131,9 +115,9 @@ export const Transaction = () => {
           <Button>Withdraw</Button>
         </span>
       </div>
-      <Button onClick={downloadPDF} className="bg-white border">
-        Download PDF
-        <Download className="ml-4" /> {/* Download icon */}
+      <Button onClick={downloadCSV} className="bg-white border">
+        Download CSV
+        <Download className="ml-4" /> {/* Icono de descarga */}
       </Button>
       <div className="flex justify-between mt-4 mb-4">
         <DatePickerWithRange
@@ -146,7 +130,7 @@ export const Transaction = () => {
           <DropdownMenuTrigger asChild>
             <Button variant="outline">Transaction Type</Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-48"> {/* Align dropdown to the right */}
+          <DropdownMenuContent className="w-48">
             <DropdownMenuLabel>Select one</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>

@@ -92,7 +92,7 @@ export const InvestorOverview = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-none">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Rental Income</CardTitle>
           </CardHeader>
@@ -102,7 +102,7 @@ export const InvestorOverview = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-none ">
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-sm font-medium">Withdraw Money</CardTitle>
           </CardHeader>
@@ -112,17 +112,20 @@ export const InvestorOverview = () => {
         </Card>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-4 px-4 pb-4">
-        <Card>
+      <div className="gap-4 flex px-4 pb-4">
+        <Card className="shadow-none w-1/3 border-0">
           <PropertyValueGraph />
         </Card>
-        <Card className="px-4">
+        <Card className="shadow-none w-2/3  py-4">
+          <h4 className="text-lg pl-4 mb-2 font-normal text-gray-500">Yield Projections</h4>
           <MyAssetsTable assetsData={yieldData || []} />
         </Card>
       </div>
 
-      <div className="px-4 pb-4">
-        <Card className="flex lg:space-x-5 grid-cols-1 grid lg:grid-cols-2">
+        <Card className="pb-4 p-4 mx-4 mb-4">
+        <h4 className="text-lg mb-2 font-normal text-gray-500">Investment Diversification</h4>
+        <hr/>
+        <Card className="flex lg:space-x-5 grid-cols-1 grid shadow-none lg:grid-cols-2 border-0">
           <PieGraph
             data={chartData}
             title="Geography"
@@ -134,17 +137,19 @@ export const InvestorOverview = () => {
             footerDescription="Showing total properties based on the property type"
           />
         </Card>
-      </div>
+        </Card>
 
-      <div className="grid lg:grid-cols-2 gap-4 px-4 pb-4">
-        <Card>
+      <div className="flex gap-4 px-4 pb-4">
+        <Card className="shadow-none bg-red-500 w-2/3 border-0">
           <RiskOverview />
         </Card>
-        <PerformanceGraph  
-          description=""
-          title={"S&P 500 Chart"}
-          data={chartData2}
-        />
+        <Card className="w-1/3 border-0 shadow-none">
+          <PerformanceGraph  
+            description=""
+            title={"S&P 500 Chart"}
+            data={chartData2}
+          />
+        </Card>
       </div>
     </section>
   );

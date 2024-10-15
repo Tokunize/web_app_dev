@@ -290,7 +290,7 @@ export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData })
 
   return (
     <div className="w-full">
-      <div className="rounded-md border">
+      <div className="border-t">
         <Table >
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
