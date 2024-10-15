@@ -31,6 +31,7 @@ const Layout = () => {
             <Route path="blog/" element={<Blog/>} />
             <Route path="blog/article/:id/" element={<SingleArticleView/>} />
           </Route>
+
           
           <Route path="sign-up/" element={<SignUpController />} />
           <Route path="public-property/" element={<PublicPropertyPage/>} />
