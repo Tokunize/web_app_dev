@@ -133,9 +133,9 @@ export function SignUpForm({
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Profesional Email</FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="example@example.com" {...field} />
+                <Input type="email" placeholder="Enter a valid email address" {...field} />
               </FormControl>
               <FormDescription>
                 You will use this email to interact with Tokunize.
@@ -152,9 +152,9 @@ export function SignUpForm({
             name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Username</FormLabel>
+                <FormLabel>First Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Jhon" {...field} />
+                  <Input placeholder="Enter your first name" {...field} />
                 </FormControl>
                 <FormDescription>
                   This is your public display name.
@@ -171,7 +171,7 @@ export function SignUpForm({
               <FormItem>
                 <FormLabel>Last Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Jhonson" {...field} />
+                  <Input placeholder="Enter your last name" {...field} />
                 </FormControl>
                 <FormDescription>
                   Please enter your last name.
@@ -201,7 +201,7 @@ export function SignUpForm({
                     className="absolute inset-y-0 right-0 flex items-center pr-3"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? '👁️' : '🙈'}
+                    {showPassword ? '👁️' : '👁️'}
                   </button>
                 </div>
               </FormControl>

@@ -40,12 +40,12 @@ const EmailInput: React.FC<{ onEmailSubmit: (email: string) => void }> = ({ onEm
       <div className="rounded-lg max-w-md p-5 h-auto bg-white shadow-lg flex flex-col"> 
         <img alt='logo' src={logo} className="h-16 mx-auto mb-5" />
         <h2 className="text-2xl font-bold mb-2 text-center">Create An Account</h2>
-        <p className="text-gray-500 mb-[45px] text-sm text-center">Invest in Real Estate. Secure. Simple. Swift.</p>
+        <p className="text-gray-500 mb-[45px] text-sm text-center">Invest in Commercial Real Estate. Secure. Simple. Swift.</p>
         <label htmlFor="email" className="mb-2">Email</label>
         <Input
           type="email"
           id="email"
-          placeholder="example@example.com"
+          placeholder="Enter a valid email address"
           value={email}
           onChange={handleInputChange}
           className={`mb-4 ${emailError ? 'border-red-500' : 'border-gray-300'}`}

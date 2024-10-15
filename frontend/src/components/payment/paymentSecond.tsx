@@ -71,7 +71,7 @@ export const PaymentSecond: React.FC<PaymentSecondProps> = ({
           <img alt="token-icon" src={cardIcon} className="h-8" />
           <span className="flex pl-2 flex-col">
             <span className="font-bold text-medium">Pay With</span>
-            <span className="text-gray-400">{selectedPaymentMethod ? selectedPaymentMethod : "Please select a method type"}</span>
+            <span className="text-gray-400">{selectedPaymentMethod ? selectedPaymentMethod : "Please select payment method"}</span>
           </span>
         </span>
         <svg

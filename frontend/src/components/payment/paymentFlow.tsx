@@ -117,7 +117,7 @@ export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="w-full">Start Payment Flow</Button>
+        <Button className="w-full">Buy</Button>
       </DialogTrigger>
 
       <DialogContent>

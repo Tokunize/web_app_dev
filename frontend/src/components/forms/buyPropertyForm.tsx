@@ -26,12 +26,12 @@ export const PurchaseForm: React.FC<PurchaseFormProps> = ({
         >
           <div className="space-y-2">
             <div className="flex items-center">
-              <span className="text-2xl w-[45%]">£{tokenPrice}</span>
-              <span className="font-xs text-gray-700">Price Per Token</span>
+              <span className="font-semibold text-2xl w-[45%]">£{tokenPrice}</span>
+              <p className="font-xs text-gray-700">per token</p>
             </div>
             <div className="flex items-center">
-              <span className="text-2xl w-[45%]">{projected_annual_return}%</span>
-              <span className="font-xs text-gray-700">Est. annual return</span>
+              <span className="font-semibold text-2xl w-[45%]">{projected_annual_return}%</span>
+              <p className="font-xs text-gray-700">est. annual return</p>
             </div>
           </div>
 

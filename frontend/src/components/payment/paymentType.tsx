@@ -20,16 +20,16 @@ export const PaymentType: React.FC<PaymentTypeProps> = ({ onPaymentSelect }) => 
       <h4 className="font-bold text-xl">Select Payment Type</h4>
 
       <span
-        className={`flex items-center hover:bg-[#C8E870] p-2 rounded-lg ${selectedPayment === 'e-wallet' ? 'bg-[#C8E870]' : ''}`}
-        onClick={() => handlePaymentSelect("e-wallet")}
+        className={`flex items-center hover:bg-[#C8E870] p-2 rounded-lg ${selectedPayment === 'Wallet' ? 'bg-[#C8E870]' : ''}`}
+        onClick={() => handlePaymentSelect("Wallet")}
       >
         <img alt="E-Wallet icon" className="h-8" src={cardIcon} />
-        <p className="pl-4">E-Wallet</p>
+        <p className="pl-4">Wallet</p>
       </span>
 
       <span
-        className={`flex items-center hover:bg-[#C8E870] p-2 rounded-lg ${selectedPayment === 'bank-card' ? 'bg-[#C8E870]' : ''}`}
-        onClick={() => handlePaymentSelect("bank-card")}
+        className={`flex items-center hover:bg-[#C8E870] p-2 rounded-lg ${selectedPayment === 'Bank Card' ? 'bg-[#C8E870]' : ''}`}
+        onClick={() => handlePaymentSelect("Bank Card")}
       >
         <img alt="Bank Card icon" className="h-8" src={yellowCardIcon} />
         <p className="pl-4">Bank Card</p>

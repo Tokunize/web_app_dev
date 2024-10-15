@@ -149,7 +149,7 @@ export const AccountType = ({ formData }: { formData: SignUpForm }) => {
         ) : (
           <div className="bg-white p-6 rounded-lg">
             <h1 className="text-3xl mb-[60px] text-center pt-5 font-semibold">Choose Your Account Type</h1>
-            <p className="font-bold text-left mb-5">I am...</p>
+            <p className="font-bold text-left mb-5">I Am...</p>
             {/* Selección de tipo de cuenta */}
             <div className="flex justify-between space-x-5 w-full max-w-md mb-6 ">
               {/* Opción de Investor */}
@@ -162,7 +162,7 @@ export const AccountType = ({ formData }: { formData: SignUpForm }) => {
                   alt="Investor" 
                   className="mb-4 h-16 rounded-full" 
                 />
-                <h2 className="text-xl">an investor</h2>
+                <h2 className="text-xl">An Investor</h2>
               </div>
               {/* Opción de Owner */}
               <div 
@@ -174,7 +174,7 @@ export const AccountType = ({ formData }: { formData: SignUpForm }) => {
                   alt="Owner" 
                   className="mb-4 h-16 rounded-full" 
                 />
-                <h2 className="text-xl">an asset owner / broker</h2>
+                <h2 className="text-xl">An Asset Owner / Broker</h2>
               </div>
             </div>
           </div>
