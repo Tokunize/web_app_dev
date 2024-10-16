@@ -1,4 +1,4 @@
-import { Input } from "@/components/ui/input"; // Asegúrate de que la ruta sea correcta
+import { Input } from "@/components/ui/input";
 import React from "react";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -15,29 +15,39 @@ export const PropertyValue: React.FC<PropertyValueProps> = ({
     ownershipPercentage,
     setOwnershipPercentage,
 }) => {
-    const [showPoundSymbol, setShowPoundSymbol] = React.useState<boolean>(false); // Estado para mostrar el símbolo de la libra
-    const [showPercentageSymbol, setShowPercentageSymbol] = React.useState<boolean>(false); // Estado para mostrar el símbolo de porcentaje
+    const [showPoundSymbol, setShowPoundSymbol] = React.useState<boolean>(false);
+    const [showPercentageSymbol, setShowPercentageSymbol] = React.useState<boolean>(false);
     const { toast } = useToast();
 
+    // Manejar cambio en el input de valor de mercado y formatear la cantidad ingresada
     const handleMarketValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-
-        // Solo permitir números y eliminar cualquier carácter no numérico
-        if (/^\d*$/.test(value)) {
+        let value = e.target.value.replace(/,/g, ""); // Quitar las comas
+        if (/^\d*\.?\d*$/.test(value)) { // Permitir solo números con o sin decimales
             setMarketValue(value);
         }
     };
 
+    // Formatear el valor cuando se pierde el foco (blur)
+    const handleMarketValueBlur = () => {
+        if (marketValue) {
+            const formattedValue = parseFloat(marketValue).toLocaleString('en-UK', {
+                style: 'currency',
+                currency: 'GBP',
+            }).replace('£', ''); // Formatear como moneda sin el símbolo de la libra
+            setMarketValue(formattedValue);
+        }
+        setShowPoundSymbol(true);
+    };
+
+    // Manejar cambio en el input de porcentaje de propiedad
     const handleOwnershipChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
-
-        // Solo permitir números y eliminar cualquier carácter no numérico
-        if (/^\d*$/.test(value)) {
+        if (/^\d*$/.test(value)) { // Solo permitir números enteros
             if (parseInt(value) > 100) {
                 toast({
                     title: "Invalid Ownership Percentage",
                     description: "You cannot enter more than 100%.",
-                    variant: "destructive", // Toast de error
+                    variant: "destructive",
                 });
             } else {
                 setOwnershipPercentage(value);
@@ -52,12 +62,12 @@ export const PropertyValue: React.FC<PropertyValueProps> = ({
                 <Input
                     value={marketValue}
                     onChange={handleMarketValueChange}
-                    onBlur={() => setShowPoundSymbol(true)} // Mostrar símbolo de libra al perder el foco
-                    onFocus={() => setShowPoundSymbol(false)} // Ocultar símbolo de libra al enfocar
+                    onBlur={handleMarketValueBlur} // Formatear cuando se pierda el foco
+                    onFocus={() => setShowPoundSymbol(false)} // Ocultar símbolo al enfocar
                     className="max-w-xs text-center border-0 mr-2 text-3xl font-bold"
-                    placeholder="0"
+                    placeholder="0" // Mostrar 0 solo cuando no hay valor
                 />
-                {showPoundSymbol && <span className="text-3xl font-bold">£</span>} {/* Mostrar símbolo de libra */}
+                {showPoundSymbol && <span className="text-3xl font-bold">£</span>}
             </div>
 
             <h3 className="text-xl text-center font-bold">How much ownership would you like to offer to investors?</h3>
@@ -69,9 +79,9 @@ export const PropertyValue: React.FC<PropertyValueProps> = ({
                     onFocus={() => setShowPercentageSymbol(false)} // Ocultar símbolo de porcentaje al enfocar
                     className="max-w-xs text-center border-0 mr-2 text-3xl font-bold"
                     placeholder="0"
-                    max="100" // Limitar el input a un máximo de 100
+                    max="100"
                 />
-                {showPercentageSymbol && <span className="text-3xl font-bold">%</span>} {/* Mostrar símbolo de porcentaje */}
+                {showPercentageSymbol && <span className="text-3xl font-bold">%</span>}
             </div>
             <p className="text-gray-500">Min. 1% and Max. 100% equity can be sold to investors</p>
         </div>
