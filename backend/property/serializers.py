@@ -15,7 +15,7 @@ class TokenSerializer(serializers.ModelSerializer):
 class UpdatePropertyStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Property
-        fields = ['status, rejection_reason']  # Asegúrate de incluir solo los campos que deseas actualizar
+        fields = ['status', 'rejection_reason']  # Asegúrate de incluir solo los campos que deseas actualizar
 
 #SERIALIZER FOR THE PROPERTY ON MARKETPLACE LANDING PAGE
 class PropertySerializerList(serializers.ModelSerializer):
@@ -165,10 +165,14 @@ class CreatePropertySerializer(serializers.ModelSerializer):
 #SERIALIZER FOR TRANSACTIONS
 
 class TransactionSerializer(serializers.ModelSerializer):
+    transaction_owner_email = serializers.SerializerMethodField()
+
     class Meta:
         model = Transaction
         fields = '__all__'
- 
+
+    def get_transaction_owner_email(self, obj):
+        return obj.transaction_owner_code.email if obj.transaction_owner_code else None
 
 class PropertyTokenSerializer(serializers.ModelSerializer):
     class Meta:

@@ -11,7 +11,7 @@ import {
     AvatarFallback,
     AvatarImage,
 } from "@/components/ui/avatar";
-import { CreateWallet } from './createWallet';
+// import { CreateWallet } from './createWallet';
 import { LogoutButton } from '../buttons/logoutBtn';
 import { useUser } from '@/context/userProvider';
 
@@ -21,9 +21,9 @@ const AccountMenu: React.FC<{ navigate: (path: string) => void }> = ({ navigate 
             <div className="p-4 font-bold">My Account</div>
             <div className="border-b"></div>
             <div className="flex flex-col px-3 mt-2">
-                <MenuItem onClick={() => navigate("/dashboard")}>Dashboard</MenuItem>
+                <MenuItem onClick={() => navigate("/dashboard/")}>Dashboard</MenuItem>
                 <MenuItem onClick={() => navigate("/")}>Marketplace</MenuItem>
-                <MenuItem onClick={() => <CreateWallet />}>Create Wallet</MenuItem>
+                {/* <MenuItem onClick={() => <CreateWallet />}>Create Wallet</MenuItem> */}
                 {/* Aquí renderizas el LogoutButton y defines que es el último */}
                 <MenuItem isLastItem>
                     <LogoutButton />

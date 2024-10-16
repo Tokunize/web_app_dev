@@ -160,7 +160,7 @@ export const OwnerDashboard = () => {
                         </p>
                     </CardContent>
                 </Card> */}
-            <div className="absolute w-1/2  top-[64px] md:top-[34px]">
+            <div className="absolute w-1/2  top-[64px] md:top-[0px]">
                 <FilterInput onFilterChange={handleFilterChange} filterValue={filterValue} />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">

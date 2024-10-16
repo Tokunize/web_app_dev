@@ -12,17 +12,34 @@ import { UserNavbar } from "./dashboard/useNavbar";
 
 export const Navbar = () => {
   const [scrollPosition, setScrollPosition] = useState(0);
-  const { isAuthenticated, getAccessTokenSilently, user } = useAuth0();
+  const { isAuthenticated, getAccessTokenSilently, user, isLoading } = useAuth0();
   const { role } = useUser();
+  const [isUserAuthenticated, setIsUserAuthenticated] = useState<boolean | null>(null);
 
-  // Handle scrolling for navbar background opacity
+  // Set scroll position to change navbar background opacity
   useEffect(() => {
     const handleScroll = () => setScrollPosition(window.scrollY);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Send user data to backend when authenticated
+  // Sync user authentication status with localStorage to avoid delay
+  useEffect(() => {
+    const storedAuthStatus = localStorage.getItem("isAuthenticated");
+    if (storedAuthStatus) {
+      setIsUserAuthenticated(JSON.parse(storedAuthStatus));
+    }
+
+    if (isAuthenticated) {
+      localStorage.setItem("isAuthenticated", JSON.stringify(true));
+      setIsUserAuthenticated(true);
+    } else {
+      localStorage.removeItem("isAuthenticated");
+      setIsUserAuthenticated(false);
+    }
+  }, [isAuthenticated]);
+
+  // Sync user data with backend when authenticated
   useEffect(() => {
     const syncUserWithBackend = async (email: string, name: string, role: string) => {
       try {
@@ -33,46 +50,31 @@ export const Navbar = () => {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            email,
-            name,
-            role,
-          }),
+          body: JSON.stringify({ email, name, role }),
         });
 
         const responseBody = await response.json();
-        
-        localStorage.setItem("id",responseBody.id )
+        localStorage.setItem("id", responseBody.id);
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-
       } catch (error) {
         console.error("Error syncing user with backend:", error);
       }
     };
 
-    // If the user is authenticated and user object is available
     if (isAuthenticated && user) {
-      const email = user.email || '';
-      const name = user.name || '';
-      const userRole = role || '';
+      const email = user.email || "";
+      const name = user.name || "";
+      const userRole = role || "";
 
-      // Call the function to sync user data with backend
       syncUserWithBackend(email, name, userRole);
     }
   }, [isAuthenticated, user, role, getAccessTokenSilently]);
 
-  const renderAuthenticatedLinks = useMemo(() => {
-    // return <Link to="/dashboard">Dashboard</Link>;
-    return <UserNavbar/>
-  }, []);
-  const renderAuthenticatedLinksMobiles = useMemo(() => {
-    return <Link to="/dashboard">Dashboard</Link>;
-  }, []);
-  
   const navbarClasses = useMemo(
     () =>
       `h-14 flex items-center justify-between sticky top-0 z-50 bg-white/${
@@ -89,16 +91,16 @@ export const Navbar = () => {
 
       <div className="hidden md:flex items-center space-x-4 mr-10">
         <Link to="/blog/">Learn</Link>
-        {isAuthenticated ? (
+        {isUserAuthenticated === true ? (  // Verificar si está autenticado desde el localStorage
           <>
-            {renderAuthenticatedLinks}
+            <UserNavbar />
           </>
-        ) : (
+        ) : isUserAuthenticated === false && !isLoading ? (  // Si no está autenticado y no está cargando
           <>
-            <Link to="sign-up/">Sign Up</Link>
+            <Link to="/sign-up/">Sign Up</Link>
             <LoginButton />
           </>
-        )}
+        ) : null}  {/* Mientras carga, no muestra nada */}
       </div>
 
       <div className="md:hidden mr-5">
@@ -112,17 +114,17 @@ export const Navbar = () => {
             <div className="flex flex-col space-y-4">
               <Link to="/">Home</Link>
               <Link to="/blog/">Learn</Link>
-              {isAuthenticated ? (
+              {isUserAuthenticated === true ? (
                 <>
-                  {renderAuthenticatedLinksMobiles}
+                  <Link to="/dashboard/">Dashboard</Link>
                   <LogoutButton />
                 </>
-              ) : (
+              ) : isUserAuthenticated === false && !isLoading ? (
                 <>
                   <Link to="/sign-up">Sign Up</Link>
                   <LoginButton />
                 </>
-              )}
+              ) : null}
             </div>
           </SheetContent>
         </Sheet>

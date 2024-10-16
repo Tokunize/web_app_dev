@@ -55,7 +55,7 @@ export const Porfolio: React.FC = () => {
         )}
       </div>
 
-      <div className="absolute  top-[64px] md:top-[34px] w-1/2 ">
+      <div className="absolute  top-[64px] md:top-[0px] w-1/2 ">
         <FilterInput
           filterValue={searchTerm} 
           onFilterChange={setSearchTerm} 

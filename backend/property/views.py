@@ -40,6 +40,7 @@ from .filters import PropertyFilter
 from users.authentication import Auth0JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny,BasePermission
 from notifications.models import ActivityLog
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 def log_activity(event_type, involved_address, contract_address=None, payload=None):
@@ -73,6 +74,7 @@ class PropertyListView(APIView):
     authentication_classes = [Auth0JWTAuthentication]
     permission_classes = [IsAdminOrOwner]
 
+
     def get(self, request):
         print(request.user.email)
         user_role = getattr(request, 'user_role', None)
@@ -80,6 +82,7 @@ class PropertyListView(APIView):
         
         if user_role == 'admin':
             properties = Property.objects.all()
+
         elif user_role == 'owner':
             try:
                 profile = PropertyOwnerProfile.objects.get(user_id=user_id)
@@ -371,6 +374,8 @@ class TransactionListview(APIView):
             "Content-Type": "application/json",
             "Authorization": f"Bearer {settings.CIRCLE_API_KEY}"  # Use the API key from settings
         }
+
+
 
         try:
             response = requests.get(url, headers=headers)

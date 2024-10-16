@@ -8,8 +8,7 @@ interface FilterInputProps {
 
 export const FilterInput: React.FC<FilterInputProps> = ({ onFilterChange, filterValue }) => {
     return (
-        <div className="flex relative w-full items-center py-4">
-            {/* Filter by title */}
+        <div className="flex relative w-full items-center py-5">
             <Input
                 placeholder="Filter properties by title..."
                 value={filterValue} // Valor del filtro

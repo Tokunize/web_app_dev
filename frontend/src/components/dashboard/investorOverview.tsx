@@ -140,10 +140,10 @@ export const InvestorOverview = () => {
         </Card>
 
       <div className="flex gap-4 px-4 pb-4">
-        <Card className="shadow-none bg-red-500 w-2/3 border-0">
+        <Card className="shadow-none  w-1/2 border-0">
           <RiskOverview />
         </Card>
-        <Card className="w-1/3 border-0 shadow-none">
+        <Card className="w-1/2 border-0 shadow-none">
           <PerformanceGraph  
             description=""
             title={"S&P 500 Chart"}

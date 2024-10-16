@@ -24,9 +24,11 @@ const SideMenu: React.FC<SideMenuProps> = ({ data, onMenuClick }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<string | null | undefined>(null);
 
-  // Establecer el tab seleccionado en función de la ruta actual
+  // Establecer el tab seleccionadooo en función de la ruta actual
   useEffect(() => {
     setSelectedItem(location.pathname);
+    console.log(location.pathname);
+    
   }, [location.pathname]);
 
   const toggleMenu = () => {
