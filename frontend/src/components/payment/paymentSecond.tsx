@@ -22,14 +22,23 @@ export const PaymentSecond: React.FC<PaymentSecondProps> = ({
   const [amount, setAmount] = useState<string>(investmentAmount); // Use the prop value
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setAmount(value);
-    setInvestmentAmount(value); // Update the state in parent
+    const value = e.target.value.replace(/,/g, ""); // Remove commas for proper number handling
+    // Allow only numbers and decimal points
+    if (/^\d*\.?\d*$/.test(value) || value === "") {
+      setAmount(value);
+      setInvestmentAmount(value); // Update the state in parent
+    }
   };
 
-  const amountValue = parseFloat(amount);
+  const amountValue = parseFloat(amount) || 0; // Default to 0 if NaN
   const tokensPurchased = amountValue / tokenPrice;
-  const equityPercentage = (tokensPurchased / totalTokens) * 100;
+  const equityPercentage = totalTokens > 0 ? (tokensPurchased / totalTokens) * 100 : 0;
+
+  // Format amount for display
+  const formattedAmount = amountValue.toLocaleString('en-UK', {
+    style: 'currency',
+    currency: 'GBP',
+  });
 
   return (
     <article className="flex flex-col items-center space-y-4 p-4 border rounded-md w-full max-w-md">
@@ -41,11 +50,9 @@ export const PaymentSecond: React.FC<PaymentSecondProps> = ({
           value={amount}
           onChange={handleChange} // Use the new handler
           className="rounded-md w-full text-5xl text-center border-0 outline-none focus:ring-0"
-          placeholder="0"
+          placeholder="" // Placeholder is now empty
         />
       </div>
-
-      <p className="text-sm text-gray-500">Minimum amount required £ 1000</p>
 
       <div className="flex p-2 justify-between items-center w-[80%] mx-auto">
         <span className="flex items-center">
@@ -53,12 +60,12 @@ export const PaymentSecond: React.FC<PaymentSecondProps> = ({
           <span className="flex pl-2 flex-col">
             <span className="font-bold text-medium">Buy</span>
             <span className="text-sm">Token Price £ {tokenPrice}</span>
-            <span className="text-gray-500 text-sm">{tokensPurchased.toFixed(2)} Tokens</span>
+            <span className="text-gray-500 text-sm">{!isNaN(tokensPurchased) ? tokensPurchased.toFixed(2) : 0} Tokens</span>
           </span>
         </span>
 
         <div className="flex flex-col">
-          <span>£ {amount}</span>
+          <span>{formattedAmount}</span>
           <span className="text-gray-500 text-sm">{equityPercentage.toFixed(2)}% Equity</span>
         </div>
       </div>
