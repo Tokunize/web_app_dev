@@ -3,6 +3,7 @@ import { AssetsAccordion } from "./assetsAccordion";
 import { PieGraph } from "../graphs/pieGraph";
 import { LoadingSpinner } from "./loadingSpinner";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
+import { Card } from "../ui/card";
 
 interface Investment {
   first_image: string;
@@ -59,25 +60,21 @@ export const Assests = () => {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <div className="rounded-lg">
-      <div className="flex justify-between">
-        <h1 className="text-3xl font-bold mb-6 text-gray-800">
-          All Invested Properties
-        </h1>
-      </div>
-      <div className="grid lg:grid-cols-2 bg-white flex items-center rounded-lg">
-        <div className="space-y-3 text-left border rounded-lg ml-4 p-4">
-          <p className="text-gray-500 text-medium">Total Properties Owned</p>
-          <span className="text-2xl font-bold">{investments?.length}</span>
-          <p className="text-gray-500 text-medium">Projected Rental Yield</p>
-          <span className="text-2xl font-bold">12.6%</span>
-        </div>
-        <PieGraph
-          data={propertyChartData}
-          title="Property Types"
-          footerDescription="Showing total properties based on the property type"
-        />
-      </div>
+    <div className="rounded-lg px-4">
+      <Card className="grid lg:grid-cols-2 bg-white flex items-center justify-between rounded-lg">
+          <div className="space-y-3 text-left  ml-4 p-4">
+            <p className="text-gray-500 text-medium">Total Properties Owned</p>
+            <span className="text-2xl font-bold">{investments?.length}</span>
+            <p className="text-gray-500 text-medium">Projected Rental Yield</p>
+            <span className="text-2xl font-bold">12.6%</span>
+          </div>
+          <PieGraph
+            data={propertyChartData}
+            title="Property Types"
+            footerDescription="Showing total properties based on the property type"
+          />
+      </Card>
+     
       <AssetsAccordion data={investments} />
     </div>
   );
