@@ -45,3 +45,15 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({ amountInUS
         </div>
     );
 };
+
+interface FormatCurrencyProps {
+    amount: number;
+  }
+  
+  export const FormatCurrency: React.FC<FormatCurrencyProps> = ({ amount }) => {
+    const formattedAmount = amount.toLocaleString('en-UK', {
+      style: 'currency',
+      currency: 'GBP',
+    });
+    return <>{formattedAmount}</>; 
+}

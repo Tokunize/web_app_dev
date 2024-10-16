@@ -87,7 +87,7 @@ export const InvestorOverview = () => {
             <CardTitle className="text-sm font-medium">Current Rent Balance</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$232,222</div>
+            <div className="text-2xl font-bold">£232,222</div>
             <p className="text-xs text-muted-foreground">+20.1% from last month</p>
           </CardContent>
         </Card>
@@ -97,7 +97,7 @@ export const InvestorOverview = () => {
             <CardTitle className="text-sm font-medium">Total Rental Income</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$898,322</div>
+            <div className="text-2xl font-bold">£898,322</div>
             <p className="text-xs text-muted-foreground">+0.4% from last month</p>
           </CardContent>
         </Card>

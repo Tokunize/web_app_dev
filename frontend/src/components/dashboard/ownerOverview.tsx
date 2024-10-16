@@ -14,6 +14,7 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { FilterInput } from "../filterInput";
+import { FormatCurrency } from "../currencyConverter";
 
 export const OwnerDashboard = () => {
     const [selectedProperty, setSelectedProperty] = useState<Asset | null>(null);
@@ -50,6 +51,8 @@ export const OwnerDashboard = () => {
         `${import.meta.env.VITE_APP_BACKEND_URL}property/properties/private/`,
         (data) => {
             setValueTokenized(data.total_value_tokenized);
+            console.log(typeof(data.total_value_tokenized));
+            
             setProperties(data.properties);
             setFilteredProperties(data.properties); // Inicializar propiedades filtradas
             if (data.properties.length > 0) {
@@ -182,7 +185,7 @@ export const OwnerDashboard = () => {
                         <div className="text-2xl font-bold">
                             {/* <CurrencyConverter amountInUSD={valueTokenized} /> */}
                             <p className="font-bold">
-                                £{valueTokenized?.toFixed(2) || 0.00} <br /> 
+                                <FormatCurrency amount={valueTokenized} />
                             </p>
                         </div>
                     </CardContent>
@@ -194,7 +197,7 @@ export const OwnerDashboard = () => {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">$15,231.89</div>
+                        <div className="text-2xl font-bold">£15,231.89</div>
                         <p className="text-xs text-muted-foreground">
                             +10.1% from last month
                         </p>
