@@ -9,8 +9,8 @@ from users.authentication import Auth0JWTAuthentication
 from decouple import config
 import uuid
 from django.conf import settings
-from rest_framework.views import APIView
 from users.models import CustomUser
+from rest_framework.views import APIView
 
 class CreateWalletAPIView(APIView):
     authentication_classes = [Auth0JWTAuthentication]
@@ -318,31 +318,69 @@ class CheckWalletBalance(APIView):
             return Response({"error": "Failed to retrieve balances."}, status=response.status_code)
 
 
-"""
-class CreateTranfersCircle(ApiView):
-    def post(self,request):
-        
-    apikey = settings.CIRCLE_API_KEY  # Asumiendo que usas settings para tu configuración
 
-    First inicitialize user sesion
-    circle apiUrl = ""
+class CreateTransfersCircle(APIView):
+    authentication_classes = [Auth0JWTAuthentication]
+    permission_classes = [AllowAny]
 
-    headers = {
-        "Content-Type" : "Application/json"
-        "Authorization": f"Bearer {self.apikey}"
-    }
+    def post(self, request, *args, **kwargs):
+        print("eeeeyyyyyyyy")
+        print(request.user.id)
+        # Definir URL para crear el user token
+        token_url = "https://api.circle.com/v1/w3s/users/token"
 
-    response = request.post(apiUrl, headers=headers)
+        # Encabezados para la solicitud de creación de token
+        headers = {
+            "Authorization": "Bearer TEST_API_KEY:1ab22a4b6d7bce416909d5a18a3c6600:d2317914305e75437353c243db46a89a",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "userId":"investor_01"
+        }
 
-    if response.status_code == 200:
-        received_data = response.json()
-        user_token = received_data.user_token
-        print(user_token)
-    else:
-        print("Error:", response.status_code, response.text)
-        return Response({"error": "Failed to retrieve balances."}, status=response.status_code)
-    
-    now,make here the request.post para crear la transferencia, usando el user_token que se ha obtenido desde la request que se ha echo 
+        # Realizar la solicitud para obtener el user token
+        token_response = requests.post(token_url,json=payload, headers=headers)
 
-    
-"""
+        if token_response.status_code == 200 :
+            received_data = token_response.json()
+            user_token = received_data.get("data", {}).get("userToken")
+            encryption_key = received_data.get("data", {}).get("encryptionKey")
+
+            # Comprobar que se ha recibido el token
+            if not user_token or not encryption_key:
+                return Response({"error": "User token or encryption key not found."}, status=400)
+
+            idempotency_key = str(uuid.uuid4())  # UUID con guiones, formato estándar
+            print(idempotency_key)
+
+            # Crear transferencia usando el user token
+            transfer_url = "https://api.circle.com/v1/w3s/user/transactions/transfer"
+            payload = {
+                "idempotencyKey": idempotency_key,  # Cambia por un valor único
+                "destinationAddress": "0x2F2E692f867DBb38e2F5d75629D2BE2a26fC9AFd",
+                "feeLevel": "LOW",
+                "tokenId": "5797fbd6-3795-519d-84ca-ec4c5f80c3b1",
+                "walletId": "8a764844-b75c-50b5-9479-cf9e1275329c",
+                "amounts": ["1"]
+            }
+
+            transfer_headers = {
+                "X-User-Token": user_token,  # Usar el user_token obtenido
+                "Authorization": f"Bearer {settings.CIRCLE_API_KEY}",  # Asumiendo que usas un settings para tu API Key
+                "Content-Type": "application/json"
+            }
+
+            # Realizar la solicitud para crear la transferencia
+            transfer_response = requests.post(transfer_url, json=payload, headers=transfer_headers)
+
+            if transfer_response.status_code == 201:
+                transfer_data = transfer_response.json()
+                challenge_id = transfer_data.get("data", {}).get("challengeId")  # Obtener el challengeId
+                return Response({"challengeId": challenge_id , "userToken":user_token , "encryptionKey": encryption_key}, status=200)
+            else:
+                return Response({"error": "Failed to create transfer.", "details": transfer_response.text}, status=transfer_response.status_code)
+
+        else:
+            return Response({"error": "Failed to retrieve user token.", "details": token_response.text}, status=token_response.status_code)
+
+

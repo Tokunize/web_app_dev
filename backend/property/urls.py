@@ -11,7 +11,8 @@ from .views import (
     SinglePropertyTransactionListView,
     UserInvestmentSummaryAPIView,
     PropertyStatusUpdateView,
-    PublicSinglePropertyTransactionListView
+    PublicSinglePropertyTransactionListView,
+    PropertyUpdateListView
 )
 
 urlpatterns = [
@@ -23,7 +24,6 @@ urlpatterns = [
     path('<int:pk>/', PropertyDetailView.as_view(), name='property-detail'),
 
     path('properties/<int:propertyId>/status/', PropertyStatusUpdateView.as_view(), name='property-status-update'),
-
     
     # Property filtering and unique values
     path('properties/filter/', PropertyFilterView.as_view(), name='property-filter'),
@@ -40,5 +40,8 @@ urlpatterns = [
     path('investment-summary/', UserInvestmentSummaryAPIView.as_view(), name='user-investment-summary'),
 
     #GET ALL THE PROPERTIES ONE INVESTOR INVESTED
-    path('investment/', InvestedProperties.as_view(), name='invested-properties')
+    path('investment/', InvestedProperties.as_view(), name='invested-properties'),
+
+    #CREATE PROPERTY UPDATE URL - POST
+    path('updates/create/', PropertyUpdateListView.as_view(), name='updates-create')
 ]

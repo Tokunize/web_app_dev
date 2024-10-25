@@ -39,6 +39,7 @@ class Property(TimeStampedModel):
     bathrooms = models.IntegerField(help_text="Number of bathrooms in the property, supporting whole numbers only.")
     price = models.DecimalField(max_digits=10, decimal_places=2, help_text="The sale or list price of the property.")
     location = models.CharField(max_length=255)
+    post_code = models.CharField(max_length=10, null=True, blank=True)
     country = models.CharField(max_length=100, null=True, blank=True, help_text="The country where the property is located.")
     property_type = models.CharField(max_length=100, help_text="The type of property, such as apartment, house, or commercial.")
     size = models.DecimalField(max_digits=6, decimal_places=2, help_text="Total interior square footage of the property.")
@@ -49,6 +50,7 @@ class Property(TimeStampedModel):
     vacancy_rate = models.DecimalField(blank=True, null=True, max_digits=5, decimal_places=2)
     rejection_reason = models.TextField(blank=True, null=True)  # Campo para el motivo de rechazo
 
+    investment_category =  models.CharField(blank=True, null=True)
     # admin fill form 
     image = ArrayField(models.URLField(max_length=500), blank=True, null=True, help_text="A list of URLs pointing to images of the property.")
     video_urls = ArrayField(models.URLField(max_length=500), blank=True, null=True, help_text="A list of URLs pointing to videos of the property.")
@@ -85,7 +87,18 @@ class Property(TimeStampedModel):
     def __str__(self):
         return self.title
 
+class PropertyUpdates(models.Model):
+    property = models.ForeignKey(Property,on_delete=models.CASCADE, related_name='updates', help_text="The property associated with this update." )
+    update_title = models.CharField(max_length=255, help_text="The title of the update")
+    update_date = models.DateTimeField(default=timezone.now, help_text="The date when the update occurred or was recorded.")
+    update_type = models.CharField(max_length=100, help_text="The type of update, e.g., repair, renovation, or general maintenance.")
+    update_cost = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, help_text="The cost associated with this update, if applicable.")
+    update_attachments = ArrayField(models.URLField(max_length=500), blank=True, null=True, help_text="A list of URLs pointing to images or documents related to the update.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return f"Update on {self.property.title}: {self.title}"
 
 class Token(models.Model):
     token_code = models.CharField(max_length=255, unique=True)
