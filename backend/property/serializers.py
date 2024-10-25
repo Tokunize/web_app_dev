@@ -2,7 +2,10 @@ from rest_framework import serializers
 from property.models import(
     Property,
     Token,
-    Transaction,PropertyToken,PropertyMetrics
+    Transaction,
+    PropertyToken,
+    PropertyMetrics,
+    PropertyUpdates
 )
 
 #SERIALZERS FOR TOKENS 
@@ -27,7 +30,7 @@ class PropertySerializerList(serializers.ModelSerializer):
                     'active','property_code',
                     'projected_annual_return', 'property_type', 'created_at',
                     'bedrooms', 'bathrooms', 'price', 'size', 'year_built',"ownershipPercentage",
-                    'country', 'description','amenities', 'tokens','vacancy_rate', 'tenant_turnover', "rejection_reason", "projected_rental_yield"
+                    'country', 'description','amenities', 'tokens','vacancy_rate', 'tenant_turnover', "rejection_reason", "projected_rental_yield", "investment_category" ,"post_code"
                 ]
         
 #SERIALZIZERS FOR SINGLE PORPERTY PAGE AND OVERVIEW, FINATIAL, DOCUMENTS, ACTIVITY AND IMAEGES
@@ -61,7 +64,8 @@ class PropertyOverviewSerializer(serializers.ModelSerializer):
             'video_urls',
             'property_type',
             'projected_annual_return',
-            'tokens'
+            'tokens',
+            'post_code'
         ]
 
 class PropertyFinancialsSerializer(serializers.ModelSerializer):
@@ -247,7 +251,11 @@ class InvestmentOverviewSerializer(serializers.ModelSerializer):
 
 
 class PropertyMetricsSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = PropertyMetrics
+        fields = '__all__'
+
+class PropertyUpdatesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PropertyUpdates
         fields = '__all__'

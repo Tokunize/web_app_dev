@@ -12,7 +12,7 @@ class Wallet(models.Model):
     wallet_id = models.CharField(max_length=100, unique=True)  # ID único de la wallet devuelto por Circle
     wallet_address = models.CharField(max_length=42, unique=True, validators=[wallet_address_validator])
     wallet_user_id = models.ForeignKey("users.customuser", on_delete=models.CASCADE)
-
+    wallet_user = models.CharField(max_length=20, unique=True, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

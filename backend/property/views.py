@@ -28,7 +28,8 @@ from .serializers import (
     InvestedPropertiesSerialier,
     InvestmentOverviewSerializer,
     PropertyMetricsSerializer,
-    UpdatePropertyStatusSerializer
+    UpdatePropertyStatusSerializer,
+    PropertyUpdatesSerializer
 )
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
@@ -61,7 +62,6 @@ def log_activity(event_type, involved_address, contract_address=None, payload=No
 
 class IsAdminOrOwner(BasePermission):
     def has_permission(self, request, view):
-        print(request.user.rol, "aquiiiiii")
         print(f"User Role: {getattr(request, 'user_role', None)}")  # Verifica el user_role
         if request.user_role== 'admin':
             return True
@@ -576,120 +576,37 @@ def session_status(request):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
-
-# class PropertyCreateUpdateView(APIView):
-#     authentication_classes = [Auth0JWTAuthentication]
-#     permission_classes = [IsAuthenticated]
-
-#     def post(self, request):
-#         data = request.data
-#         user_id = request.user.id
-#         try:
-#             owner_profile = PropertyOwnerProfile.objects.get(user_id=user_id)
-#             print(f"Owner Profile found: ID {owner_profile.id} for user ID {user_id}")
-#         except PropertyOwnerProfile.DoesNotExist:
-#             return Response({'error': f'Owner profile not found for user ID {user_id}.'}, status=404)
+class PropertyUpdateListView(APIView):
+    authentication_classes=[Auth0JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = PropertyUpdatesSerializer
+    
+    def post(self,request):
+        data = request.data
+        required_data = ["property_id", "update_title", "update_type", ]
+        for info in required_data:
+            if info not in data:
+                return Response({"Error": f"{info} shoud be in the body of the request"}, status=status.HTTP_400_BAD_REQUEST)
         
-#         data['owner_profile'] = owner_profile.id
-#         serializer = CreatePropertySerializer(data=data, context={'request': request})
-#         if serializer.is_valid():
-#             if 'owner' in request.user.rol:
-#                 print("User role: owner")
-#                 property_instance, created = Property.objects.update_or_create(
-#                     id=serializer.validated_data.get('id'),  # Usar el ID si está disponible
-#                     defaults={**serializer.validated_data, 'owner_profile': owner_profile, 'owner_fields_completed': True}
-#                 )
-                
-#                 property_serializer = PropertySerializerList(property_instance)
-                
-#                 return Response({
-#                     'message': 'Property data saved successfully. Awaiting admin review.',
-#                     'property': property_serializer.data  # Incluye la propiedad en la respuesta
-#                 }, status=200)
-#             return Response({'error': 'Only owners can create properties.'}, status=403)
-
-#         return Response(serializer.errors, status=400)
-
-#     def put(self, request):
-#         data = request.data
-#         user_id = request.user.id
-#         property_id = data.get('id')
-#         try:
-#             property_instance = Property.objects.get(id=property_id)
-#         except Property.DoesNotExist:
-#             return Response({'error': 'Property not found.'}, status=404)
-
-#         if 'admin' in request.user.rol:
-#             serializer = CreatePropertySerializer(property_instance, data=data, partial=True, context={'request': request})
-
-#             if serializer.is_valid():
-#                 for field in serializer.validated_data:
-#                     setattr(property_instance, field, serializer.validated_data[field])
-#                 property_instance.admin_fields_completed = True
-#                 property_instance.save()
-
-#                 return Response({'message': 'Property updated successfully by admin.'}, status=200)
-
-#             return Response(serializer.errors, status=400)
-
-#         # Si el usuario es propietario (owner)
-#         elif 'owner' in request.user.rol:
-#             try:
-#                 owner_profile = PropertyOwnerProfile.objects.get(user_id=user_id)
-#             except PropertyOwnerProfile.DoesNotExist:
-#                 return Response({'error': 'Owner profile is required for owners to update properties.'}, status=404)
-#             if property_instance.owner_profile != owner_profile:
-#                 return Response({'error': 'You can only update your own properties.'}, status=403)
-#             data['owner_profile'] = owner_profile.id
-#             if property_instance.admin_fields_completed:
-#                 return Response({'error': 'Admin fields are already completed. No further changes allowed.'}, status=400)
-#             serializer = CreatePropertySerializer(property_instance,  data=data, partial=True, context={'request': request})
-
-#             if serializer.is_valid():
-
-#                 for field in serializer.validated_data:
-#                     setattr(property_instance, field, serializer.validated_data[field])
-#                 property_instance.owner_fields_completed = True  # Se puede ajustar según la lógica que quieras aplicar
-#                 property_instance.save()
-
-#                 return Response({'message': 'Property updated successfully by owner.'}, status=200)
-
-#             return Response(serializer.errors, status=400)
-
-#         return Response({'error': 'Only admins or owners can update properties.'}, status=403)
-
-
-
-# class PropertyListView(APIView):
-#     permission_classes = [IsAdminOrOwner]
-
-#     def get(self, request):
-#         user_role = getattr(request, 'user_role', None)
-#         user_id = request.user.id
+        property_id = data.get("property_id")
+        try:
+            selected_property = Property.objects.get(id=property_id)
+            update_serializer = self.serializer_class() 
+        except Property.DoesNotExist:
+            return Response({"Error": "The property does not exists"})
         
-#         if user_role == 'admin':
-#             properties = Property.objects.all()
-#         elif user_role == 'owner':
-#             try:
-#                 profile = PropertyOwnerProfile.objects.get(user_id=user_id)
-#             except PropertyOwnerProfile.DoesNotExist:
-#                 return Response({'error': 'Profile not found'}, status=404)
+        property_update_data = {
+            "property": selected_property,
+            "update_title": data.get("updaxte_title"),  # Cambiar "updateTitle" a "update_title"
+            "update_type": data.get("update_type"),    # Cambiar "updateType" a "update_type"
+            "update_cost": data.get("update_cost"),     # Este campo puede ser nulo
+            "update_attachments": data.get("update_attachments", []),  # Inicializa con una lista vacía si es None
+        }
+        update_serializer = self.serializer_class(data=property_update_data)
+        if update_serializer.is_valid():
+            update_serializer.save()
+            return Response(update_serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(update_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#             # Obtener todas las propiedades del propietario
-#             properties = Property.objects.filter(owner_profile=profile.id)
-#         else:
-#             return Response({'error': 'Unauthorized'}, status=401)
-
-#         # Filtrar las propiedades publicadas para el cálculo de la suma de precios
-#         published_properties = properties.filter(status='published')
-
-#         # Calcular la suma del precio de las propiedades publicadas
-#         total_price = published_properties.aggregate(total_price=Sum('price'))['total_price'] or 0
-
-#         # Serializar todas las propiedades del propietario
-#         serializer = PropertySerializerList(properties, many=True)
-
-#         return Response({
-#             'total_value_tokunized': total_price,
-#             'properties': serializer.data
-#         })
+        
