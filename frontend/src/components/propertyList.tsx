@@ -38,10 +38,7 @@ export const PropertyList: React.FC = () => {
         
         const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/properties/public/`;
         const response = await axios.get(apiUrl);
-        console.log(response.data);
-        console.log(apiUrl);
         
-
         const pusblisedProperties = response.data.filter((property) => property.status === "published" || property.status === "coming_soon")
         setProperties(pusblisedProperties);
       } catch (err) {
@@ -105,6 +102,7 @@ export const PropertyList: React.FC = () => {
               createdDay={property.created_at}
               status={property.status}
               tokens_available={property.tokens[0].tokens_available}
+              investment_category={property.investment_category}
             />
           ))}
         </div>

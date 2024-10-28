@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { PropertyAccordion } from "@/components/propertyAccordion";
 import { PurchaseForm } from "@/components/forms/buyPropertyForm";
-import { useUser } from "@/context/userProvider";
 import { BackButton } from "@/components/buttons/backButton";
 import { LoadingSpinner } from "@/components/dashboard/loadingSpinner";
 import shareIcon from "../assets/Share.png";
@@ -25,8 +24,10 @@ export const SingleProperty: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [tokenPrice, setTokenPrice] = useState<number>(0);
   const [anuReturns, setAnuReturns] = useState<number>(0);
-  const { role } = useUser();
   const { id } = useParams<{ id: string }>();
+  
+  // Convertir el ID a número, asegurando que no sea null
+  const numericId = id ? parseInt(id, 10) : undefined; // Cambia null a undefined
 
   const backendUrl = import.meta.env.VITE_APP_BACKEND_URL;
 
@@ -66,8 +67,13 @@ export const SingleProperty: React.FC = () => {
 
   if (error) return <div>{error}</div>;
 
+  // Asegurarse de que numericId no sea undefined o NaN
+  if (numericId === undefined || isNaN(numericId)) {
+    return <div>Invalid property ID</div>; // Manejar caso de ID inválido
+  }
+
   return (
-    <section className="md:px-[80px]">
+    <section className="px-[20px] md:px-[60px]">
       <div className="flex justify-between items-center md:py-[20px]">
         <BackButton />
         <Button variant="outline" className="flex items-center space-x-2">
@@ -77,72 +83,69 @@ export const SingleProperty: React.FC = () => {
       </div>
 
       <div className="flex flex-row h-[580px] gap-4">
-  {/* Primera imagen */}
-  <div className="w-1/2 flex justify-center items-center h-full">
-    {isDataLoaded && propertyImages[0] && (
-      <img
-        src={propertyImages[0]}
-        alt="First Property Image"
-        className="object-cover w-full h-full rounded-tl-xl rounded-bl-xl"
-      />
-    )}
-  </div>
-
-  {/* Galería de imágenes en la segunda columna */}
-  <div className="w-1/2 grid grid-cols-2 grid-rows-2 gap-4 h-full">
-    {propertyImages.length > 1 && (
-      <>
-        {/* Imagen de la derecha, fila 1, columna 1 */}
-        <div className="h-[100%] cover rounded-tr-xl">
-          <img
-            src={propertyImages[1]}
-            alt="Property Image 2"
-            className="w-full h-full object-cover"
-          />
+        {/* Primera imagen */}
+        <div className="w-1/2 flex justify-center items-center h-full">
+          {isDataLoaded && propertyImages[0] && (
+            <img
+              src={propertyImages[0]}
+              alt="First Property Image"
+              className="object-cover w-full h-full rounded-tl-xl rounded-bl-xl"
+            />
+          )}
         </div>
 
-        {/* Imagen de la derecha, fila 1, columna 2 */}
-        <div className="h-[100%] cover">
-          <img
-            src={propertyImages[2]}
-            alt="Property Image 3"
-            className="w-full h-full object-cover rounded-tr-xl"
-          />
+        {/* Galería de imágenes en la segunda columna */}
+        <div className="w-1/2 grid grid-cols-2 grid-rows-2 gap-4 h-full">
+          {propertyImages.length > 1 && (
+            <>
+              {/* Imagen de la derecha, fila 1, columna 1 */}
+              <div className="h-[100%] cover rounded-tr-xl">
+                <img
+                  src={propertyImages[1]}
+                  alt="Property Image 2"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              {/* Imagen de la derecha, fila 1, columna 2 */}
+              <div className="h-[100%] cover">
+                <img
+                  src={propertyImages[2]}
+                  alt="Property Image 3"
+                  className="w-full h-full object-cover rounded-tr-xl"
+                />
+              </div>
+
+              {/* Imagen de la derecha, fila 2, columna 1 */}
+              <div className="h-[100%] cover">
+                <img
+                  src={propertyImages[3]}
+                  alt="Property Image 4"
+                  className="w-full h-full object-cover "
+                />
+              </div>
+
+              {/* Imagen de la derecha, fila 2, columna 2 */}
+              <div className="h-[100%] cover rounded-br-xl">
+                <img
+                  src={propertyImages[4]}
+                  alt="Property Image 5"
+                  className="w-full h-full object-cover rounded-br-xl"
+                />
+              </div>
+            </>
+          )}
         </div>
+      </div>
 
-        {/* Imagen de la derecha, fila 2, columna 1 */}
-        <div className="h-[100%] cover">
-          <img
-            src={propertyImages[3]}
-            alt="Property Image 4"
-            className="w-full h-full object-cover "
-          />
+      <div className="flex space-x-[40px] justify-between mt-8">
+        <div className="md:w-2/3">
+          {/* Asegúrate de que numericId no sea null o undefined */}
+          {numericId && <PropertyAccordion property_id={numericId} />}
         </div>
-
-        {/* Imagen de la derecha, fila 2, columna 2 */}
-        <div className="h-[100%] cover rounded-br-xl">
-          <img
-            src={propertyImages[4]}
-            alt="Property Image 5"
-            className="w-full h-full object-cover rounded-br-xl"
-          />
-        </div>
-      </>
-    )}
-  </div>
-</div>
-
-
-
-
-      <div className="flex justify-between mt-8">
-        <div className="md:w-[65%]">
-          {id && <PropertyAccordion property_id={id} />}
-        </div>
-        <div className="md:w-[30%]">
+        <div className="md:w-1/3">
           <PurchaseForm
-            property_id={id}
-            role={role}
+            property_id={numericId}
             tokenPrice={tokenPrice}
             projected_annual_return={anuReturns}
           />

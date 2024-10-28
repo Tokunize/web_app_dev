@@ -1,9 +1,15 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(),
+    visualizer({
+      filename: './stats.html', // Archivo donde se genera el análisis
+      open: true, // Abre el reporte automáticamente al generar el bundle
+    }),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

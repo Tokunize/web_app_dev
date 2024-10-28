@@ -2,41 +2,42 @@ import React from 'react';
 import { PaymentFlow } from '../payment/paymentFlow';
 import { useUser } from '@/context/userProvider';
 import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover'; // Asegúrate de tener un componente Popover para mostrar el mensaje.
+import { TokenPriceGraph } from '../graphs/tokenPriceGraph';
+import { FormatCurrency } from '../currencyConverter';
 
 interface PurchaseFormProps {
   tokenPrice: number;
   projected_annual_return: number;
-  property_id: string;
+  property_id: number;
 }
 
 export const PurchaseForm: React.FC<PurchaseFormProps> = ({
     tokenPrice,
     projected_annual_return,
-    property_id
+    property_id,
   }) => {
     const { role } = useUser(); // Obtener el rol del usuario
     const canInvest = role === 'investor'; // Validar si el usuario puede invertir
     const isLoggedIn = !!role; // Verificar si el usuario ha iniciado sesión
 
     return (
-      <section className="sticky top-0 py-4">
+      <section className="sticky w-full space-y-4 top-0 py-4">
         <div
           className="space-y-4 border rounded-lg p-4"
           style={{ boxShadow: "0px 0px 13px 0px #00000014" }}
         >
           <div className="space-y-2">
             <div className="flex items-center">
-              <span className="font-semibold text-2xl w-[45%]">£{tokenPrice}</span>
-              <p className="font-xs text-gray-700">per token</p>
+              <span className="font-semibold text-2xl w-[45%]"><FormatCurrency amount={tokenPrice} /></span>
+              <p className="text-sm md:text-lg text-gray-700">per token</p>
             </div>
             <div className="flex items-center">
               <span className="font-semibold text-2xl w-[45%]">{projected_annual_return}%</span>
-              <p className="font-xs text-gray-700">est. annual return</p>
+              <p className="text-sm  md:text-lg text-gray-700">Projected annual return</p>
             </div>
           </div>
 
           {canInvest ? (
-            // Si el usuario es un inversor, mostrar PaymentFlow
             <PaymentFlow property_id={property_id} />
           ) : (
             // Si no es inversor o no ha iniciado sesión, mostrar Popover
@@ -56,6 +57,7 @@ export const PurchaseForm: React.FC<PurchaseFormProps> = ({
             </Popover>
           )}
         </div>
+        <TokenPriceGraph tokenPrice={tokenPrice}/>
       </section>
     );
   };

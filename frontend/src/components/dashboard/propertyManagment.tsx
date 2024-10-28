@@ -1,8 +1,9 @@
 import { TabsComponent } from "../tabs";
-import { useState, useEffect, useMemo } from "react";
-import axios from "axios";
+import { useState, useMemo } from "react";
 import { MyAssetsTable } from "./myAssetsTable";
 import { Card } from "../ui/card";
+import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
+import { LoadingSpinner } from "./loadingSpinner";
 
 interface Property {
     image?: string[];
@@ -12,50 +13,25 @@ interface Property {
     price: number;
     status: string;
     id: number;
-    projected_rental_yield:number,
-    created_at: string
-
+    projected_rental_yield: number;
+    created_at: string;
 }
 
+
+
 export const PropertyManagement = () => {  
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
     const [properties, setProperties] = useState<Property[]>([]);
 
-    useEffect(() => {
-        const fetchProperties = async () => {
-            const accessToken = localStorage.getItem('accessToken');
-
-            if (!accessToken) {
-                setError('Access token not found in local storage');
-                setLoading(false);
-                return;
-            }
-
-            try {
-                setLoading(true);
-                const response = await axios.get(`${import.meta.env.VITE_APP_BACKEND_URL}property/properties/private/`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${accessToken}`
-                    }
-                });
-                
-                console.log(response.data.properties);
-                
-                const fetchedProperties: Property[] = response.data.properties;
-
-                setProperties(fetchedProperties);
-            } catch (err: any) {
-                console.error('Error fetching properties:', err);
-                setError(err.response?.data?.message || 'Failed to fetch properties');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchProperties();
-    }, []);
+    // Fetching properties
+    const { loading, error: fetchError } = useGetAxiosRequest<{
+        properties: Property[];  // Asegúrate de que la respuesta tiene la forma correcta
+    }>(
+        `${import.meta.env.VITE_APP_BACKEND_URL}property/properties/private/`,
+        (fetchedData) => {
+            // Se espera que fetchedData tenga una propiedad `properties` que es un array de Property
+            setProperties(fetchedData.properties);  // Establece las propiedades correctamente
+        }
+    );
 
     const underReviewProperties = useMemo(() => {
         return properties.filter(property => property.status === "under_review");
@@ -206,11 +182,11 @@ export const PropertyManagement = () => {
     ];
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <LoadingSpinner/>;
     }
 
-    if (error) {
-        return <div>Error: {error}</div>;
+    if (fetchError) {
+        return <div>Error: {fetchError}</div>;
     }
 
     return (

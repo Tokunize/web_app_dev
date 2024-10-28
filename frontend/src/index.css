@@ -90,10 +90,10 @@
   list-style-type: disc; 
   padding-left: 50px; 
 }
-
+/* 
 .custom-landing-carousel .group {
   display: none;
-} 
+}  */
 
 #addPropertyModal{
   display: flex !important;

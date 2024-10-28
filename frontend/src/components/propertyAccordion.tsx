@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import useFetchPropertyDetails from './property/getDetailsHook';
 import { Documents } from './documents';
 import { Activity } from './activity';
-import { Finantial } from './finantial';
+import { Finantial } from './financial';
 import { Overview } from './overview';
 
 interface PropertyAccordionProps {
@@ -37,13 +37,13 @@ export const PropertyAccordion: React.FC<PropertyAccordionProps> = ({ property_i
           className={`p-2 border-b-2 transition-all ease-in-out duration-300 ${activeIndex === 1 ? 'border-black' : 'border-transparent'}`}
           onClick={() => handleClick(1)}
         >
-          Activity
+          Financial
         </button>
         <button
           className={`p-2 border-b-2 transition-all ease-in-out duration-300 ${activeIndex === 2 ? 'border-black' : 'border-transparent'}`}
           onClick={() => handleClick(2)}
         >
-          Financial
+          Activity
         </button>
         <button
           className={`p-2 border-b-2 transition-all ease-in-out duration-300 ${activeIndex === 3 ? 'border-black' : 'border-transparent'}`}
@@ -59,10 +59,11 @@ export const PropertyAccordion: React.FC<PropertyAccordionProps> = ({ property_i
           <Overview/>
         )}
         {activeIndex === 1 && (
-          <Activity data={data} property_id={property_id} />
+          <Finantial data={data} loading={loading} error={error} />
         )}
         {activeIndex === 2 && (
-          <Finantial data={data} loading={loading} error={error} />
+          <Activity data={data} property_id={property_id} />
+
         )}
         {activeIndex === 3 && (
           <Documents />

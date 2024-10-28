@@ -1,9 +1,8 @@
 "use client"
 
 import { FC } from "react"
-import { TrendingUp } from "lucide-react"
-import { CartesianGrid, Line, LineChart, XAxis, Brush, Tooltip } from "recharts"
-
+import { CartesianGrid, Area, AreaChart, XAxis } from "recharts"
+import { FormatCurrency } from "../currencyConverter"
 import {
   Card,
   CardContent,
@@ -14,6 +13,7 @@ import {
   ChartConfig,
   ChartContainer,
   ChartTooltipContent,
+  ChartTooltip
 } from "@/components/ui/chart"
 
 interface ChartData {
@@ -47,26 +47,36 @@ export const TokenPriceGraph: FC<TokenPriceGraphProps> = ({ tokenPrice }) => {
     // Add more data as needed
   ]
 
+  // Corregido el tipo de las propiedades de las opciones
+  const options: Intl.DateTimeFormatOptions = { 
+    hour: 'numeric', 
+    minute: 'numeric', 
+    hour12: false, // Cambia a false para el formato de 24 horas
+    day: 'numeric', 
+    month: 'short', 
+    year: 'numeric' 
+  };
+
+  const formattedTime = timeNow.toLocaleString('en-GB', options);
+
   return (
     <Card style={{ boxShadow: "0px 0px 13px 0px #00000014" }}>
       <CardHeader>
-        {/* Adjusted to remove <div> inside <p> */}
         <span className="flex justify-between">
-          <span>Token Price</span>
-          <span>Past Month</span>
+          <span className="text-xs text-gray-500">Token Price</span>
+          <span className="text-xs text-gray-500">Past Month</span>
         </span>
-        <h3 className="text-[36px] font-bold text-black">£{tokenPrice}</h3>
+        <h3 className="text-[36px] font-bold text-black"><FormatCurrency amount={tokenPrice}/></h3>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <LineChart
+          <AreaChart
             accessibilityLayer
             data={chartData}
             margin={{
               left: 12,
               right: 12,
             }}
-            width={600}
           >
             <CartesianGrid vertical={false} />
             <XAxis
@@ -75,29 +85,24 @@ export const TokenPriceGraph: FC<TokenPriceGraphProps> = ({ tokenPrice }) => {
               axisLine={false}
               tickMargin={8}
               tickFormatter={(value) => value.slice(0, 3)}
-              padding={{ left: 20, right: 20 }}
             />
-            <Tooltip
+            <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent hideLabel />}
+              content={<ChartTooltipContent indicator="dot" hideLabel />}
             />
-            <Line
+            <Area
               dataKey="desktop"
               type="linear"
+              fill="var(--color-desktop)"
+              fillOpacity={0.4}
               stroke="var(--color-desktop)"
-              strokeWidth={2}
-              dot={false}
             />
-            <Brush dataKey="month" height={30} stroke="var(--color-desktop)" />
-          </LineChart>
+          </AreaChart>
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Last updated: {timeNow.toLocaleString()}
+        <div className="leading-none text-xs  text-muted-foreground">
+          Last updated: {formattedTime}
         </div>
       </CardFooter>
     </Card>
