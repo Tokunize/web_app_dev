@@ -169,7 +169,7 @@ class ConditionalPermissionMixin:
         return [IsAuthenticated()]
 
 class PropertyDetailView(ConditionalPermissionMixin, APIView):
-    authentication_classes = [AllowAny]
+    permission_classes = [AllowAny]
     
     def get(self, request, pk):
         try:
