@@ -86,6 +86,9 @@ class Property(TimeStampedModel):
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        ordering = ['-created_at']
     
 class PropertyUpdates(models.Model):
     property = models.ForeignKey(Property,on_delete=models.CASCADE, related_name='updates', help_text="The property associated with this update." )

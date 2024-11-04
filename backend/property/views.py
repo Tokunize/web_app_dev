@@ -207,8 +207,9 @@ class PropertyDetailLandingPage(APIView):
     permission_classes=[AllowAny]
 
     def get(self, request, pk):
+        
         try:
-            property = Property.objects.get(pk=pk)
+            property = Property.objects.filter(pk=pk)
         except Property.DoesNotExist:
             return Response({'detail': 'Property not found'}, status=404)
         
@@ -656,6 +657,7 @@ class MarketplaceListView(APIView):
     serializer_class = MarketplaceListViewSerializer
 
     def get(self,request):
-        properties = Property.objects.exclude(status__in=["under_review", "rejected"])
+        ids = [64,65,66]
+        properties = Property.objects.filter(pk__in=ids).exclude(status__in=["under_review", "rejected"])
         serializer = self.serializer_class(properties, many=True)
         return Response(serializer.data)
