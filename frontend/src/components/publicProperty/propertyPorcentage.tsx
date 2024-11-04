@@ -19,34 +19,41 @@ export const PropertyValue: React.FC<PropertyValueProps> = ({
     const [showPercentageSymbol, setShowPercentageSymbol] = React.useState<boolean>(false);
     const { toast } = useToast();
 
-    // Manejar cambio en el input de valor de mercado y formatear la cantidad ingresada
+    // Handle changes in the market value input and format the input without commas
     const handleMarketValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let value = e.target.value.replace(/,/g, ""); // Quitar las comas
-        if (/^\d*\.?\d*$/.test(value)) { // Permitir solo números con o sin decimales
+        let value = e.target.value.replace(/,/g, ""); // Remove commas
+        if (/^\d*\.?\d*$/.test(value)) { // Allow only numbers with or without decimals
             setMarketValue(value);
         }
     };
 
-    // Formatear el valor cuando se pierde el foco (blur)
+    // Format the value on blur (losing focus)
     const handleMarketValueBlur = () => {
         if (marketValue) {
             const formattedValue = parseFloat(marketValue).toLocaleString('en-UK', {
-                style: 'currency',
-                currency: 'GBP',
-            }).replace('£', ''); // Formatear como moneda sin el símbolo de la libra
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            });
             setMarketValue(formattedValue);
         }
         setShowPoundSymbol(true);
     };
 
-    // Manejar cambio en el input de porcentaje de propiedad
+    // Handle ownership percentage input and validate between 1-100
     const handleOwnershipChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
-        if (/^\d*$/.test(value)) { // Solo permitir números enteros
-            if (parseInt(value) > 100) {
+        if (/^\d*$/.test(value)) { // Only allow whole numbers
+            const parsedValue = parseInt(value) || 0;
+            if (parsedValue > 100) {
                 toast({
                     title: "Invalid Ownership Percentage",
                     description: "You cannot enter more than 100%.",
+                    variant: "destructive",
+                });
+            } else if (parsedValue < 1) {
+                toast({
+                    title: "Invalid Ownership Percentage",
+                    description: "Ownership percentage must be at least 1%.",
                     variant: "destructive",
                 });
             } else {
@@ -62,10 +69,10 @@ export const PropertyValue: React.FC<PropertyValueProps> = ({
                 <Input
                     value={marketValue}
                     onChange={handleMarketValueChange}
-                    onBlur={handleMarketValueBlur} // Formatear cuando se pierda el foco
-                    onFocus={() => setShowPoundSymbol(false)} // Ocultar símbolo al enfocar
+                    onBlur={handleMarketValueBlur} // Format on blur
+                    onFocus={() => setShowPoundSymbol(false)} // Hide symbol on focus
                     className="max-w-xs text-center border-0 mr-2 text-3xl font-bold"
-                    placeholder="0" // Mostrar 0 solo cuando no hay valor
+                    placeholder="0" // Display 0 only when there's no value
                 />
                 {showPoundSymbol && <span className="text-3xl font-bold">£</span>}
             </div>
@@ -75,11 +82,10 @@ export const PropertyValue: React.FC<PropertyValueProps> = ({
                 <Input
                     value={ownershipPercentage}
                     onChange={handleOwnershipChange}
-                    onBlur={() => setShowPercentageSymbol(true)} // Mostrar símbolo de porcentaje al perder el foco
-                    onFocus={() => setShowPercentageSymbol(false)} // Ocultar símbolo de porcentaje al enfocar
+                    onBlur={() => setShowPercentageSymbol(true)} // Show percentage symbol on blur
+                    onFocus={() => setShowPercentageSymbol(false)} // Hide symbol on focus
                     className="max-w-xs text-center border-0 mr-2 text-3xl font-bold"
                     placeholder="0"
-                    max="100"
                 />
                 {showPercentageSymbol && <span className="text-3xl font-bold">%</span>}
             </div>

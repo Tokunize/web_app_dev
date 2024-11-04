@@ -18,14 +18,14 @@ import {
 
 // Define available property types
 const propertyTypes = [
-    { value: "apartment", label: "Apartment" },
-    { value: "house", label: "House" },
-    { value: "condo", label: "Condo" },
-    { value: "townhouse", label: "Townhouse" },
-    { value: "villa", label: "Villa" },
-    { value: "land", label: "Land" },
-    { value: "commercial", label: "Commercial" },
-    { value: "industrial", label: "Industrial" },
+    { value: "Apartment", label: "Apartment" },
+    { value: "Multifamily", label: "Multifamily" },
+    { value: "Offices", label: "Offices" },
+    { value: "Townhouse", label: "Townhouse" },
+    { value: "Villa", label: "Villa" },
+    { value: "Land", label: "Land" },
+    { value: "Commercial", label: "Commercial" },
+    { value: "Industrial", label: "Industrial" },
 ];
 
 // Component definition with props for propertyType and setPropertyType
