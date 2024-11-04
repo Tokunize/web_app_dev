@@ -209,7 +209,7 @@ class PropertyDetailLandingPage(APIView):
     def get(self, request, pk):
         
         try:
-            property = Property.objects.filter(pk=pk)
+            property = Property.objects.get(pk=pk)
         except Property.DoesNotExist:
             return Response({'detail': 'Property not found'}, status=404)
         
