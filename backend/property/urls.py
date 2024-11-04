@@ -13,7 +13,8 @@ from .views import (
     PropertyStatusUpdateView,
     PublicSinglePropertyTransactionListView,
     PropertyUpdateListView,
-    MarketplaceListView
+    MarketplaceListView,
+    PropertyDetailLandingPage
 )
 
 urlpatterns = [
@@ -23,6 +24,8 @@ urlpatterns = [
 
     path('create/', PropertyCreateUpdateView.as_view(), name='property-create-update'),
     path('<int:pk>/', PropertyDetailView.as_view(), name='property-detail'),
+    path('<int:pk>/landing-page/', PropertyDetailLandingPage.as_view(), name='property-detail-landing-page'),
+
 
     path('properties/<int:propertyId>/status/', PropertyStatusUpdateView.as_view(), name='property-status-update'),
     

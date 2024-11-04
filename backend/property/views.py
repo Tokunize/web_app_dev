@@ -169,7 +169,7 @@ class ConditionalPermissionMixin:
         return [IsAuthenticated()]
 
 class PropertyDetailView(ConditionalPermissionMixin, APIView):
-    permission_classes = [AllowAny]
+    authentication_classes = [Auth0JWTAuthentication]
     
     def get(self, request, pk):
         try:
@@ -201,6 +201,43 @@ class PropertyDetailView(ConditionalPermissionMixin, APIView):
             return Response({'detail': 'Invalid view type'}, status=400)
         
         return Response(serializer.data)
+
+
+class PropertyDetailLandingPage(APIView):
+    permission_classes=[AllowAny]
+
+    def get(self, request, pk):
+        try:
+            property = Property.objects.get(pk=pk)
+        except Property.DoesNotExist:
+            return Response({'detail': 'Property not found'}, status=404)
+        
+        view_type = request.query_params.get('view', 'overview')
+        
+        if view_type == 'overview':
+            serializer = PropertyOverviewSerializer(property)
+        elif view_type == 'images':
+            serializer = PropertyImagesSerializer(property)
+        elif view_type == 'financial':
+            serializer = PropertyFinancialsSerializer(property)
+        elif view_type == 'all':
+            serializer = AllDetailsPropertySerializer(property)
+        elif view_type == 'activity':
+            serializer = PropertyFinancialsSerializer(property)
+        elif view_type == 'payment':
+            property_serializer = PropertyTokenPaymentSerializer(property)
+            financials_serializer = PropertyFinancialsSerializer(property)
+            
+            data = property_serializer.data
+            data['financials_details'] = financials_serializer.data
+
+            return Response(data)
+        else:
+            return Response({'detail': 'Invalid view type'}, status=400)
+        
+        return Response(serializer.data)
+
+
 
 class PropertyFilterView(generics.ListAPIView):
     queryset = Property.objects.all()
