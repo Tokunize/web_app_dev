@@ -44,7 +44,7 @@ class Property(TimeStampedModel):
     property_type = models.CharField(max_length=100, help_text="The type of property, such as apartment, house, or commercial.")
     size = models.DecimalField(max_digits=6, decimal_places=2, help_text="Total interior square footage of the property.")
     year_built = models.IntegerField(help_text="The year in which the property was originally constructed.")
-    
+        
     ownershipPercentage = models.IntegerField(blank=True, null=True)
     tenant_turnover = models.DecimalField(blank=True, null=True,max_digits=5, decimal_places=2,)
     vacancy_rate = models.DecimalField(blank=True, null=True, max_digits=5, decimal_places=2)
@@ -86,7 +86,7 @@ class Property(TimeStampedModel):
 
     def __str__(self):
         return self.title
-
+    
 class PropertyUpdates(models.Model):
     property = models.ForeignKey(Property,on_delete=models.CASCADE, related_name='updates', help_text="The property associated with this update." )
     update_title = models.CharField(max_length=255, help_text="The title of the update")

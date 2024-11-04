@@ -29,7 +29,8 @@ from .serializers import (
     InvestmentOverviewSerializer,
     PropertyMetricsSerializer,
     UpdatePropertyStatusSerializer,
-    PropertyUpdatesSerializer
+    PropertyUpdatesSerializer,
+    MarketplaceListViewSerializer
 )
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
@@ -69,6 +70,7 @@ class IsAdminOrOwner(BasePermission):
             return True
         return False
     
+
 
 class PropertyListView(APIView):
     authentication_classes = [Auth0JWTAuthentication]
@@ -158,7 +160,7 @@ class PublicPropertyList(APIView):
         serializer = PropertySerializerList(properties, many=True)        
         return Response(serializer.data)
     
-
+    
 class ConditionalPermissionMixin:
     def get_permissions(self):
         view_type = self.request.query_params.get('view', 'overview')
@@ -167,7 +169,7 @@ class ConditionalPermissionMixin:
         return [IsAuthenticated()]
 
 class PropertyDetailView(ConditionalPermissionMixin, APIView):
-    authentication_classes = [Auth0JWTAuthentication]
+    authentication_classes = [AllowAny]
     
     def get(self, request, pk):
         try:
@@ -610,3 +612,13 @@ class PropertyUpdateListView(APIView):
         return Response(update_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         
+
+#VIEW IMPROVED MARKETPLACE LIST VIEW PROPERTY
+class MarketplaceListView(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = MarketplaceListViewSerializer
+
+    def get(self,request):
+        properties = Property.objects.exclude(status__in=["under_review", "rejected"])
+        serializer = self.serializer_class(properties, many=True)
+        return Response(serializer.data)

@@ -13,3 +13,4 @@ export interface Asset {
     price:string;
     projected_annual_return:string;
 }
+

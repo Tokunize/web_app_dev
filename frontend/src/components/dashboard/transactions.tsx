@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { TransactionTable } from "../transactionsTable";
 import { DatePickerWithRange } from "./DatePickerRange";
@@ -6,6 +5,8 @@ import { Download } from "lucide-react";
 import { CurrencyConverter } from "../currencyConverter";
 import { AddFundsFlow } from "../funds/addFundsFlow";
 import { Button } from "@/components/ui/button";
+import axios from "axios";
+import { useAuth0 } from "@auth0/auth0-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LoadingSpinner } from "./loadingSpinner";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
+import { ConfirmPin } from "./confirmPin";
 
 type Transaction = {
   id: number;
@@ -34,6 +36,13 @@ export const Transaction = () => {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [balance, setBalance] = useState<number>(0);
+  
+  // Añadir estados para almacenar los datos del token, clave de encriptación y ID de desafío
+  const [userToken, setUserToken] = useState<string | null>(null);
+  const [encryptionKey, setEncryptionKey] = useState<string | null>(null);
+  const [challengeId, setChallengeId] = useState<string | null>(null);
+  
+  const { getAccessTokenSilently } = useAuth0();
 
   // Use the custom hook to fetch transactions
   const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/transactions/`;
@@ -41,7 +50,7 @@ export const Transaction = () => {
   const { loading, error } = useGetAxiosRequest<{
     transactions: Transaction[];
     balance: { data: { tokenBalances: { amount: string }[] } };
-  }>(apiUrl, (data) => {
+  }>(apiUrl, (data) => {    
     setTransactions(data.transactions);
     const balanceAmount = data.balance?.data?.tokenBalances[0]?.amount;
     setBalance(balanceAmount ? parseFloat(balanceAmount) : 0);
@@ -63,6 +72,30 @@ export const Transaction = () => {
 
   if (loading) return <LoadingSpinner />;
   if (error) return <div>Error: {error}</div>;
+
+  const StartTransfer = async () => {
+    const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}wallet/transfer/`; // URL de la API
+  
+    try {
+      const accessToken = await getAccessTokenSilently();
+      const response = await axios.post(apiUrl, {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}` // Si tienes una API key
+          }      
+        });
+  
+      const { challengeId, userToken, encryptionKey } = response.data;
+  
+      // Actualizar los estados con los datos recibidos
+      setUserToken(userToken);
+      setEncryptionKey(encryptionKey);
+      setChallengeId(challengeId);
+      
+    } catch (error) {
+      console.log(error);      
+    }
+  };
 
   // Función para descargar CSV en lugar de PDF
   const downloadCSV = () => {
@@ -93,7 +126,6 @@ export const Transaction = () => {
     const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
     
-    // Crear un enlace para descargar el archivo CSV
     const link = document.createElement("a");
     link.href = url;
     link.download = "transactions.csv";
@@ -111,14 +143,26 @@ export const Transaction = () => {
           <br/> 
         </div>
         <span className="space-x-3">
+          <Button onClick={StartTransfer}>Transfer</Button>
           <AddFundsFlow />
           <Button>Withdraw</Button>
         </span>
       </div>
+
+      {/* Renderizar ConfirmPin solo si userToken, encryptionKey y challengeId están disponibles */}
+      {userToken && encryptionKey && challengeId ? (
+        <ConfirmPin 
+          userToken={userToken}
+          encryptionKey={encryptionKey}
+          challengeId={challengeId}
+        />
+      ) : null}
+
       <Button onClick={downloadCSV} className="bg-white border">
         Download CSV
         <Download className="ml-4" /> {/* Icono de descarga */}
       </Button>
+
       <div className="flex justify-between mt-4 mb-4">
         <DatePickerWithRange
           startDate={startDate}

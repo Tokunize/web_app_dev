@@ -33,6 +33,8 @@ class PropertySerializerList(serializers.ModelSerializer):
                     'country', 'description','amenities', 'tokens','vacancy_rate', 'tenant_turnover', "rejection_reason", "projected_rental_yield", "investment_category" ,"post_code"
                 ]
         
+
+        
 #SERIALZIZERS FOR SINGLE PORPERTY PAGE AND OVERVIEW, FINATIAL, DOCUMENTS, ACTIVITY AND IMAEGES
 class PropertyImagesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -259,3 +261,31 @@ class PropertyUpdatesSerializer(serializers.ModelSerializer):
     class Meta:
         model = PropertyUpdates
         fields = '__all__'
+
+
+
+#new serializers improved
+
+class MarketplaceTokeInfo(serializers.ModelSerializer):
+    class Meta:
+        model = Token
+        fields = [
+            "total_tokens", "tokens_available", "token_price"
+        ]
+
+class MarketplaceListViewSerializer(serializers.ModelSerializer):
+    tokens = serializers.SerializerMethodField()  # Cambiamos a SerializerMethodField para un método personalizado
+    
+    class Meta():
+        model = Property
+        fields = [
+            'id', 'title', 'status', 'location', 'image', 
+            'projected_annual_return', 'property_type', 'created_at',
+            'tokens', "investment_category"
+        ]
+    
+    def get_tokens(self, obj):  # Cambia el nombre de getSinglePropertyTokens a get_tokens
+        # Aquí asegúrate de que estás usando el campo correcto para el filtro
+        tokens = Token.objects.filter(property_code=obj)
+        return MarketplaceTokeInfo(tokens, many=True).data
+
