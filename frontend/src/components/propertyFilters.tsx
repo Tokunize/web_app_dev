@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { ChevronsUpDown, Check } from 'lucide-react';
-import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 // Mapeo de opciones legibles para clasificación
@@ -9,8 +7,6 @@ const sortOptions: { [key: string]: string } = {
   'price_desc': 'Price: High to Low',
   'annual_return_asc': 'Annual Return: Low to High',
   'annual_return_desc': 'Annual Return: High to Low',
-  //   'funding_asc': 'Funding: Low to High',
-  //   'funding_desc': 'Funding: High to Low',
 };
 
 interface FiltersProps {
@@ -38,6 +34,18 @@ export const PropertyFilters: React.FC<FiltersProps> = ({
     onFilterChange('sort_by', value);
   };
 
+  // Filtrar locaciones únicas, normalizando a minúsculas y capitalizando la primera letra
+  const uniqueLocations = Array.from(new Set(locations.map(location => {
+    const normalizedLocation = location.toLowerCase();
+    return normalizedLocation.charAt(0).toUpperCase() + normalizedLocation.slice(1);
+  })));
+  
+  // Filtrar tipos de propiedad únicos, normalizando a minúsculas y capitalizando la primera letra
+  const uniquePropertyTypes = Array.from(new Set(propertyTypes.map(type => {
+    const normalizedType = type.toLowerCase();
+    return normalizedType.charAt(0).toUpperCase() + normalizedType.slice(1);
+  })));
+
   return (
     <form className='flex flex-wrap justify-between'> 
       {/* Left Filters */}
@@ -56,8 +64,8 @@ export const PropertyFilters: React.FC<FiltersProps> = ({
                 <SelectItem key="all" value="All">
                   All Locations
                 </SelectItem>
-                {locations.map((location) => (
-                  <SelectItem key={location} value={location}>
+                {uniqueLocations.map((location, index) => (
+                  <SelectItem key={index} value={location}>
                     {location}
                   </SelectItem>
                 ))}
@@ -81,8 +89,8 @@ export const PropertyFilters: React.FC<FiltersProps> = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem key="all" value="all">All Types</SelectItem>
-                {propertyTypes.map((type) => (
-                  <SelectItem key={type} value={type}>{type}</SelectItem>
+                {uniquePropertyTypes.map((type, index) => (
+                  <SelectItem key={index} value={type}>{type}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

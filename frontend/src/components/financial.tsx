@@ -36,9 +36,7 @@ export const Finantial: React.FC<Financial> = ({ data, loading, error }) => {
   const [financialData, setFinancialData] = useState<Financial['data'] | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
-  useEffect(() => {
-    console.log(data);
-    
+  useEffect(() => {    
     setFinancialData(data);
     setAccessToken(localStorage.getItem("accessToken"));
   }, [data]);

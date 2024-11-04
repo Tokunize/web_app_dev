@@ -12,7 +12,8 @@ from .views import (
     UserInvestmentSummaryAPIView,
     PropertyStatusUpdateView,
     PublicSinglePropertyTransactionListView,
-    PropertyUpdateListView
+    PropertyUpdateListView,
+    MarketplaceListView
 )
 
 urlpatterns = [
@@ -43,5 +44,12 @@ urlpatterns = [
     path('investment/', InvestedProperties.as_view(), name='invested-properties'),
 
     #CREATE PROPERTY UPDATE URL - POST
-    path('updates/create/', PropertyUpdateListView.as_view(), name='updates-create')
+    path('updates/create/', PropertyUpdateListView.as_view(), name='updates-create'),
+
+
+
+
+
+    #NEW URLS IMPROVED THE VIEWS AND SERIALIZER
+    path("marketplace-list/",MarketplaceListView.as_view(), name="marketplace-property-list" )
 ]

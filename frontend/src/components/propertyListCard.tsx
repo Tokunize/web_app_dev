@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Carousel } from "flowbite-react";
-import { IoIosCloseCircle } from "react-icons/io";
 import shareIcon from "../assets/share.png"
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+
 interface PropertyListCardProps {
   title: string;
   location: string;
@@ -33,7 +33,6 @@ const investmentData: { [key: string]: { risk: string; income: string; capitalGr
   },
 };
 
-
 export const PropertyListCard: React.FC<PropertyListCardProps> = ({
   title,
   location,
@@ -50,6 +49,8 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
   const [badgeType, setBadgeType] = useState<string | null>(null);
   const [category, setCategory] = useState<string>(""); 
   const [isCardBack, setIsCardBack] = useState<boolean>(false)
+  const [showControls, setShowControls] = useState(false);
+
 
   const currentData = investmentData[investment_category] || {
     risk: "Low",
@@ -74,24 +75,22 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
       setBadgeType('New');
     } else if (status === "coming_soon") {
       setBadgeType('Coming Soon');
-    }
-     else {
+    } else {
       setBadgeType(null);
     }
 
-    if(investment_category != null){
-       if(investment_category == "Opportunistic"){
-          setCategory("Opportunistic")
-       }else if(investment_category == "Core"){
-        setCategory("Core")
-       }
+    if (investment_category != null) {
+      if (investment_category === "Opportunistic") {
+        setCategory("Opportunistic");
+      } else if (investment_category === "Core") {
+        setCategory("Core");
+      }
     }
   }, []); 
   
-  const taggleCardPosition = () =>{
-    setIsCardBack(prevValue => !prevValue )
+  const taggleCardPosition = () => {
+    setIsCardBack(prevValue => !prevValue);
   }
-
 
   return (
     <article className="relative rounded-lg overflow-hidden mt-6">
@@ -99,7 +98,6 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
         <>
           <span 
             className='absolute cursor-pointer left-4 top-[215px] bg-black  text-white text-xs font-semibold py-1 px-2 rounded-full z-20'
-            onClick={taggleCardPosition}
           >
             {category}
           </span>
@@ -137,24 +135,37 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
       )}
 
       {/* Link for Image Carousel */}
-      <Link to={`/property-details/${id}`} className="h-64 relative block hover:opacity-80 transition-opacity duration-300">
-        <Carousel
-          indicators={true}  // Show indicators for slides
-          slide={false}
-          className="custom-landing-carousel"
-        >
-            {propertyImgs.slice(0, 3).map((img, index) => (
-            <img
-              key={index}
-              src={img}
-              alt={`${title} image ${index + 1}`}
-              className="w-full h-full object-cover"
-            />
+      <Link
+      to={`/property-details/${id}`}
+      className="h-64 relative block hover:opacity-80 transition-opacity duration-300"
+      onMouseEnter={() => setShowControls(true)} // Mostrar botones al hacer hover
+      onMouseLeave={() => setShowControls(false)} // Ocultar botones al salir
+    >
+      <Carousel className="h-full">
+        <CarouselContent>
+          {propertyImgs.slice(0, 3).map((img, index) => (
+            <CarouselItem key={index}>
+              <img
+                src={img}
+                alt={`${title} image ${index + 1}`}
+                className="w-full rounded-lg h-[250px] object-cover"
+              />
+            </CarouselItem>
           ))}
-        </Carousel>
-      </Link>
+        </CarouselContent>
 
-      <div className="py-3">
+        {/* Controles de navegación */}
+        <div className={`carousel-controls ${showControls ? 'visible' : ''}`}>
+          <CarouselPrevious/>
+          <CarouselNext />
+        </div>
+      </Carousel>
+    </Link>
+
+      <div className="py-3"
+        // onMouseOver={taggleCardPosition}
+        // onMouseLeave={taggleCardPosition}
+        >
         <div className="flex items-center justify-end">
           <div className="float-right text-sm text-gray-500 flex items-center">
             {status === "published" ? (
@@ -179,10 +190,11 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
       </div>
 
       {/* Overlay for Backside Content */}
-      <div className={`absolute inset-0  z-99 bg-[#C8E870] shadow-xl rounded-lg p-6 transition-transform duration-500 ease-in-out transform ${
+      <div
+        className={`absolute  inset-0 bg-[#C8E869] shadow-xl rounded-lg p-8 transition-transform duration-500 ease-in-out transform ${
           isCardBack ? "translate-y-0" : "translate-y-full"
-        }`}>
-        <IoIosCloseCircle onClick={taggleCardPosition} className="cursor-pointer text-3xl float-right" />
+        }`}
+      >
         <h2 className="text-xl font-semibold mb-2 border-b pb-2">{title}</h2>
         {/* Tabla para la información */}
         <div className="overflow-x-auto">
