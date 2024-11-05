@@ -35,7 +35,9 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     'localhost:5173',
-    'localhost:5174'
+    'localhost:5174',
+    "tokunize.com/marketplace/",
+    "tokunize.com"
 ]
 
 
@@ -66,7 +68,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "https://monkfish-app-o6nz8.ondigitalocean.app",
     "https://dev-2l2jjwfm5ekzae3u.us.auth0.com",
-    "http://localhost:5174"
+    "http://localhost:5174",
+    "https://www.tokunize.com/marketplace",
+    "https://www.tokunize.com"
 
 ]
 
@@ -74,6 +78,8 @@ CORS_ALLOWED_ORIGINS = [
 CSRF_TRUSTED_ORIGINS = [
     "https://monkfish-app-o6nz8.ondigitalocean.app",
     "http://localhost:5173"
+    "https://www.tokunize.com"
+
 ]
 
 
