@@ -35,7 +35,7 @@ export const SingleProperty: React.FC = () => {
     try {
       const [propertyResponse, overviewResponse] = await Promise.all([
         axios.get<PropertyResponse>(`${backendUrl}property/${id}/?view=images`),
-        axios.get<OverviewResponse>(`${backendUrl}property/${id}/?view=overview`)
+        axios.get<OverviewResponse>(`${backendUrl}property/${id}/landing-page/?view=overview`)
       ]);
 
       setPropertyImages(propertyResponse.data.image);
