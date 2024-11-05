@@ -54,6 +54,7 @@ class PropertyOverviewSerializer(serializers.ModelSerializer):
         model = Property
         fields = [
             'title', 
+            'price',
             'location', 
             'image', 
             'annual_gross_rents',
