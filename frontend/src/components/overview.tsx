@@ -36,7 +36,7 @@ export const Overview: React.FC = () => {
   useEffect(() => {
     const fetchProperty = async () => {
       try {
-        const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/${id}/?view=overview`;
+        const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/${id}/landing-page/?view=overview`;
         const response = await axios.get<PropertyData>(apiUrl);                
         setProperty(response.data);
         setProgress(50); 
