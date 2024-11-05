@@ -91,6 +91,7 @@ class PropertyFinancialsSerializer(serializers.ModelSerializer):
             "monthly_cash_flow",
             "projected_annual_cash_flow",
             "legal_documents_url",
+            "investment_category"
         ]
 
 
