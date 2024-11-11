@@ -14,6 +14,7 @@ class NotificationAPIView(APIView):
 
     def get(self, request):
         notifications = Notification.objects.filter(user=request.user)
+        print(request.user.id)
         serializer = NotificationSerializer(notifications, many=True)
         return Response(serializer.data)
 
@@ -43,18 +44,6 @@ class NotificationAPIView(APIView):
 
                     if admin_serializer.is_valid():
                         admin_serializer.save()
-
-                # Notificar también al mismo usuario que realizó la acción
-                user_notification_data = {
-                    'user': request.user.id,
-                    'message': f"You performed an action: You submitted a new property.",
-                    'is_read': False,
-                    'notification_type': 'user_action'
-                }
-                user_action_serializer = NotificationSerializer(data=user_notification_data)
-
-                if user_action_serializer.is_valid():
-                    user_action_serializer.save()
 
             elif notification_type == 'admin_broadcast':
                 # Notificar a todos los usuarios excepto al remitente

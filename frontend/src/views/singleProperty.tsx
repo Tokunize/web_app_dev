@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { PropertyAccordion } from "@/components/propertyAccordion";
 import { PurchaseForm } from "@/components/forms/buyPropertyForm";
 import { BackButton } from "@/components/buttons/backButton";
-import { LoadingSpinner } from "@/components/dashboard/loadingSpinner";
+import { LoadingSpinner } from "@/components/loadingSpinner";
 import shareIcon from "../assets/Share.png";
 
 interface PropertyResponse {

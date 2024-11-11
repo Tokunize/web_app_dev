@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { TabsComponent } from "../tabs";
+import { TabsComponent } from "../components/tabs";
 import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
@@ -20,7 +20,7 @@ interface Log {
 }
 
 // Componente principal ActivityLog
-export const ActivityLog = () => {
+const ActivityLog = () => {
   const { getAccessTokenSilently, isAuthenticated } = useAuth0();
   const [allLogs, setAllLogs] = useState<Log[]>([]); // Usar el tipo Log[] para los logs
   const [loading, setLoading] = useState(true);
@@ -185,3 +185,6 @@ const formatTimestamp = (timestamp: string) => {
     hour12: true,
   });
 };
+
+
+export default ActivityLog

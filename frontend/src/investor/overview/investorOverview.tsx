@@ -1,12 +1,12 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "../ui/button";
-import { PropertyValueGraph } from "../graphs/propertyValueGraph";
-import { PieGraph } from "../graphs/pieGraph";
-import { RiskOverview } from "../graphs/riskGraph";
-import { PerformanceGraph } from "../graphs/performanceGraph";
-import { MyAssetsTable } from "./myAssetsTable";
-import { LoadingSpinner } from "./loadingSpinner";
+import { Button } from "@/components/ui/button";
+import { PropertyValueGraph } from "@/components/graphs/propertyValueGraph";
+import { PieGraph } from "@/components/graphs/pieGraph";
+import { RiskOverview } from "@/components/graphs/riskGraph";
+import { PerformanceGraph } from "@/components/graphs/performanceGraph";
+import { MyAssetsTable } from "@/components/dashboard/myAssetsTable";
+import { LoadingSpinner } from "@/components/loadingSpinner";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";  // Importamos el hook personalizado
 
 interface Investment {
@@ -30,14 +30,21 @@ export const InvestorOverview = () => {
     return <p>Error: {error}</p>
   }
 
+  const dummyAppreciation = [
+    "3.3", "4.2", "3.6", "-0.5", "4.1" ,"1.5"
+  ]
+
   // Transformamos los datos recibidos para pasarlos a las gráficas y tablas
-  const yieldData = investments?.properties.map((property) => ({
+  const yieldData = investments?.properties.map((property,index) => ({
     image: property.yield_data.image,
     title: property.yield_data.title,
     projected_rental_yield: property.yield_data.projected_rental_yield,
-    projected_appreciation: 1.2,
+    projected_appreciation: dummyAppreciation[index],
     location: property.location,
   }));
+
+
+  
 
   const predefinedColors = [
     "#299D90",
@@ -52,7 +59,7 @@ export const InvestorOverview = () => {
   ];
 
   // Datos para la gráfica de ubicaciones geográficas
-  const geographyData = investments?.properties.map(property => property.location) || [];
+  const geographyData = [...new Set(investments?.properties.map(property => property.location))] || [];
   const totalLocations = geographyData.length;
   const chartData = geographyData.map((location, index) => ({
     location,
@@ -61,7 +68,7 @@ export const InvestorOverview = () => {
   }));
 
   // Datos para la gráfica de tipos de propiedades
-  const propertyTypeData = investments?.properties.map(property => property.property_type) || [];
+  const propertyTypeData = [...new Set(investments?.properties.map(property => property.property_type))] || [];
   const totalPropertyTypes = propertyTypeData.length;
   const propertyChartData = propertyTypeData.map((type, index) => ({
     location: type,

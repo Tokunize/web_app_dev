@@ -9,6 +9,8 @@ interface UserContextType {
   userImage: string | null;
   setUserImage: React.Dispatch<React.SetStateAction<string | null>>;
   loading: boolean; // Estado de carga
+  userEmail: string | null;
+  setUserEmail : React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -20,6 +22,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }); 
   const [name, setName] = useState<string | null>(null); 
   const [userImage, setUserImage] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null)
   const [loading, setLoading] = useState<boolean>(true); // Estado de carga
   const { isAuthenticated, getIdTokenClaims } = useAuth0();
 
@@ -28,7 +31,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (isAuthenticated) {
         try {
           const claims: IdToken | undefined = await getIdTokenClaims();
+          console.log(claims);
+          
           if (claims) {
+            const userEmail = claims.email as string | undefined;
             const userRole = claims["https://tokunize.com/role"] as string | undefined;
             const userName = claims["https://tokunize.com/name"] as string | undefined;
             const userImage = claims.picture as string | undefined;
@@ -39,6 +45,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
             if (userName) setName(userName);
             if (userImage) setUserImage(userImage);
+            if (userEmail) setUserEmail(userEmail)
           } else {
             console.error("No claims found");
           }
@@ -56,7 +63,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [isAuthenticated, getIdTokenClaims]);
 
   return (
-    <UserContext.Provider value={{ role, setRole, name, setName, userImage, setUserImage, loading }}>
+    <UserContext.Provider value={{ role, setRole, name, setName, userImage, setUserImage, loading, userEmail, setUserEmail }}>
       {children}
     </UserContext.Provider>
   );

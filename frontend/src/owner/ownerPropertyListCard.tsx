@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Carousel } from "flowbite-react";
-import token from "../../assets/token.svg";
+import token from "../assets/token.svg";
 import { useUser } from '@/context/userProvider';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,7 +15,8 @@ interface PropertyListCardProps {
     totalTokens: number;
     status: string;
     tokens_available: number;
-    rejection_reason: string
+    rejection_reason: string,
+    rejectionReasonComment:string;
 }
 
 export const OwnerPropertyListCard: React.FC<PropertyListCardProps> = ({
@@ -27,7 +28,8 @@ export const OwnerPropertyListCard: React.FC<PropertyListCardProps> = ({
     status,
     tokens_available,
     id,
-    rejection_reason
+    rejection_reason,
+    rejectionReasonComment
 }) => {
     const [badgeType, setBadgeType] = useState<string | null>(null);
     const { role } = useUser();
@@ -127,9 +129,20 @@ export const OwnerPropertyListCard: React.FC<PropertyListCardProps> = ({
                     </div>
                 )}
                  {status === "rejected" && rejection_reason && (
-                    <div className="mt-2 p-2 border-red-500 text-red-700 bg-red-100 rounded  text-sm">
-                        <strong>Property Status:</strong> {rejection_reason}
-                    </div>
+                    <div className="mt-2 p-3 space-y-2 bg-red-100 rounded-lg text-red-700 text-sm">
+                        <div className="flex items-center space-x-2">
+                            <span className="font-semibold">Property Status:</span>
+                            <span>{status.charAt(0).toUpperCase() + status.slice(1)}</span>
+                        </div>
+                        <div className=" items-center space-x-2">
+                            <span className="font-semibold">Reason:</span>
+                            <span>{rejection_reason}</span>
+                        </div>
+                        <div className=" items-center space-x-2">
+                            <span className="font-semibold">Extra Details:</span>
+                            <span>{rejectionReasonComment}</span>
+                        </div>
+                  </div>
                 )}
             </div>
         </article>

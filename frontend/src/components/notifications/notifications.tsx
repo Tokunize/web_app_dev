@@ -132,7 +132,7 @@ export const Notifications: React.FC = () => {
 
       <PopoverContent side="bottom" align="end" className="mt-2 max-h-80 max-w-lg bg-white shadow-lg rounded-lg overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
         <div className="flex items-center justify-between p-2">
-          <div className="font-bold text-gray-800">Notifications</div>
+          <div className="text-sm font-medium leading-none">Notifications</div>
           {unreadCount > 0 && (
             <button onClick={handleMarkAllAsRead} className="text-green-500 hover:underline">
               Mark All as Read
@@ -143,10 +143,10 @@ export const Notifications: React.FC = () => {
         {loading ? (
             <SkeletonDemo />
         ) : (
-          <Tabs defaultValue="all" className="max-w-lg">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="unread">Unread {unreadCount}</TabsTrigger>
+          <Tabs defaultValue="all" className="max-w-lg space-y-4">
+            <TabsList className="grid w-full grid-cols-2 text-3xl ">
+              <TabsTrigger value="all" className='text-sm font-medium leading-none'>All</TabsTrigger>
+              <TabsTrigger value="unread" className='text-sm font-medium leading-none'>Unread  <span className='text-xs translate-y-[-10%] pl-1'>{unreadCount}</span> </TabsTrigger>
             </TabsList>
             <TabsContent value="all">
               {notifications.length > 0 ? (

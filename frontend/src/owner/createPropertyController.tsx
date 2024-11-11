@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { TokenForm } from "../forms/tokenForm";
-import { CreatePropertyForm } from "../forms/createPropertyForm";
+import { TokenForm } from "../components/forms/tokenForm";
+import { CreatePropertyForm } from "../components/forms/createPropertyForm";
 import { useParams } from "react-router-dom";
 
 const CreatePropertyController: React.FC = () => {
@@ -17,7 +17,7 @@ const CreatePropertyController: React.FC = () => {
     };
 
   return (
-    <div>
+    <div >
       {currentStep === 0 && <CreatePropertyForm onNext={handleNext} />}
       {currentStep === 1 && <TokenForm propertyId={numericPropertyId} onNext={handleNext} onBack={handleBack} />}
       {/* {currentStep === 2 && <Summary onBack={handleBack} />} */}

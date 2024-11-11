@@ -18,6 +18,7 @@ export const PropertyAccordion: React.FC<PropertyAccordionProps> = ({ property_i
   const viewType = viewTypes[activeIndex ?? 0];
 
   const { data, loading, error } = useFetchPropertyDetails(property_id, viewType);
+  
 
   const handleClick = (index: number) => {
     setActiveIndex(index === activeIndex ? null : index);

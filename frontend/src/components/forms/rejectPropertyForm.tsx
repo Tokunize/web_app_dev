@@ -7,13 +7,24 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 import { useToast } from "../ui/use-toast";
-import { createNotification } from "../notificationService";
-
 interface RejectPropertyFormProps {
-    propertyId: number; // Cambia 'string' por el tipo correcto según tus necesidades
+    propertyId: string; // Cambia 'string' por el tipo correcto según tus necesidades
 }
 
+const propertyIssues = [
+  "Inadequate property quality",
+  "High risk profile of the property",
+  "Sponsor’s limited experience or poor track record",
+  "Lack of transparency in property details",
+  "Negative environmental or social impact",
+  "Insufficient revenue potential",
+  "Legal complications or liens",
+  "Property value mismatch"
+];
+
+
 export const RejectPropertyForm: React.FC<RejectPropertyFormProps> = ({ propertyId }) => {
+
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
   const [reasonDescription, setReasonDescription] = useState("");
   const { toast } = useToast();
@@ -53,7 +64,8 @@ export const RejectPropertyForm: React.FC<RejectPropertyFormProps> = ({ property
       const data = {
         status: "rejected",
         id: propertyId,
-        rejection_reason: `Rejected: The reason is "${selectedReason}". Additional comments: "${reasonDescription}".`
+        rejectionReason: selectedReason,
+        rejectionDescription: reasonDescription
       };
       const response = await axios.put(
         `${import.meta.env.VITE_APP_BACKEND_URL}property/properties/${propertyId}/status/`,
@@ -61,28 +73,14 @@ export const RejectPropertyForm: React.FC<RejectPropertyFormProps> = ({ property
         config
       );
 
-      console.log('Response:', response.data);
-
-      // Crear una notificación si la propiedad fue rechazada exitosamente
       if (response.status === 200) { // Asegúrate de que el estado sea el correcto para un rechazo exitoso
-        const notificationData = {
-            message: `Rejected: The reason is "${selectedReason}". Additional comments: "${reasonDescription}".`,
-            property_id: propertyId,
-            notification_type: "admin_broadcast", // Agregar tipo de notificación si es necesario
-        };
-
-        // Llama a la función para crear la notificación
-        await createNotification(notificationData, accessToken);
-
-        // Muestra un toast de éxito
         toast({
           title: "Success",
-          description: "Property rejected and notification sent.",
+          description: "Property rejected and notification sent to the assets owner.",
           variant: "default"
         });
-      }
-
-    } catch (error) {
+        
+    }} catch (error) {
       console.error('Error:', error);
       toast({
         title: "Error",
@@ -93,18 +91,18 @@ export const RejectPropertyForm: React.FC<RejectPropertyFormProps> = ({ property
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4 h-auto">
       <div>
-        <h3 className="font-bold text-lg mb-4">Select a Reason for Rejection</h3>
-        <div className="grid grid-cols-2 gap-4">
-          {["Reason 1", "Reason 2", "Reason 3", "Reason 4"].map((reason) => (
+        <h3 className="font-bold text-lg mb-4">Select a reason to reject this property</h3>
+        <div className="grid grid-cols-2 gap-4 ">
+          {propertyIssues.map((reason) => (
             <div key={reason} className="flex items-center">
               <Checkbox
                 id={reason}
                 checked={selectedReason === reason}
                 onCheckedChange={() => handleCheckboxChange(reason)}
               />
-              <Label htmlFor={reason} className="ml-2">
+              <Label htmlFor={reason} className="ml-2 ">
                 {reason}
               </Label>
             </div>

@@ -49,6 +49,7 @@ class Property(TimeStampedModel):
     tenant_turnover = models.DecimalField(blank=True, null=True,max_digits=5, decimal_places=2,)
     vacancy_rate = models.DecimalField(blank=True, null=True, max_digits=5, decimal_places=2)
     rejection_reason = models.TextField(blank=True, null=True)  # Campo para el motivo de rechazo
+    rejection_reason_comment = models.TextField(blank=True, null=True, help_text="Extra information for the rejection reason")
 
     investment_category =  models.CharField(blank=True, null=True)
     # admin fill form 
@@ -89,7 +90,7 @@ class Property(TimeStampedModel):
 
     class Meta:
         ordering = ['-created_at']
-    
+
 class PropertyUpdates(models.Model):
     property = models.ForeignKey(Property,on_delete=models.CASCADE, related_name='updates', help_text="The property associated with this update." )
     update_title = models.CharField(max_length=255, help_text="The title of the update")
@@ -124,8 +125,6 @@ class PropertyToken(models.Model):
     def __str__(self):
         return f"{self.number_of_tokens} tokens for {self.property_code} ({self.token_code})"
     
-
-
 
 class Transaction(TimeStampedModel):
     property_id = models.ForeignKey(Property, blank=True, null=True, related_name='transactions', on_delete=models.CASCADE)

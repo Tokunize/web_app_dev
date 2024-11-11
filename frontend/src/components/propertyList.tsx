@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import { PropertyFilters } from './propertyFilters';
 import { PropertyListCard } from './propertyListCard';
-import { LoadingSpinner } from './dashboard/loadingSpinner';
+import { LoadingSpinner } from './loadingSpinner';
 
 const sortProperties = (properties: any[], sortBy: string) => {
   return properties.sort((a, b) => {

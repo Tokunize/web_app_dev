@@ -23,7 +23,7 @@ export const PaymentOrderView: React.FC<PaymentOrderViewProps> = ({
       <ul className="space-y-2">
         <li className="flex justify-between py-2 border-b">
           <span className="font-bold text-sm">Price</span>
-          <span className="text-gray-500">1 Equity (Token) = £{tokenPrice} GBP</span>
+          <span className="text-gray-500">1 Token = £{tokenPrice} GBP</span>
         </li>
         <li className="flex justify-between py-2 border-b">
           <span className="font-bold text-sm">Fee (0.5%)</span>

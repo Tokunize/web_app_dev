@@ -1,20 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PerformanceGraph } from "../graphs/performanceGraph";
+import { PerformanceGraph } from "../components/graphs/performanceGraph";
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { MyAssetsTable } from "./myAssetsTable";
-import { InsightsTable } from "./insightsTable";
+import { MyAssetsTable } from "../components/dashboard/myAssetsTable";
+import { InsightsTable } from "../components/dashboard/insightsTable";
 import { Asset } from "@/types";
-import { LoadingSpinner } from "./loadingSpinner";
+import { LoadingSpinner } from "../components/loadingSpinner";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
-import infoIcon from "../../assets/infoIcon.svg";
+import infoIcon from "../assets/infoIcon.svg";
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { FilterInput } from "../filterInput";
-import { FormatCurrency } from "../currencyConverter";
+import { FilterInput } from "../components/filterInput";
+import { FormatCurrency } from "../components/currencyConverter";
 
 export const OwnerDashboard = () => {
     const [selectedProperty, setSelectedProperty] = useState<Asset | null>(null);

@@ -116,11 +116,11 @@ export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) 
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
+      <DialogTrigger id='hola' asChild>
         <Button className="w-full">Buy</Button>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent id='hola'>
         <DialogHeader>
           <DialogTitle className="hidden">Payment Flow</DialogTitle>
           <DialogDescription>
@@ -155,7 +155,7 @@ export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) 
             </Button>
           )}
           {step === 5 && (
-            <Button className="w-full" onClick={() =>{navigate("/dashboard/")}}>
+            <Button className="w-full" onClick={() =>{navigate("/transactions/")}}>
               Check My Wallet
             </Button>
           )}

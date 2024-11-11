@@ -150,7 +150,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ onImagesUploaded, 
       )}
       {files.length > 0 && (
         <div className="w-full max-w-4xl">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">Image Previews</h2>
+          <h2 className="font-bold text-gray-700 text-sm mb-4">Image Previews</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {files.map((file, index) => (
               <div

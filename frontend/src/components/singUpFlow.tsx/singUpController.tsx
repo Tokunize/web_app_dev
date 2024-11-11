@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button"; 
 import { SignUpForm } from '../forms/singUpForm';
 import { AccountType } from '@/views/accounType';
-import { LoadingSpinner } from '../dashboard/loadingSpinner';
+import { LoadingSpinner } from '../loadingSpinner';
 
 // Componente EmailInput
 const EmailInput: React.FC<{ onEmailSubmit: (email: string) => void }> = ({ onEmailSubmit }) => {

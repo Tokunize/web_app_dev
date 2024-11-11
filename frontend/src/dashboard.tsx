@@ -1,8 +1,8 @@
 import { useUser } from "./context/userProvider";
 import { Navigate } from 'react-router-dom'; // Importa Navigate
-import { AdminOverview } from "./components/dashboard/adminOverview";
-import { OwnerDashboard } from "./components/dashboard/ownerOverview";
-import { InvestorOverview } from "./components/dashboard/investorOverview";
+import { AdminOverview } from "./admin/adminOverview";
+import { OwnerDashboard } from "./owner/ownerOverview";
+import { InvestorOverview } from "./investor/overview/investorOverview";
 
 const Dashboard = () => {
   const { role, loading } = useUser(); 

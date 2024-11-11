@@ -8,6 +8,7 @@ from property.models import(
     PropertyUpdates
 )
 
+
 #SERIALZERS FOR TOKENS 
 
 class TokenSerializer(serializers.ModelSerializer):
@@ -18,7 +19,7 @@ class TokenSerializer(serializers.ModelSerializer):
 class UpdatePropertyStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Property
-        fields = ['status', 'rejection_reason']  # Asegúrate de incluir solo los campos que deseas actualizar
+        fields = ['status', 'rejection_reason', 'rejection_reason_comment']  # Asegúrate de incluir solo los campos que deseas actualizar
 
 #SERIALIZER FOR THE PROPERTY ON MARKETPLACE LANDING PAGE
 class PropertySerializerList(serializers.ModelSerializer):
@@ -27,7 +28,7 @@ class PropertySerializerList(serializers.ModelSerializer):
         model = Property
         fields = [
                     'id', 'title', 'status', 'location', 'image', 
-                    'active','property_code',
+                    'active','property_code',"rejection_reason_comment",
                     'projected_annual_return', 'property_type', 'created_at',
                     'bedrooms', 'bathrooms', 'price', 'size', 'year_built',"ownershipPercentage",
                     'country', 'description','amenities', 'tokens','vacancy_rate', 'tenant_turnover', "rejection_reason", "projected_rental_yield", "investment_category" ,"post_code"
@@ -266,7 +267,7 @@ class PropertyUpdatesSerializer(serializers.ModelSerializer):
 
 
 
-#new serializers improved
+#NEW SERIALIZER  IMPROVED FOR BETTER PERFORMANCE AND BEST PRACTISES
 
 class MarketplaceTokeInfo(serializers.ModelSerializer):
     class Meta:
@@ -291,3 +292,34 @@ class MarketplaceListViewSerializer(serializers.ModelSerializer):
         tokens = Token.objects.filter(property_code=obj)
         return MarketplaceTokeInfo(tokens, many=True).data
 
+
+class AdminPropertyManagment(serializers.ModelSerializer):
+    first_image = serializers.SerializerMethodField()  # Custom method field for the first image
+    class Meta():
+        model = Property
+        fields = [
+            'id', 'title', 'status', 'location', 'first_image', 
+            'projected_annual_return', 'property_type', 'created_at',
+            "investment_category", "price", "ownershipPercentage",
+            "projected_rental_yield"
+        ]
+    
+    def get_first_image(self,obj):
+        return obj.image[0]
+    
+class AdminOverviewSerializer(serializers.ModelSerializer):
+    first_image = serializers.SerializerMethodField()  # Custom method field for the first image
+
+
+    class Meta():
+        model = Property
+        fields = [
+            'id', 'title', 'status', 'location', 'first_image', 
+            'projected_annual_return', 'property_type', 'created_at',
+            "investment_category", "price", "ownershipPercentage","status",
+            "projected_rental_yield"
+        ]
+    def get_first_image(self,obj):
+        return obj.image[0]
+    
+   

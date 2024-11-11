@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { TransactionTable } from "../transactionsTable";
-import { DatePickerWithRange } from "./DatePickerRange";
+import { TransactionTable } from "@/components/transactionsTable";
+import { DatePickerWithRange } from "@/components/dashboard/DatePickerRange";
 import { Download } from "lucide-react"; 
-import { CurrencyConverter } from "../currencyConverter";
-import { AddFundsFlow } from "../funds/addFundsFlow";
+import { CurrencyConverter } from "@/components/currencyConverter";
+import { AddFundsFlow } from "@/components/funds/addFundsFlow";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -16,9 +16,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LoadingSpinner } from "./loadingSpinner";
+import { LoadingSpinner } from "@/components/loadingSpinner";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
-import { ConfirmPin } from "./confirmPin";
+import { ConfirmPin} from "../../components/dashboard/confirmPin"
 
 type Transaction = {
   id: number;
@@ -143,7 +143,7 @@ export const Transaction = () => {
           <br/> 
         </div>
         <span className="space-x-3">
-          <Button onClick={StartTransfer}>Transfer</Button>
+          {/* <Button onClick={StartTransfer}>Transfer</Button> */}
           <AddFundsFlow />
           <Button>Withdraw</Button>
         </span>

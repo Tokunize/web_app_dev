@@ -17,22 +17,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-export const description = "A bar chart with a label"
-
-const chartData = [
-    { month: "January", properties: 50 },
-    { month: "February", properties: 75 },
-    { month: "March", properties: 60 },
-    { month: "April", properties: 30 },
-    { month: "May", properties: 90 },
-    { month: "June", properties: 45 },
-    { month: "July", properties: 80 },
-    { month: "August", properties: 40 },
-    { month: "September", properties: 70 },
-    { month: "October", properties: 55 },
-    { month: "November", properties: 65 },
-    { month: "December", properties: 25 },
-];
+export const description = "A bar chart to show how many properties were published during  year period"
 
 const chartConfig = {
   properties: {
@@ -41,19 +26,29 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export const NewPropertiesGraph =() => {
+interface PropertyChart {
+  data: {
+      month: string;
+      properties: number;
+    }[]; 
+}
+interface Props {
+  propertyAmount: number;
+  data: PropertyChart[]; // Definimos correctamente que `data` es un array de objetos con las propiedades `month` y `properties`
+}
+export const NewPropertiesGraph = ({ data, propertyAmount }: Props) => {
   return (
     <Card className="w-[90%] sm:w-full">
       <CardHeader>
-        <CardTitle className="text-lg  text-gray-500">New Property Listed</CardTitle>
-        <CardDescription>Total <span className="font-bold text-black text-lg"> 210 </span>properties</CardDescription>
+        <CardTitle className="text-xl text-gray-500">Properties Listed During Last Year</CardTitle>
+        <CardDescription>Total <span className="font-bold text-black text-lg"> {propertyAmount} </span>properties</CardDescription>
         <CardDescription>January - June 2024</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer className="h-[350px] w-[90%] mx-auto" config={chartConfig}>
           <BarChart
             accessibilityLayer
-            data={chartData}
+            data={data}
             margin={{
               top: 20,
             }}

@@ -14,7 +14,9 @@ from .views import (
     PublicSinglePropertyTransactionListView,
     PropertyUpdateListView,
     MarketplaceListView,
-    PropertyDetailLandingPage
+    PropertyDetailLandingPage,
+    PropertyManagmentListView,
+    AdminOverviewListView
 )
 
 urlpatterns = [
@@ -54,5 +56,10 @@ urlpatterns = [
 
 
     #NEW URLS IMPROVED THE VIEWS AND SERIALIZER
-    path("marketplace-list/",MarketplaceListView.as_view(), name="marketplace-property-list" )
+    path("marketplace-list/",MarketplaceListView.as_view(), name="marketplace-property-list" ),
+    
+
+    #DASHBOARD ADMIN URLS 
+    path("property-managment/",PropertyManagmentListView.as_view(), name="property-managment-admin" ),
+    path("overview-dashboard-admin/",AdminOverviewListView.as_view(), name="overview-dashboard-admin" )
 ]

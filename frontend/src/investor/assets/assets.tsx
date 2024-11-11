@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { AssetsAccordion } from "./assetsAccordion";
-import { PieGraph } from "../graphs/pieGraph";
-import { LoadingSpinner } from "./loadingSpinner";
+import { AssetsAccordion } from "../../components/dashboard/assetsAccordion";
+import { PieGraph } from "../../components/graphs/pieGraph";
+import { LoadingSpinner } from "../../components/loadingSpinner";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
-import { Card } from "../ui/card";
+import { Card } from "../../components/ui/card";
 
 interface Investment {
   first_image: string;
@@ -44,17 +44,23 @@ export const Assests = () => {
     "#FFFAEA"  // Color 7
   ];
 
-  const propertyTypeData = investments.map((property) => 
-    property.property_type || ""
-  );
+  
 
-  const totalPropertyTypes = propertyTypeData.length;
+  // Paso 1: Extrae todos los tipos de propiedad (o vacío si no hay) en un array
+const propertyTypeData = investments.map((property) => property.property_type || "");
 
-  const propertyChartData = propertyTypeData.map((type, index) => ({
-    location: type,
-    percentage: Math.round((1 / totalPropertyTypes) * 100),
-    fill: predefinedColors[index % predefinedColors.length], // Usamos los colores predefinidos
-  }));
+// Paso 2: Filtra los tipos de propiedad únicos
+const uniquePropertyTypes = [...new Set(propertyTypeData)];
+
+// Paso 3: Calcula el total de tipos de propiedad únicos
+const totalPropertyTypes = uniquePropertyTypes.length;
+
+// Paso 4: Genera los datos para `propertyChartData` usando solo tipos únicos
+const propertyChartData = uniquePropertyTypes.map((type, index) => ({
+  location: type,
+  percentage: Math.round((1 / totalPropertyTypes) * 100),
+  fill: predefinedColors[index % predefinedColors.length], // Usamos los colores predefinidos
+}));
 
   if (loading) return <div><LoadingSpinner/></div>;
   if (error) return <p>Error: {error}</p>;

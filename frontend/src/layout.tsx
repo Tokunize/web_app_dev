@@ -4,19 +4,20 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { SingleProperty } from "./views/singleProperty";
 import { UserProvider } from "./context/userProvider";
 import ProtectedRoute from "./protectedRoutes";
-import CreatePropertyController from "./components/dashboard/createPropertyController";
+import CreatePropertyController from "./owner/createPropertyController";
 import DashboardLayout from "./dashboardLayout";
 import MainLayout from "./mainLayout"; 
-import { Porfolio } from "./components/dashboard/porfolio";
-import { Assests } from "./components/dashboard/assets";
-import { Transaction } from "./components/dashboard/transactions";
+import { Porfolio } from "./owner/porfolio";
+import { Assests } from "./investor/assets/assets";
+import { Transaction } from "./investor/wallet/transactions";
 import { Blog } from "./views/blog";
 import { SingleArticleView } from "./views/singleArticleView";
 import { Toaster } from "./components/ui/toaster";
 import { PublicPropertyPage } from "./views/publicProperty";
 import Dashboard from "./dashboard";
 import SignUpController from "./components/singUpFlow.tsx/singUpController";
-import { PropertyManagement } from "./components/dashboard/propertyManagment";
+import { PropertyManagement } from "./admin/propertyManagment";
+import { TradingPage } from "./views/TradingPage";
 
 const Layout = () => {
   return (
@@ -69,7 +70,13 @@ const Layout = () => {
               }
             />
             <Route
-              path="dashboard-property/:propertyId"
+              path="trading/"
+              element={
+                <ProtectedRoute roleRequired="investor" element={<TradingPage/>} />
+              }
+            />
+            <Route
+              path="dashboard-property/:propertyId/"
               element={
                 <ProtectedRoute roleRequired="investor,admin" element={<CreatePropertyController />} />
               }

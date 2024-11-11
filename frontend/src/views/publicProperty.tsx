@@ -14,8 +14,8 @@ import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
-import { createNotification } from "@/components/notificationService";
-import { LoadingSpinner } from "@/components/dashboard/loadingSpinner";
+import { createNotification } from "@/components/notifications/notificationService";
+import { LoadingSpinner } from "@/components/loadingSpinner";
 
 interface PropertyLocation {
   postcode: string;

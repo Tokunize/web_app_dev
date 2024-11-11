@@ -3,9 +3,9 @@ import { Button } from '@/components/ui/button';
 import { useUser } from '@/context/userProvider';
 import { useNavigate } from 'react-router-dom';
 import { OwnerPropertyListCard } from './ownerPropertyListCard';
-import { LoadingSpinner } from './loadingSpinner';
+import { LoadingSpinner } from '../components/loadingSpinner';
 import { useGetAxiosRequest } from '@/hooks/getAxiosRequest';
-import { FilterInput } from '../filterInput';
+import { FilterInput } from '../components/filterInput';
 
 interface Token {
   total_tokens: number;
@@ -22,6 +22,7 @@ interface Property {
   image: string[];
   status: string;
   rejection_reason: string;
+  rejection_reason_comment:string;
 }
 
 export const Porfolio: React.FC = () => {
@@ -33,9 +34,7 @@ export const Porfolio: React.FC = () => {
   // Usar el hook personalizado para obtener las propiedades
   const { error, loading } = useGetAxiosRequest<{ properties: Property[] }>(
     `${import.meta.env.VITE_APP_BACKEND_URL}property/properties/private/`,
-    (data) =>{ 
-      console.log(data);
-      
+    (data) =>{       
       setProperties(data.properties)},
     (error) => console.error('Error fetching your portfolio:', error)
   );
@@ -89,6 +88,7 @@ export const Porfolio: React.FC = () => {
               status={property.status}
               rejection_reason={property.rejection_reason}
               tokens_available={property.tokens[0]?.tokens_available || 0} // Tokens disponibles
+              rejectionReasonComment={property.rejection_reason_comment}
             />
           ))
         ) : (
