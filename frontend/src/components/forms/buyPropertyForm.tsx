@@ -17,8 +17,8 @@ export const PurchaseForm: React.FC<PurchaseFormProps> = ({
     property_id,
   }) => {
     const { role } = useUser(); // Obtener el rol del usuario
-    const canInvest = role === 'investor'; // Validar si el usuario puede invertir
-    const isLoggedIn = !!role; // Verificar si el usuario ha iniciado sesión
+    const canInvest = role === 'investor'; 
+    const isLoggedIn = !!role; 
 
     return (
       <section className="sticky w-full space-y-4 top-0 py-4">

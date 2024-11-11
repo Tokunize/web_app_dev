@@ -9,7 +9,7 @@ import {
 } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { useAuth0 } from '@auth0/auth0-react';
-import { Pin } from '@/views/pin';
+import { Pin } from '@/utils/pin';
 
 const Spinner = () => {
   return (

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Filters } from '@/types';
 
 // Mapeo de opciones legibles para clasificación
 const sortOptions: { [key: string]: string } = {
@@ -9,11 +10,13 @@ const sortOptions: { [key: string]: string } = {
   'annual_return_desc': 'Annual Return: High to Low',
 };
 
+
 interface FiltersProps {
   locations: string[];
-  onFilterChange: (key: string, value: any) => void;
   propertyTypes: string[];
+  onFilterChange: (key: keyof Filters, value: string) => void;
 }
+
 
 export const PropertyFilters: React.FC<FiltersProps> = ({
   locations,

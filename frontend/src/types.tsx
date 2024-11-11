@@ -14,3 +14,30 @@ export interface Asset {
     projected_annual_return:string;
 }
 
+
+export interface Property {
+    id: string;
+    title: string;
+    location: string;
+    property_type: string;
+    tokens: { token_price: string; tokensSold: number; total_tokens: number; tokens_available: number }[];
+    projected_annual_return: string;
+    image: string[];
+    status: string;
+    investment_category: string;
+    created_at: string;
+  }
+  
+export type Filters = {
+    location: string;
+    property_type: string;
+    sort_by: string;
+  };
+  
+
+export   interface PropertyToken {
+    token_price: string;
+    tokensSold: number;
+    total_tokens: number;
+    tokens_available: number;
+  }

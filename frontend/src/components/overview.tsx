@@ -40,8 +40,12 @@ interface PropertyData {
 }
 
 
-export const Overview = () => {
-  
+export const Overview = ({overviewData}) => {
+
+  if(overviewData){
+    console.log(overviewData);
+    
+  }
   const [property, setProperty] = useState<PropertyData | null>(null);
   const [progress, setProgress] = useState<number>(0);
   const { id } = useParams<{ id: string }>();
@@ -94,33 +98,33 @@ export const Overview = () => {
   < LoadingSpinner/>
  </div>;
 
-    const minPrice = property.price * 0.8;
-    const maxPrice = property.price * 1.2;
+    const minPrice = overviewData.price * 0.8;
+    const maxPrice = overviewData.price * 1.2;
 
   return (
     <section className='md:pl-5 text-lg'> 
         <div className="border-b py-5">
-          <h4 className="text-xl font-semibold mb-2">{property.title}</h4>
-          <p className="text-medium text-gray-500">{property.location}, {property.post_code} </p>
+          <h4 className="text-xl font-semibold mb-2">{overviewData.title}</h4>
+          <p className="text-medium text-gray-500">{overviewData.location}, {overviewData.post_code} </p>
         </div> 
         <div className="mt-6 space-y-6  bg-[#F4FAE2] rounded-lg p-4 ">
+        <div className="flex items-center space-x-5">
+            <FaBed className="text-xl" />
+            <span className="text-xl">{overviewData.bedrooms || 'N/A'} Apartments</span>
+          </div>
+
           <div className="flex items-center space-x-5">
             <FaBath className="text-xl" />
-            <span className="text-xl">{property.bathrooms || 'N/A'} Bath</span>
-          </div>
-  
-          <div className="flex items-center space-x-5">
-            <FaBed className="text-xl" />
-            <span className="text-xl">{property.bedrooms || 'N/A'} Beds</span>
+            <span className="text-xl">{overviewData.bathrooms || 'N/A'} Bath</span>
           </div>
   
           <div className="flex items-center space-x-5">
             <FaRulerCombined className=" text-xl" />
-            <span className="text-xl">{property.size || 'N/A'} sq ft</span>
+            <span className="text-xl">{overviewData.size || 'N/A'} sq ft</span>
           </div>
           <div className="flex items-center space-x-5">
             <FaHouse className=" text-xl" />
-            <span className="text-xl">{property.property_type || 'N/A'}</span>
+            <span className="text-xl">{overviewData.property_type || 'N/A'}</span>
           </div>
         </div>
 
@@ -192,8 +196,8 @@ export const Overview = () => {
         <div className="mt-[40px] featureContainer my-[40px]   bg-[#F4FAE2] rounded-lg p-4  ">
           <h2 className="text-2xl font-semibold mb-4">Key Features</h2>
           <ul className="list-disc pl-5 space-y-1 text-gray-700 break-words">
-            {property.amenities ? (
-              property.amenities.map((item: string, index: number) => (
+            {overviewData.amenities ? (
+              overviewData.amenities.map((item: string, index: number) => (
                 <li key={index}>{item}</li>
               ))
             ) : (
@@ -244,7 +248,7 @@ export const Overview = () => {
                 with proximity to corporate offices.
             </p>
         </div>
-          <MapView  location={property.location} />
+          <MapView  location={overviewData.location} />
         <div className="featureContainer  my-[40px] bg-[#F4FAE2] rounded-lg p-4 ">
           <h4 className="text-2xl font-semibold">Historical sold prices in {property.location}</h4>
           <HistoricalPrice />

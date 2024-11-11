@@ -27,6 +27,8 @@ def hola_view(request):
 
         return JsonResponse({'message': 'Hola'}, status=200)
     return JsonResponse({'error': 'Invalid request method'}, status=405)
+ 
+
 
 class SyncUserView(APIView):
     authentication_classes = [Auth0JWTAuthentication]

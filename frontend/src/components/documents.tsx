@@ -14,8 +14,8 @@ export const Documents = () => {
       <h4 className="font-bold text-[30px] mb-4">Projected Annual Returns</h4>
       <ul className="space-y-4">
         <li className="flex items-center space-x-2">
-          <a href="https://example.com/report1" target="_blank" rel="noopener noreferrer" className="flex items-center underline">
-            Property Management and Insurance
+          <a href="https://tssrct-my.sharepoint.com/:w:/g/personal/mohamed_omar_tokunize_com/EVRdWk4gy71Ap6BAx_BcH9IBJXXrbBYoM9WyEn4FDobmlw?e=sJecMu" target="_blank" rel="noopener noreferrer" className="flex items-center underline">
+            Private Placement Memorandum
           </a>
           <img src={externalLink} alt="external-link" />
         </li>
