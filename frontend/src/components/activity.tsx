@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { HistoricalPrice } from "./graphs/historicalGraph";
 import { SmallSignUpForm } from "./property/smallSignUp";
-import { LoadingSpinner } from "./dashboard/loadingSpinner";
+import { LoadingSpinner } from "./loadingSpinner";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
 import { useAuth0 } from "@auth0/auth0-react";
 

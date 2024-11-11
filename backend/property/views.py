@@ -4,6 +4,10 @@ from rest_framework import status
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import stripe
+from django.db.models import Count
+from collections import defaultdict
+import calendar
+from django.db.models.functions import TruncMonth
 import os
 import requests
 import random
@@ -12,7 +16,8 @@ from wallet.serializers import WalletSerializer
 from wallet.models import Wallet
 from django.conf import settings  # Make sure to import settings to access the API key
 from django.db.models import Sum
-
+from notifications.models import Notification
+from notifications.serializers import NotificationSerializer
 from rest_framework.views import APIView
 from property.models import Property,Token,Transaction,PropertyToken,PropertyMetrics
 from .serializers import (
@@ -30,8 +35,12 @@ from .serializers import (
     PropertyMetricsSerializer,
     UpdatePropertyStatusSerializer,
     PropertyUpdatesSerializer,
-    MarketplaceListViewSerializer
+    MarketplaceListViewSerializer,
+    AdminPropertyManagment,
+    AdminOverviewSerializer
 )
+from rest_framework.pagination import PageNumberPagination
+from datetime import datetime
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Max
@@ -43,6 +52,8 @@ from users.authentication import Auth0JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny,BasePermission
 from notifications.models import ActivityLog
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from .permissions import IsAdminOrOwnerPermission, IsAdminPermission
+from users.models import CustomUser
 
 
 def log_activity(event_type, involved_address, contract_address=None, payload=None):
@@ -61,20 +72,10 @@ def log_activity(event_type, involved_address, contract_address=None, payload=No
         payload=payload
     )
 
-class IsAdminOrOwner(BasePermission):
-    def has_permission(self, request, view):
-        print(f"User Role: {getattr(request, 'user_role', None)}")  # Verifica el user_role
-        if request.user_role== 'admin':
-            return True
-        if request.user_role == 'owner':
-            return True
-        return False
     
-
-
 class PropertyListView(APIView):
     authentication_classes = [Auth0JWTAuthentication]
-    permission_classes = [IsAdminOrOwner]
+    permission_classes = [IsAdminOrOwnerPermission]
 
 
     def get(self, request):
@@ -120,36 +121,59 @@ class PropertyListView(APIView):
             'properties': properties_data  # Include properties with metrics
         })
 
+
+
 class PropertyStatusUpdateView(APIView):
     authentication_classes = [Auth0JWTAuthentication]
-    permission_classes = [IsAuthenticated]  # Cambia esto si necesitas permisos diferentes
+    permission_classes = [IsAdminPermission]  # Adjust if other permissions are needed.
 
     def put(self, request, propertyId):
+        # Retrieve property instance and new status data
         property_instance = get_object_or_404(Property, id=propertyId)
-        
-        # Verificar si se está actualizando el estado a "rejected"
         new_status = request.data.get('status')
-        rejection_reason = request.data.get('rejection_reason')
-
-        # Validar que si el estado es "rejected", el motivo de rechazo sea proporcionado
-        if new_status == 'rejected' and not rejection_reason:
-            return Response({'error': 'Rejection reason must be provided when status is rejected.'},
-                            status=status.HTTP_400_BAD_REQUEST)
+        rejection_reason = request.data.get('rejectionReason')
+        rejection_reason_comment = request.data.get('rejectionDescription')
         
-        # Actualizar el estado y el motivo de rechazo si aplica
-        if new_status == 'rejected':
-            request.data['rejection_reason'] = rejection_reason  # Establece el motivo de rechazo
-
-        # Serializar y guardar los datos
-        serializer = UpdatePropertyStatusSerializer(property_instance, data=request.data, partial=True)
-
+        # If status is rejected, ensure rejection reason is provided
+        if new_status == 'rejected' and not rejection_reason:
+            return Response(
+                {'error': 'Rejection reason must be provided when status is rejected.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Set rejection fields in request data if needed
+        update_data = {
+            'status': new_status,
+            'rejection_reason': rejection_reason if new_status == 'rejected' else None,
+            'rejection_reason_comment': rejection_reason_comment if new_status == 'rejected' else None,
+        }
+        
+        # Use a serializer to validate and update the property
+        serializer = UpdatePropertyStatusSerializer(property_instance, data=update_data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            
+            # Create a rejection notification if needed
+            if new_status == 'rejected':
+                self._create_rejection_notification(property_instance)
+            
             return Response(serializer.data, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    
+    def _create_rejection_notification(self, property_instance):
+        """
+        Create a notification for the property owner if the property is rejected.
+        """
+        owner_profile = property_instance.owner_profile
+        message = f"Your property '{property_instance.title}' has been rejected. Check status on the dashboard."
+        
+        # Directly create the notification object to save overhead from using the serializer
+        Notification.objects.create(
+            user=owner_profile.user_id, 
+            message=message,
+            notification_type='admin_broadcast'
+        )
 
 
 class PublicPropertyList(APIView):
@@ -170,6 +194,7 @@ class ConditionalPermissionMixin:
 
 class PropertyDetailView(ConditionalPermissionMixin, APIView):
     authentication_classes = [Auth0JWTAuthentication]
+    permission_classes=[AllowAny]
     
     def get(self, request, pk):
         try:
@@ -661,3 +686,90 @@ class MarketplaceListView(APIView):
         properties = Property.objects.filter(pk__in=ids).exclude(status__in=["under_review", "rejected"])
         serializer = self.serializer_class(properties, many=True)
         return Response(serializer.data)
+    
+
+#ADMIN DASHBOARD VIEWS 
+
+    #PROPERTY MANAGMENT VIEW
+    
+class PropertyManagmentListView(APIView):
+    authentication_classes=[Auth0JWTAuthentication]
+    permission_classes=[IsAdminPermission]
+
+    def get(self, request):
+        try:
+            properties = Property.objects.all()
+            serializer = AdminPropertyManagment(properties, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        except Property.DoesNotExist:
+            return Response(
+                {"error": "No properties found"},
+                status=status.HTTP_404_NOT_FOUND
+            )  
+        except Exception as e:
+            return Response(
+                {"error": f"An error occurred: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )    
+    
+    #ADMIN OVERVIEW API
+
+class AdminOverviewListView(APIView):
+    authentication_classes=[Auth0JWTAuthentication]
+    permission_classes=[IsAdminPermission]
+
+    def get(self,request):
+        try:
+            current_month = datetime.now().month
+
+            # Calcular las propiedades publicadas por mes
+            published_properties = Property.objects.annotate(month=TruncMonth('created_at')) \
+            .filter(status = "published") \
+            .values('month') \
+            .annotate(count=Count('id')) \
+            .order_by('month')
+
+            # Crear el diccionario de propiedades por mes
+            monthly_counts = defaultdict(int)
+            for entry in published_properties:
+                # Extraemos el año y mes
+                month_key = entry['month'].strftime('%Y-%m')  # 'YYYY-MM'
+                monthly_counts[month_key] = entry['count']
+
+            # Meses en inglés
+            months = list(calendar.month_name)[1:]  # ['January', 'February', ..., 'December']
+
+            # Crear el formato deseado para chartData
+            chart_data = []
+            for i, month_name in enumerate(months):
+                # Solo incluir meses hasta el mes actual
+                if i+1 <= current_month:
+                    month_key = f"2024-{str(i+1).zfill(2)}"  # Formato '2024-MM'
+                    chart_data.append({
+                        'month': month_name,
+                        'properties': monthly_counts.get(month_key, 0)  # Si no hay datos, asignamos 0
+                    })
+
+
+            under_review = Property.objects.filter(status = "under_review")
+            published_properties_amount = Property.objects.filter(status = "published").count()
+            serializer = AdminOverviewSerializer(under_review, many=True)
+
+            return Response({
+                "published_properties" : published_properties_amount,
+                "UR_properties": serializer.data,
+                'published_properties_per_month': chart_data
+            }, status=status.HTTP_200_OK)
+      
+        except Property.DoesNotExist:
+            return Response(
+                {"error": "No properties found"},
+                status=status.HTTP_404_NOT_FOUND
+            )  
+        except Exception as e:
+            return Response(
+                {"error": f"An error occurred: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            ) 
+

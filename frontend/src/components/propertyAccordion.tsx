@@ -5,12 +5,15 @@ import { Documents } from './documents';
 import { Activity } from './activity';
 import { Finantial } from './financial';
 import { Overview } from './overview';
+import { Property } from '@/types';
 
 interface PropertyAccordionProps {
   property_id: number;
+  overviewData: Property 
 }
 
-export const PropertyAccordion: React.FC<PropertyAccordionProps> = ({ property_id }) => {
+export const PropertyAccordion: React.FC<PropertyAccordionProps> = ({ property_id, overviewData }) => {
+  
   const [activeIndex, setActiveIndex] = useState<number | null>(0);
   
   // Define view types based on index
@@ -18,6 +21,7 @@ export const PropertyAccordion: React.FC<PropertyAccordionProps> = ({ property_i
   const viewType = viewTypes[activeIndex ?? 0];
 
   const { data, loading, error } = useFetchPropertyDetails(property_id, viewType);
+  
 
   const handleClick = (index: number) => {
     setActiveIndex(index === activeIndex ? null : index);
@@ -56,7 +60,7 @@ export const PropertyAccordion: React.FC<PropertyAccordionProps> = ({ property_i
       {/* Accordion Content */}
       <div>
         {activeIndex === 0 && (
-          <Overview/>
+          <Overview overviewData={overviewData}/>
         )}
         {activeIndex === 1 && (
           <Finantial data={data} loading={loading} error={error} />

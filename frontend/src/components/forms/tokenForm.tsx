@@ -19,7 +19,7 @@ interface FormData {
   tokens_available: number | string;
 }
 
-export const TokenForm: React.FC<TokenFormProps> = ({ propertyId,OnNext,onBack }) => {
+export const TokenForm: React.FC<TokenFormProps> = ({ propertyId,onBack }) => {
   const { getAccessTokenSilently } = useAuth0();  // Acceso al método para obtener el token
   const [formData, setFormData] = useState<FormData>({
     token_code: '',
@@ -62,7 +62,6 @@ export const TokenForm: React.FC<TokenFormProps> = ({ propertyId,OnNext,onBack }
           Authorization: `Bearer ${accessToken}`  
         }
       };
-
       const response = await axios.post(apiUrl, updatedFormData, config);
       console.log('Response:', response.data);
       handleReset();
@@ -72,8 +71,8 @@ export const TokenForm: React.FC<TokenFormProps> = ({ propertyId,OnNext,onBack }
   };
 
   return (
-    <section className="p-6 bg-white shadow-md rounded-md ">
-      <h1 className="text-xl font-bold mb-4">Create Token</h1>
+    <section className="p-6">
+      <h1 className="text-xl font-bold mb-4">Create Property Token </h1>
       <form onSubmit={handleSubmit}>
         {/* Token Code */}
         <div className="mb-4">

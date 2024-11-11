@@ -1,6 +1,7 @@
 import { Carousel } from "flowbite-react";
 import { Progress } from "../ui/progress";
 import { useEffect, useState } from "react";
+import { FormatCurrency } from "../currencyConverter";
 
 interface PaymentFirstProps {
   property_id: number; 
@@ -83,7 +84,7 @@ export const PaymentFirst: React.FC<PaymentFirstProps> = ({ propertyData }) => {
               </li>
               <li className="flex flex-col text-sm text-gray-500">
                 Current Value
-                <span className="text-black text-lg">£ {propertyData.price}</span>
+                <span className="text-black text-lg"><FormatCurrency  amount={propertyData.price}/></span>
               </li>
             </ul>
           </div>
@@ -94,7 +95,7 @@ export const PaymentFirst: React.FC<PaymentFirstProps> = ({ propertyData }) => {
             </header>
             <ul className="space-y-2">
               <li className="flex justify-between">
-                Equity Listed <span>£ {propertyData.price}</span>
+                Equity Listed <span> <FormatCurrency amount={propertyData.price}/> </span>
               </li>
               <Progress value={progressEquity} className="w-[60%]" />
               <li className="flex justify-between">

@@ -1,15 +1,15 @@
-import { useAuth0 } from '@auth0/auth0-react';
+import { useUser } from "@/context/userProvider";
 
-const DashboardHeader = () => {
-  const { user, isLoading } = useAuth0();
+
+export const DashboardHeader = () => {
+  const { name } = useUser();
 
   return (
-    <div className="flex justify-end items-center p-5">
-      <span className="text-xl font-bold">
-        {isLoading ? 'Loading...' : user ? `Welcome back, ${user.name}!` : 'Welcome!'}
+    <div className="flex justify-start items-center">
+      <span className="text-lg font-normal">
+        {`Welcome back, ${name}`}
       </span>
     </div>
   );
 };
 
-export default DashboardHeader;

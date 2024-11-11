@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import PositiveNumber from "../../assets/positiveNUmber.svg";
+import PositiveNumber from "../../assets/postiveNumber.svg";
 import { AcceptProperty } from "../acceptProperty";
 import { useUser } from "@/context/userProvider";
 import { formatDistanceToNow, parseISO } from 'date-fns'; // Import necessary functions from date-fns
@@ -55,6 +55,8 @@ const formatStatus = (status: string): string => {
     .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
     .join(' '); // Join the words back into a string
 };
+
+
 // The main functional component
 export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData }) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);

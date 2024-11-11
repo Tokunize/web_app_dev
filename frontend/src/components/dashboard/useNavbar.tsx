@@ -1,73 +1,103 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Notifications } from '../notifications';
-import {
-    Popover,
-    PopoverTrigger,
-    PopoverContent,
-} from "@/components/ui/popover";
-import {
-    Avatar,
-    AvatarFallback,
-    AvatarImage,
-} from "@/components/ui/avatar";
-// import { CreateWallet } from './createWallet';
-import { LogoutButton } from '../buttons/logoutBtn';
+
+
 import { useUser } from '@/context/userProvider';
+import { useEffect } from "react";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Notifications } from '../notifications/notifications';
 
-const AccountMenu: React.FC<{ navigate: (path: string) => void }> = ({ navigate }) => {
-    return (
-        <div className="flex flex-col">
-            <div className="p-4 font-bold">My Account</div>
-            <div className="border-b"></div>
-            <div className="flex flex-col px-3 mt-2">
-                <MenuItem onClick={() => navigate("/dashboard/")}>Dashboard</MenuItem>
-                <MenuItem onClick={() => navigate("/")}>Marketplace</MenuItem>
-                {/* <MenuItem onClick={() => <CreateWallet />}>Create Wallet</MenuItem> */}
-                {/* Aquí renderizas el LogoutButton y defines que es el último */}
-                <MenuItem isLastItem>
-                    <LogoutButton />
-                </MenuItem>
-            </div>
-        </div>
-    );
-};
+// Tipado del contexto de usuario
+interface UserContext {
+  userImage?: string;
+  name: string;
+  userEmail: string;
+}
 
-const MenuItem: React.FC<{
-    onClick?: () => void;
-    children: React.ReactNode;
-    isLastItem?: boolean; // Nueva prop para indicar si es el último item
-}> = ({ onClick, children, isLastItem = false }) => {
-    return (
-        <button
-            className={`text-left py-2  ${isLastItem ? 'pl-0' : 'hover:bg-accent duration-300 hover:text-accent-foreground pl-4'}  rounded-lg w-full`}
-            onClick={onClick}
-        >
-            {children}
-        </button>
-    );
-};
-
+// Componente de navegación de usuario
 export const UserNavbar: React.FC = () => {
-    const navigate = useNavigate();
-    const { userImage } = useUser();
+  const { userImage, name, userEmail } = useUser() as UserContext;
 
-    return (
-        <div className="flex">
-            <div className="relative flex items-center justify-center mr-4">
-                <Notifications />
+  // Función de manejo de atajos de teclado
+  const handleShortcuts = (event: KeyboardEvent) => {
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "b") {
+      event.preventDefault();
+      window.location.href = "/dashboard/";
+    }
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "z") {
+      event.preventDefault();
+      window.location.href = "/";
+    }
+    if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === "q") {
+      event.preventDefault();
+      window.location.href = "/logout";
+    }
+  };
+
+
+  useEffect(() => {
+    // Agrega el evento al montar
+    window.addEventListener("keydown", handleShortcuts);
+
+    // Limpia el evento al desmontar
+    return () => window.removeEventListener("keydown", handleShortcuts);
+  }, []);
+
+  const userNavLinkDropDown = [
+    {name: "Marketplace", url: "/", shortCutLetter: "Z"},
+    {name: "Dashboard", url: "/dashboard/",shortCutLetter:"B" },
+  ]
+
+  return (
+    <div className="flex space-x-4">
+      <Notifications/>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+            <Avatar className="h-9 w-9">
+              <AvatarImage src={userImage || undefined} alt="@user" />
+              <AvatarFallback>SC</AvatarFallback>
+            </Avatar>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56" align="end" forceMount>
+          <DropdownMenuLabel className="font-normal">
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium leading-none">{name}</p>
+              <p className="text-xs leading-none text-muted-foreground">
+                {userEmail}
+              </p>
             </div>
-            <Popover>
-                <PopoverTrigger asChild>
-                    <Avatar className="cursor-pointer w-10 h-10 rounded-full">
-                        <AvatarImage src={userImage || undefined} alt="@user" />
-                        <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
-                </PopoverTrigger>
-                <PopoverContent side="bottom" align="end" className="max-w-xs p-0">
-                    <AccountMenu navigate={navigate} />
-                </PopoverContent>
-            </Popover>
-        </div>
-    );
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            {userNavLinkDropDown.map((link, index)=>(
+              <DropdownMenuItem key={index}>
+              {link.name}
+              <DropdownMenuShortcut>⌘{link.shortCutLetter}</DropdownMenuShortcut>
+            </DropdownMenuItem>
+            ))}
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem>
+            Log out
+            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
 };

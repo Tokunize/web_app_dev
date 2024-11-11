@@ -49,7 +49,6 @@ const useFetchPropertyDetails = (property_id: number, viewType: string): FetchSt
         const config: AxiosRequestConfig = {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`
           }
         };
 
