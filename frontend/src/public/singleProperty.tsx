@@ -60,7 +60,7 @@ export const SingleProperty = () => {
           {data && (
             <PurchaseForm
               property_id={numericId}
-              tokenPrice={parseFloat(data.tokens[0].token_price)} // Convertir a número si es necesario
+              tokenPrice={parseFloat(data.tokens[0].token_price) } // Convertir a número si es necesario
               projected_annual_return={parseFloat(data.projected_annual_return)} // Convertir a número si es necesario
             />
           )}

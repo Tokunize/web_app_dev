@@ -27,6 +27,8 @@ export interface Property {
     investment_category: string;
     created_at: string;
   }
+
+  
   
 export type Filters = {
     location: string;

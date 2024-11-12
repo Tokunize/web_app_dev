@@ -14,6 +14,7 @@ import { useToast } from '../ui/use-toast';
 import { LoadingSpinner } from '../loadingSpinner';
 
 export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) => {
+  
   const navigate = useNavigate()
   const { getAccessTokenSilently } = useAuth0(); 
   const [step, setStep] = useState(1);
