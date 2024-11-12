@@ -5,6 +5,8 @@ import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover'; // Aseg
 import { TokenPriceGraph } from '../graphs/tokenPriceGraph';
 import { FormatCurrency } from '../currencyConverter';
 
+
+
 interface PurchaseFormProps {
   tokenPrice: number;
   projected_annual_return: number;

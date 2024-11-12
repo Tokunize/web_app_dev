@@ -7,7 +7,9 @@ import { RiskOverview } from "@/components/graphs/riskGraph";
 import { PerformanceGraph } from "@/components/graphs/performanceGraph";
 import { MyAssetsTable } from "@/components/dashboard/myAssetsTable";
 import { LoadingSpinner } from "@/components/loadingSpinner";
-import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";  // Importamos el hook personalizado
+import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";  
+
+
 
 interface Investment {
   properties: {
@@ -153,7 +155,7 @@ export const InvestorOverview = () => {
         <Card className="w-1/2 border-0 shadow-none">
           <PerformanceGraph  
             description=""
-            title={"S&P 500 Chart"}
+            title={"Comparative Analysis Chart"}
             data={chartData2}
           />
         </Card>
