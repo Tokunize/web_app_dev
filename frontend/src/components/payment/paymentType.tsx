@@ -1,7 +1,7 @@
 import { useState } from "react";
 import yellowCardIcon from "../../assets/yellowCardIcon.svg";
 import cardIcon from "../../assets/cardIcon.svg";
-// import ConnectMetaMask from "../blockchain/connectMetamask";
+import ConnectMetaMask from "../blockchain/connectMetamask";
 
 // Define the props type
 interface PaymentTypeProps {
@@ -27,9 +27,9 @@ export const PaymentType: React.FC<PaymentTypeProps> = ({ onPaymentSelect }) => 
           <img alt="E-Wallet icon" className="h-8" src={cardIcon} />
           <p className="pl-4">Wallet</p>
         </span>
-        {/* <ul>
+        <ul>
             <li ><ConnectMetaMask/></li>
-          </ul> */}
+          </ul>
       </div>
 
       <span
