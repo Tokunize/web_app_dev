@@ -36,17 +36,15 @@ export const PropertyManagement = () => {
       ownershipPercentage: property.ownershipPercentage || 0,
       listingDate: property.created_at,
       propertyType: property.property_type || "",
-      investmentCategory: property.investment_category || ""
+      investmentCategory: property.investment_category || "",
     }));
   };
 
   // Fetching properties
   const { loading, error: fetchError } = useGetAxiosRequest<Property[]>(
-    `${import.meta.env.VITE_APP_BACKEND_URL}property/property-managment/`,
+    `${import.meta.env.VITE_APP_BACKEND_URL}property/property-managment/`,true,
     (fetchedData) => {
-      try {        
-        console.log(fetchedData);
-        
+      try {                
         const mappedProperties = mapPropertiesToCamelCase(fetchedData);
         const parsedProperties = z.array(propertySchema).parse(mappedProperties);
         setProperties(parsedProperties); // Set validated properties

@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import useFetchPropertyDetails from '@/components/property/getDetailsHook';
 import axios from 'axios';
 import { BackButton } from '../buttons/backButton';
 import { Button } from '@/components/ui/button';
@@ -11,6 +10,7 @@ import { ImageUploader } from '@/components/property/imageUploader';
 import ImageGallery from '@/components/property/imageGallery';
 import { LoadingSpinner } from '../loadingSpinner';
 import { MySelectDropdown } from '../SelectDropdown';
+import { useGetAxiosRequest } from '@/hooks/getAxiosRequest';
 
 interface FormInputProps {
   label: string;
@@ -33,15 +33,15 @@ export const FormInput: React.FC<FormInputProps> = ({ label, name, value, onChan
       onChange={onChange}
       className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200"
     />
-    {/* Optional: Add error message here */}
-    {/* <p className="text-xs text-red-500">{error}</p> */}
   </div>
 );
 export const CreatePropertyForm: React.FC<{ onNext: () => void }> = ({ onNext }) => {
   const { propertyId } = useParams<{ propertyId: string }>();
   const numericPropertyId = propertyId ? parseInt(propertyId, 10) : 0;
-  const viewType = 'all';
-  const { data, loading, error } = useFetchPropertyDetails(numericPropertyId, viewType);
+
+  const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/${numericPropertyId}/landing-page/?view=all`;
+
+  const { data, loading, error } = useGetAxiosRequest(apiUrl,true);
   
 
   const [formValues, setFormValues] = useState({

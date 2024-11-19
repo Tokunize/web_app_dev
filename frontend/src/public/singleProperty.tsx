@@ -9,9 +9,6 @@ import { PropertyImagesGallery } from "@/components/PropertyImagesGallery";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
 import { Property } from '@/types';
 
-// Definir los tipos de los datos de la propiedad
-
-
 export const SingleProperty = () => {
   const { id } = useParams<{ id: string }>();
   

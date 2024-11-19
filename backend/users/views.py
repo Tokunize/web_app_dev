@@ -2,8 +2,8 @@ from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from .models import CustomUser, InvestorProfile, PropertyOwnerProfile
-from .serializers import CustomUserSerializer
+from .models import CustomUser, InvestorProfile, PropertyOwnerProfile,SubmitApplication
+from .serializers import CustomUserSerializer,ApplicationSubmitSerializer
 from rest_framework import status
 from .authentication import Auth0JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -83,3 +83,76 @@ class UserProfileView(APIView):
         serializer = CustomUserSerializer(user)
         return Response(serializer.data)
 
+
+
+#VIEW TO APPLICATION SUBMIT
+class ApplicationSubmitListView(APIView):
+    authentication_classes = [Auth0JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    # Obtener todas las aplicaciones de un usuario
+    def get(self, request):
+        user_id = request.user.id
+
+        try:
+            # Usamos `filter()` para obtener todas las aplicaciones del usuario
+            applications = SubmitApplication.objects.filter(user_id=user_id)            
+            if not applications.exists():
+                return Response({"message": "No applications found for this user."}, status=status.HTTP_404_NOT_FOUND)
+
+            # Serializamos las aplicaciones
+            serializer = ApplicationSubmitSerializer(applications, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            # Capturamos cualquier error no esperado y lo reportamos
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    # Crear una nueva aplicación
+    def post(self, request):
+        request.data['user'] = request.user.id
+        serializer = ApplicationSubmitSerializer(data=request.data)
+        if serializer.is_valid():
+            # Si los datos son válidos, crea la solicitud de aplicación
+            serializer.save()
+            # Devuelve la respuesta con los datos de la solicitud creada
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        # Si los datos no son válidos, devuelve un error con los detalles
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+    # Actualizar una aplicación existente
+    def put(self, request, reference_number):
+        try:
+            # Recupera la solicitud de aplicación usando el reference_number (uuid)
+            application = SubmitApplication.objects.get(reference_number=reference_number)
+
+        except SubmitApplication.DoesNotExist:
+            return Response({"error": "Application not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Serializa los datos con los nuevos datos enviados en la solicitud
+        serializer = ApplicationSubmitSerializer(application, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            # Guarda los cambios de la solicitud
+            serializer.save()
+
+            # Devuelve la respuesta con los datos actualizados
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        # Si los datos no son válidos, devuelve un error con los detalles
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # Obtener una aplicación específica usando el reference_number
+    def get(self, request, reference_number=None):
+        try:
+            # Recupera la solicitud de aplicación usando el reference_number (uuid)
+            application = SubmitApplication.objects.get(reference_number=reference_number)
+
+            # Serializa la solicitud de aplicación encontrada
+            serializer = ApplicationSubmitSerializer(application)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except SubmitApplication.DoesNotExist:
+            return Response({"error": "Application not found."}, status=status.HTTP_404_NOT_FOUND)

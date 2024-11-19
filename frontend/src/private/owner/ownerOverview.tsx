@@ -41,14 +41,14 @@ export const OwnerDashboard = () => {
 
     // Usando el hook personalizado para obtener el balance
     const { error: balanceError, loading: balanceLoading } = useGetAxiosRequest<number>(
-        `${import.meta.env.VITE_APP_BACKEND_URL}wallet/balance-wallet/`,
+        `${import.meta.env.VITE_APP_BACKEND_URL}wallet/balance-wallet/`,true,
         (data) => setOwnerBalance(data),  // Callback de éxito
         (error) => console.error('Error fetching balance:', error)  // Callback de error
     );
 
     // Usando el hook personalizado para obtener las propiedades
     const { error: propertiesError, loading: propertiesLoading } = useGetAxiosRequest<{ properties: Asset[], total_value_tokenized: number }>(
-        `${import.meta.env.VITE_APP_BACKEND_URL}property/properties/private/`,
+        `${import.meta.env.VITE_APP_BACKEND_URL}property/properties/private/`,true, 
         (data) => {
             setValueTokenized(data.total_value_tokenized);
             console.log(typeof(data.total_value_tokenized));

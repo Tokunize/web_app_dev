@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import cardIcon from "../../assets/cardIcon.svg";
 import tokenIcon from "../../assets/token.svg";
 
@@ -7,8 +7,9 @@ interface PaymentSecondProps {
   selectedPaymentMethod: string | null;
   tokenPrice: number;
   totalTokens: number;
-  investmentAmount: string; // Accept investment amount
-  setInvestmentAmount: (amount: string) => void; // Accept function to set amount
+  investmentAmount: number;
+  setInvestmentAmount: (amount: number) => void;
+  setTotalAmountInUSDC: (amount: number) => void; // Nuevo prop para enviar el total en USDC
 }
 
 export const PaymentSecond: React.FC<PaymentSecondProps> = ({
@@ -18,39 +19,62 @@ export const PaymentSecond: React.FC<PaymentSecondProps> = ({
   totalTokens,
   investmentAmount,
   setInvestmentAmount,
+  setTotalAmountInUSDC, // Recibimos la función desde el componente padre
 }) => {
-  const [amount, setAmount] = useState<string>(investmentAmount); // Use the prop value
+  const [amount, setAmount] = useState<string>(investmentAmount.toString()); // Store as string to handle empty input
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/,/g, ""); // Remove commas for proper number handling
-    // Allow only numbers and decimal points
-    if (/^\d*\.?\d*$/.test(value) || value === "") {
-      setAmount(value);
-      setInvestmentAmount(value); // Update the state in parent
+  const handleFocus = () => {
+    if (amount === '0') {
+      setAmount('');
     }
   };
 
-  const amountValue = parseFloat(amount) || 0; // Default to 0 if NaN
-  const tokensPurchased = amountValue / tokenPrice;
-  const equityPercentage = totalTokens > 0 ? (tokensPurchased / totalTokens) * 100 : 0;
+  const handleBlur = () => {
+    if (amount === '') {
+      setAmount('0');
+      setInvestmentAmount(0); // Update parent state
+    }
+  };
 
-  // Format amount for display
-  const formattedAmount = amountValue.toLocaleString('en-UK', {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) { // Allow only digits
+      setAmount(value);
+      const valueInTokens = Number(value); // Get the amount in tokens
+      setInvestmentAmount(valueInTokens); // Update parent state with tokens
+    }
+  };
+
+  // Calcular el valor total en USDC y el porcentaje de equity
+  const usdcAmount = Number(amount) * tokenPrice;
+  const equityPercentage = totalTokens > 0 ? (Number(amount) / totalTokens) * 100 : 0;
+
+  // Formatear el monto en USDC para su visualización
+  const formattedUSDCAmount = usdcAmount.toLocaleString('en-UK', {
     style: 'currency',
-    currency: 'GBP',
+    currency: 'USD',
   });
+
+  // Actualizar el total en USDC en el componente padre cuando el valor de 'amount' cambia
+  useEffect(() => {
+    setTotalAmountInUSDC(usdcAmount); // Enviar el valor total en USDC al padre
+  }, [amount, tokenPrice, setTotalAmountInUSDC]);
 
   return (
     <article className="flex flex-col items-center space-y-4 p-4 border rounded-md w-full max-w-md">
-      <h4 className="text-xl font-semibold">Investment Amount</h4>
+      <h4 className="text-xl font-semibold">Token Amount</h4>
 
       <div className="flex items-center space-x-2">
         <input
           type="text"
+          ref={inputRef}
           value={amount}
-          onChange={handleChange} // Use the new handler
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          onChange={handleChange}
           className="rounded-md w-full text-5xl text-center border-0 outline-none focus:ring-0"
-          placeholder="" // Placeholder is now empty
+          placeholder="0"
         />
       </div>
 
@@ -60,22 +84,22 @@ export const PaymentSecond: React.FC<PaymentSecondProps> = ({
           <span className="flex pl-2 flex-col">
             <span className="font-bold text-medium">Buy</span>
             <span className="text-sm">Token Price £ {tokenPrice}</span>
-            <span className="text-gray-500 text-sm">{!isNaN(tokensPurchased) ? tokensPurchased.toFixed(2) : 0} Tokens</span>
+            <span className="text-gray-500 text-sm">{amount} Tokens</span>
           </span>
         </span>
 
         <div className="flex flex-col">
-          <span>{formattedAmount}</span>
+          <span>{formattedUSDCAmount}</span>
           <span className="text-gray-500 text-sm">{equityPercentage.toFixed(2)}% Equity</span>
         </div>
       </div>
 
-      <div 
-        onClick={goNext} 
+      <div
+        onClick={goNext}
         className="flex p-2 rounded-lg hover:bg-[#C8E870] justify-between items-center w-[80%] mx-auto cursor-pointer"
       >
         <span className="flex items-center">
-          <img alt="token-icon" src={cardIcon} className="h-8" />
+          <img alt="payment-method-icon" src={cardIcon} className="h-8" />
           <span className="flex pl-2 flex-col">
             <span className="font-bold text-medium">Pay With</span>
             <span className="text-gray-400">{selectedPaymentMethod ? selectedPaymentMethod : "Please select payment method"}</span>

@@ -8,10 +8,19 @@ import { PerformanceGraph } from "@/components/graphs/performanceGraph";
 import { MyAssetsTable } from "@/components/dashboard/myAssetsTable";
 import { LoadingSpinner } from "@/components/loadingSpinner";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";  
-
-
+import { DashboardDetailCard } from "@/components/dashboard/dashboardDetailCard";
 
 interface Investment {
+  locations: {
+    item: string,
+    percentage: number,
+    fill: string
+  }[],
+  property_types: {
+    item: string,
+    percentage: number,
+    fill: string
+  }[],
   properties: {
     location: string;
     yield_data: any; // Ajusta el tipo según tu estructura de datos
@@ -20,9 +29,12 @@ interface Investment {
   total_invested: number;
 }
 
+
 export const InvestorOverview = () => {
-  const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/investment-summary/`;
-  const { data: investments, loading, error } = useGetAxiosRequest<Investment>(apiUrl);
+  const { data: investments, loading, error } = useGetAxiosRequest<Investment>(`${import.meta.env.VITE_APP_BACKEND_URL}property/investment-summary/`,true
+  );
+  console.log(investments);
+  
 
   if (loading) {
     return <div><LoadingSpinner/></div>
@@ -46,37 +58,12 @@ export const InvestorOverview = () => {
   }));
 
 
-  
-
-  const predefinedColors = [
-    "#299D90",
-    "#C3DF6D",
-    "#667085", // Color 1
-    "#EAFBBE", // Color 2
-    "#D0D5DD", // Color 3
-    "#83A621", // Color 4
-    "#C8E870", // Color 5
-    "#A6F4C5", // Color 6
-    "#FFFAEA"  // Color 7
-  ];
-
   // Datos para la gráfica de ubicaciones geográficas
-  const geographyData = [...new Set(investments?.properties.map(property => property.location))] || [];
-  const totalLocations = geographyData.length;
-  const chartData = geographyData.map((location, index) => ({
-    location,
-    percentage: Math.round((1 / totalLocations) * 100),
-    fill: predefinedColors[index % predefinedColors.length],
-  }));
+  const chartData = investments?.locations || [];  
 
   // Datos para la gráfica de tipos de propiedades
-  const propertyTypeData = [...new Set(investments?.properties.map(property => property.property_type))] || [];
-  const totalPropertyTypes = propertyTypeData.length;
-  const propertyChartData = propertyTypeData.map((type, index) => ({
-    location: type,
-    percentage: Math.round((1 / totalPropertyTypes) * 100),
-    fill: predefinedColors[index % predefinedColors.length],
-  }));
+  const propertyChartData = investments?.property_types || [];
+
 
   // Datos para la gráfica de performance
   const chartData2 = [
@@ -88,28 +75,17 @@ export const InvestorOverview = () => {
     { month: "June", value: 3.8 },
   ];
 
+  const inverstorOverview = [
+    {title:"Current Rent Balance" , value:234443 },
+    {title:"Total Rental Income" ,value: 53443 }
+  ]
+
   return (
     <section className="">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
-        <Card className="callout-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Current Rent Balance</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">£232,222</div>
-            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-none">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Rental Income</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">£898,322</div>
-            <p className="text-xs text-muted-foreground">+0.4% from last month</p>
-          </CardContent>
-        </Card>
+        {inverstorOverview.map((item,index)=>(
+          <DashboardDetailCard key={index} title={item.title} value={item.value} />
+        ))}
 
         <Card className="shadow-none ">
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
@@ -122,30 +98,36 @@ export const InvestorOverview = () => {
       </div>
 
       <div className="gap-4 flex px-4 pb-4">
-        <Card className="shadow-none w-1/3 border-0">
+        <Card className="shadow-none w-1/2 border-0">
           <PropertyValueGraph />
         </Card>
-        <Card className="shadow-none w-2/3  py-4">
+        <Card className="shadow-none w-1/2  py-4">
           <h4 className="text-lg pl-4 mb-2 font-normal text-gray-500">Yield Projections</h4>
           <MyAssetsTable assetsData={yieldData || []} />
         </Card>
       </div>
 
         <Card className="pb-4 p-4 mx-4 mb-4">
-        <h4 className="text-lg mb-2 font-normal text-gray-500">Investment Diversification</h4>
-        <hr/>
-        <Card className="flex lg:space-x-5 grid-cols-1 grid shadow-none lg:grid-cols-2 border-0">
-          <PieGraph
-            data={chartData}
-            title="Geography"
-            footerDescription="Showing total properties based on the geography"
-          />
-          <PieGraph
-            data={propertyChartData}
-            title="Property Types"
-            footerDescription="Showing total properties based on the property type"
-          />
-        </Card>
+          <h4 className="text-lg mb-2 font-normal text-gray-500">Investment Diversification</h4>
+          <hr/>
+          <Card className="flex lg:space-x-5 grid-cols-1 grid shadow-none lg:grid-cols-2 border-0">
+            <PieGraph
+              customHeight="h-[350px]"
+              customRadius="45"
+              data={chartData}
+              type={"Locations"}
+              title="Geography"
+              footerDescription="Showing diversification based on the geography"
+            />
+            <PieGraph
+              customHeight="h-[350px]"
+              customRadius="45"
+              data={propertyChartData}
+              title="Property Types"
+              type={"Types"}
+              footerDescription="Showing  diversification based on the property type"
+            />
+          </Card>
         </Card>
 
       <div className="flex gap-4 px-4 pb-4">

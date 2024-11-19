@@ -42,8 +42,6 @@ const useFetchPropertyDetails = (property_id: number, viewType: string): FetchSt
 
 
       try {
-        const accessToken = await getAccessTokenSilently();
-
         const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/${property_id}/landing-page/?view=${viewType}`;
 
         const config: AxiosRequestConfig = {

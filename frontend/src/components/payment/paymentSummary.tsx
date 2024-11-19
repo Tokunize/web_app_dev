@@ -1,15 +1,16 @@
 import React from 'react';
 import checkBoxSuccesIcon from "../../assets/bigCheckBox.svg";
+import { FormatCurrency } from '../currencyConverter';
 
 interface PaymentSummaryProps {
-  investmentAmount: string; // Assuming the amount is passed as a string
+  investmentAmount: number; // Assuming the amount is passed as a string
 }
 
 export const PaymentSummary: React.FC<PaymentSummaryProps> = ({ investmentAmount }) => {
   return (
     <article className="p-5 text-center">
       <img alt="success-check-box" src={checkBoxSuccesIcon} className="mx-auto mb-4" />
-      <p className="font-bold text-3xl">£ {investmentAmount}</p>
+      <p className="font-bold text-3xl"><FormatCurrency amount={investmentAmount} /></p>
       <p className="text-lg text-gray-600">Successfully invested</p>
       <ul className="space-y-2 mt-4">
         <li className="flex justify-between py-2 border-b">

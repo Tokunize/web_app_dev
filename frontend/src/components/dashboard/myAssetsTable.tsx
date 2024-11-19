@@ -36,7 +36,8 @@ interface Asset {
   total_tokens?: number;
   status?: string;
   property_status?: string;
-  projected_appreciation?: number;
+  ocupancy_status?:string;
+  projected_appreciation?: string;
   total_rental_income?: number;
   price_change?: number;
   cap_rate?: number;
@@ -74,7 +75,7 @@ export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData })
 
   // Use useMemo to optimize asset data processing
   const memoizedAssetsData = React.useMemo(() => {
-    if (assetsData.length > 0) {
+    if (Array.isArray(assetsData) && assetsData.length > 0) {
       const asset = assetsData[0];
 
       // Add columns dynamically based on the asset data
@@ -105,11 +106,13 @@ export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData })
         },
       });
 
+
+
       asset.projected_rental_yield != null && columns.push({
         accessorKey: "projected_rental_yield",
         header: () => (
-          <div className="flex items-center">
-            <span>Projected Yield (%)</span>
+          <div className="flex items-center min-w-[150px]">
+            <span>Projected Rental Yield (%)</span>
             <button
               onClick={() => setSorting([{ id: 'projected_rental_yield', desc: !sorting[0]?.desc }])}
               className="ml-2 text-gray-500 hover:text-gray-700"
@@ -124,6 +127,20 @@ export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData })
           return <div className={`${textColor}`}>{value.toFixed(2)}%</div>;
         },
       });
+
+      asset.user_tokens != null &&  columns.push({
+        accessorKey: "user_tokens",
+        header: "Liquidity",
+        cell : ({row}) =>{
+          const user_tokens = row.getValue("user_tokens") as number || 0
+          const totalTokens = row.original.total_tokens || 0; // Accedemos directamente al valor
+          const ownerPercentage = (user_tokens*100)/ totalTokens
+          return <div className="flex flex-col min-w-[100px]">
+              <span className="text-[#82A621] font-bold">{ownerPercentage.toFixed(2)}%</span>
+              <span>{user_tokens} of {totalTokens}</span>
+          </div>
+        }
+      })
 
       // Listing price column
       asset.listing_price != null && columns.push({
@@ -148,8 +165,7 @@ export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData })
             const formatted = currency
               ? new Intl.NumberFormat("en-UK", { style: "currency", currency: "GBP" }).format(value)
               : `${value.toFixed(2)}%`;
-            const textColor = value > 0 ? "text-[#0FB86A]" : "text-red-500";
-            return <div className={`${textColor} font-medium`}>{formatted}</div>;
+            return <div className="font-medium">{formatted}</div>;
           },
         });
       };
@@ -196,6 +212,17 @@ export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData })
               <div className={`w-2 h-2 rounded-full mr-2 ${dotColor}`}></div>
               <span className="font-medium">{formatStatus(value)}</span> {/* Use formatStatus here */}
             </div>
+          );
+        },
+      });
+
+      asset.ocupancy_status && columns.push({
+        accessorKey: "ocupancy_status",
+        header: "Status",
+        cell: ({ row }) => {
+          const value = row.getValue("ocupancy_status") as string;          
+          return (
+            <div>{formatStatus(value)}</div>
           );
         },
       });

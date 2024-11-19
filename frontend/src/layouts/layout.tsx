@@ -18,6 +18,8 @@ import Dashboard from "./dashboard";
 import SignUpController from "../components/singUpFlow.tsx/singUpController";
 import { PropertyManagement } from "@/private/admin/propertyManagment";
 import { TradingPage } from "../private/investor/trading/TradingPage";
+// import { PublicPropertyForm } from "@/private/owner/publicPropertyForm";
+import { SmartContractFunctions } from "@/private/smartContractsManagment/smartContractFuntions";
 
 const Layout = () => {
   return (
@@ -79,6 +81,12 @@ const Layout = () => {
               path="dashboard-property/:propertyId/"
               element={
                 <ProtectedRoute roleRequired="investor,admin" element={<CreatePropertyController />} />
+              }
+            />
+            <Route
+              path="smart-contract/"
+              element={
+                <ProtectedRoute roleRequired="admin" element={<SmartContractFunctions />} />
               }
             />
           </Route>

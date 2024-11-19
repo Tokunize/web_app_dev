@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField, JSONField
 from django.utils import timezone
 
-
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
@@ -11,26 +10,33 @@ class TimeStampedModel(models.Model):
         abstract = True
 
 class Property(TimeStampedModel): 
-    LISTING = 'listing'
-    PUBLISHED = 'published'
-    DRAFT = 'draft'
-    COMING_SOON = 'coming_soon'
-    REJECTED = 'rejected'
-    UNDER_REVIEW = 'under_review' 
-
-
     STATUS_CHOICES = [
-        (LISTING, 'Listing'),
-        (PUBLISHED, 'Published'),
-        (DRAFT, 'Draft'),
-        (COMING_SOON, 'Coming Soon'),
-        (REJECTED, 'Rejected'),
-        (UNDER_REVIEW, 'Under Review') 
+    ('listing', 'Listing'), 
+    ('published', 'Published'), 
+    ('draft', 'Draft'), 
+    ('coming_soon', 'Coming Soon'), 
+    ('rejected', 'Rejected'), 
+    ('under_review', 'Under Review')
     ]
 
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=LISTING, help_text="The current status of the property listing.")
+    OCUPANCY_STATUS = [
+        ('rented', 'Rented'), 
+        ('vacant', 'Vacant'), 
+        ('occupied', 'Occupied')
+    ]
+
+
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="listing", help_text="The current status of the property listing.")
+    ocupancy_status = models.CharField(max_length=25, choices=OCUPANCY_STATUS, default="rented")
     
-    # owner fill formmmmmmm
+    
+    application_ref_number = models.OneToOneField(
+        'users.SubmitApplication',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='property_application',
+    )   
     property_code = models.CharField(max_length = 50, unique=True, null=True, blank=True)
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
@@ -45,6 +51,7 @@ class Property(TimeStampedModel):
     size = models.DecimalField(max_digits=6, decimal_places=2, help_text="Total interior square footage of the property.")
     year_built = models.IntegerField(help_text="The year in which the property was originally constructed.")
         
+
     ownershipPercentage = models.IntegerField(blank=True, null=True)
     tenant_turnover = models.DecimalField(blank=True, null=True,max_digits=5, decimal_places=2,)
     vacancy_rate = models.DecimalField(blank=True, null=True, max_digits=5, decimal_places=2)

@@ -30,9 +30,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const fetchToken = async () => {
       if (isAuthenticated) {
         try {
-          const claims: IdToken | undefined = await getIdTokenClaims();
-          console.log(claims);
-          
+          const claims: IdToken | undefined = await getIdTokenClaims();          
           if (claims) {
             const userEmail = claims.email as string | undefined;
             const userRole = claims["https://tokunize.com/role"] as string | undefined;
@@ -72,7 +70,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useUser = () => {
   const context = useContext(UserContext);
   if (context === undefined) {
-    throw new Error('useUser must be used within a UserProvider');
+    throw new Error('Use User must be used within a UserProvider');
   }
   return context;
 };

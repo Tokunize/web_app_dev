@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -14,7 +14,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
+} from "@tanstack/react-table";
 
 import {
   Table,
@@ -23,19 +23,20 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 
-import { DataTablePagination } from "./data-table-pagination"
-import { DataTableToolbar } from "./data-table-toolbar"
-import { SinglePropertyDetailOnModal } from "@/private/investor/trading/propertyDetails"
+import { DataTablePagination } from "./data-table-pagination";
+import { DataTableToolbar } from "./data-table-toolbar";
+import { SinglePropertyDetailOnModal } from "@/private/investor/trading/propertyDetails";
 
 import { useState } from "react";
 import { GlobalModal } from "@/components/GlobalModal2";
+import { useUser } from "@/context/userProvider";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  filterOptions: Array<{ column: string; title: string; options: Array<{ label: string; value: string }> }>
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  filterOptions: Array<{ column: string; title: string; options: Array<{ label: string; value: string }> }>;
 }
 interface RowData {
   id: string;
@@ -45,15 +46,18 @@ interface RowData {
 export function DataTable<TData extends RowData, TValue>({
   columns,
   data,
-  filterOptions
+  filterOptions,
 }: DataTableProps<TData, TValue>) {
-  const [rowSelection, setRowSelection] = React.useState({})
+  const [rowSelection, setRowSelection] = React.useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [propertyIdRow, setPropertyIdRow] = useState<string | null>(null); 
+  const [propertyIdRow, setPropertyIdRow] = useState<string | null>(null);
+  const { role } = useUser(); // Obtener el rol del usuario
 
   const openModal = (id: string) => {
-    setPropertyIdRow(id); 
-    setIsModalOpen(true);
+    if (role === "investor") {
+      setPropertyIdRow(id);
+      setIsModalOpen(true);
+    }
   };
 
   const closeModal = () => {
@@ -61,15 +65,12 @@ export function DataTable<TData extends RowData, TValue>({
     setPropertyIdRow(null); // Limpiar el ID seleccionado cuando se cierra el modal
   };
 
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({
-      totalTokens: false,
-      performanceStatus: false
-    })
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
+    totalTokens: false,
+    performanceStatus: false,
+  });
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [sorting, setSorting] = React.useState<SortingState>([]);
 
   const table = useReactTable({
     data,
@@ -91,7 +92,7 @@ export function DataTable<TData extends RowData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-  })
+  });
 
   return (
     <section>
@@ -118,8 +119,10 @@ export function DataTable<TData extends RowData, TValue>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    onClick={() => openModal(row.original.id)} // Pasamos la fila completa
-                    >
+                    onClick={() => {
+                      if (role === "investor") openModal(row.original.id);
+                    }}
+                  >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -140,10 +143,12 @@ export function DataTable<TData extends RowData, TValue>({
         <DataTablePagination table={table} />
       </div>
 
-      {/* Aquí se muestra el modal si está abierto */}
-      <GlobalModal isOpen={isModalOpen} closeModal={closeModal}>
-        <SinglePropertyDetailOnModal propertyId={propertyIdRow}/>
-      </GlobalModal>
+      {/* Renderizar el modal solo si el rol es "investor" */}
+      {role === "investor" && (
+        <GlobalModal isOpen={isModalOpen} closeModal={closeModal}>
+          <SinglePropertyDetailOnModal propertyId={propertyIdRow ? Number(propertyIdRow) : 0} />
+        </GlobalModal>
+      )}
     </section>
-  )
+  );
 }

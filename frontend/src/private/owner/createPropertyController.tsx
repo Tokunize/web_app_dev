@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TokenForm } from "@/components/forms/tokenForm";
+import { CreatePropertySmartContracts } from "@/components/forms/tokenForm";
 import { CreatePropertyForm } from "@/components/forms/createPropertyForm";
 import { useParams } from "react-router-dom";
 
@@ -19,7 +19,7 @@ const CreatePropertyController: React.FC = () => {
   return (
     <div >
       {currentStep === 0 && <CreatePropertyForm onNext={handleNext} />}
-      {currentStep === 1 && <TokenForm propertyId={numericPropertyId} onNext={handleNext} onBack={handleBack} />}
+      {currentStep === 1 && <CreatePropertySmartContracts propertyId={numericPropertyId} onNext={handleNext} onBack={handleBack} />}
       {/* {currentStep === 2 && <Summary onBack={handleBack} />} */}
     </div>
   );

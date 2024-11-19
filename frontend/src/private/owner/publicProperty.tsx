@@ -16,6 +16,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { createNotification } from "@/components/notifications/notificationService";
 import { LoadingSpinner } from "@/components/loadingSpinner";
+import { PublicPropertyForm } from "./publicPropertyForm";
+ 
 
 interface PropertyLocation {
   postcode: string;
@@ -37,9 +39,10 @@ export const PublicPropertyPage: React.FC = () => {
     bedroomCount: 0,
     bathroomCount: 0,
     size: "",
-    title: "", // Add initial state for title
-    yearBuilt: "" // Add initial state for year built
+    title: "", 
+    yearBuilt: "" 
   });
+
   const [amenities, setAmenities] = useState<string[]>([
     "Pool",
     "Gym",
@@ -188,17 +191,19 @@ export const PublicPropertyPage: React.FC = () => {
   const renderStep = () => {
     switch (step) {
       case 1:
-        return <ChoosePropertyType propertyType={propertyType} setPropertyType={setPropertyType} />;
+        return <PublicPropertyForm />
       case 2:
-        return <ChoosePropertyLocation propertyLocation={propertyLocation} setPropertyLocation={setPropertyLocation} />;
+        return <ChoosePropertyType propertyType={propertyType} setPropertyType={setPropertyType} />;
       case 3:
+        return <ChoosePropertyLocation propertyLocation={propertyLocation} setPropertyLocation={setPropertyLocation} />;
+      case 4:
         return (
           <PropertyDetails
             propertyDetails={propertyDetails}
             setPropertyDetails={setPropertyDetails}
           />
         );
-      case 4:
+      case 5:
         return (
           <PropertyAmenities
             amenities={amenities}
@@ -207,11 +212,11 @@ export const PublicPropertyPage: React.FC = () => {
             setSelectedAmenities={setSelectedAmenities}
           />
         );
-      case 5:
-        return <PropertyImages images={images} setImages={setImages} />;
       case 6:
-        return <PropertyDescription description={description} setDescription={setDescription} />;
+        return <PropertyImages images={images} setImages={setImages} />;
       case 7:
+        return <PropertyDescription description={description} setDescription={setDescription} />;
+      case 8:
         return (
           <PropertyValue
             marketValue={marketValue}
@@ -220,7 +225,7 @@ export const PublicPropertyPage: React.FC = () => {
             setOwnershipPercentage={setOwnershipPercentage}
           />
         );
-      case 8:
+      case 9:
         return (
           <PropertySummary
             propertyLocation={propertyLocation} 
@@ -235,7 +240,7 @@ export const PublicPropertyPage: React.FC = () => {
   };
 
   return (
-    <section className="flex flex-col h-screen space-y-5">
+    <section className="flex flex-col min-h-screen  space-y-5">
       <header className="flex justify-between px-[20px] md:px-[80px] mt-[40px]">
         <img alt="tokunize-logo" className="w-32" src={logo} />
         <Button variant="outline" onClick={handleExit}>Exit</Button>
@@ -251,7 +256,7 @@ export const PublicPropertyPage: React.FC = () => {
         )}
       </main>
 
-      <footer className="pb-[30px]">
+      <footer className="">
         <Progress className="rounded-xs h-2 bg-gray-200 mb-5" value={(step / 8) * 100} />
         <div className="flex justify-between px-5">
           {step > 1 && (

@@ -28,7 +28,7 @@ export const SinglePropertyDetailOnModal = ({ propertyId }: Props) => {
 
   // Fetch the data with custom hook
   const { data, loading, error } = useGetAxiosRequest<PropertyData>(
-    `${import.meta.env.VITE_APP_BACKEND_URL}property/${propertyId}/landing-page/?view=payment`
+    `${import.meta.env.VITE_APP_BACKEND_URL}property/${propertyId}/landing-page/?view=payment`,true
   );
 
   // Show a loading spinner while fetching data

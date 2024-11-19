@@ -4,11 +4,10 @@ import { ColumnDef } from "@tanstack/react-table"
 
 import { Checkbox } from "@/components/ui/checkbox"
 import { investmentCategories, statuses } from "../../data/data"
-import { Properties } from "../../data/schema"
 import { DataTableColumnHeader } from "../tasdata-table-column-header"
-import { DataTableRowActions } from "../data-table-row-actions"
 import { formatDistanceToNow, parseISO } from 'date-fns'; // Import necessary functions from date-fns
-
+import {  Properties} from "../../data/schema"
+import { DataTableRowActionsPManagment } from "../rows/rowActionAdminPManagment"
 
 const toNumber = (value: unknown): number => {
   return typeof value === "number" ? value : parseFloat(value as string) || 0;
@@ -148,7 +147,7 @@ export const columns: ColumnDef<Properties>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <DataTableRowActions row={row} id={row.original.id}/>,
+    cell: ({ row }) => <DataTableRowActionsPManagment row={row}  statuses={statuses}/>,
   },
 ]
 

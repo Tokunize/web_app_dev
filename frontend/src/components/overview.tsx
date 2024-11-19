@@ -20,39 +20,24 @@ interface AdditionalFinancialInformation {
 }
 
 interface PropertyData {
-  overviewData :{
+  overviewData: {
     title: string;
     location: string;
-    post_code:string;
+    post_code: string; // Asegúrate de incluir post_code
     image: string[];
-    annual_gross_rents: string;
+    annual_gross_rents: string; // Asegúrate de incluir annual_gross_rents
     bedrooms?: number;
     bathrooms?: string;
     size?: string;
     description?: string;
     details?: string;
-    amenities?: string[] ;
+    amenities?: string[];
     video_urls?: string[];
-    property_type?:string
-    price:number
-  }
+    property_type?: string;
+    price: number; // Asegúrate de incluir price
+  };
 }
 
-
-// Componente que representa cada ítem de la lista
-interface InformationItemProps {
-  title: string;
-  value: React.ReactNode;
-}
-
-export const InformationItem = ({ title, value }: InformationItemProps) => {
-  return (
-    <li className="flex justify-between">
-      <span>{title}</span>
-      <span className="font-semibold">{value}</span>
-    </li>
-  );
-};
 
 export const Overview = ({overviewData}:PropertyData) => {
 

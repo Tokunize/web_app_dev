@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     PropertyListView,
     PropertyCreateUpdateView,
-    PropertyDetailView,
+    # PropertyDetailView,
     PropertyFilterView,
     PublicPropertyList,
     TokenListView,
@@ -16,7 +16,8 @@ from .views import (
     MarketplaceListView,
     PropertyDetailLandingPage,
     PropertyManagmentListView,
-    AdminOverviewListView
+    AdminOverviewListView,
+    InvestorAssetsGetView
 )
 
 urlpatterns = [
@@ -25,7 +26,7 @@ urlpatterns = [
     path('properties/public/', PublicPropertyList.as_view(), name='property-list'),
 
     path('create/', PropertyCreateUpdateView.as_view(), name='property-create-update'),
-    path('<int:pk>/', PropertyDetailView.as_view(), name='property-detail'),
+    # path('<int:pk>/', PropertyDetailView.as_view(), name='property-detail'),
     path('<int:pk>/landing-page/', PropertyDetailLandingPage.as_view(), name='property-detail-landing-page'),
 
 
@@ -43,7 +44,6 @@ urlpatterns = [
     path('transactions/<int:property_id>/', PublicSinglePropertyTransactionListView.as_view(), name='single-property-transactions-public'),
 
     
-    path('investment-summary/', UserInvestmentSummaryAPIView.as_view(), name='user-investment-summary'),
 
     #GET ALL THE PROPERTIES ONE INVESTOR INVESTED
     path('investment/', InvestedProperties.as_view(), name='invested-properties'),
@@ -53,7 +53,7 @@ urlpatterns = [
 
 
 
-
+# -------------------------------------------------------
 
     #NEW URLS IMPROVED THE VIEWS AND SERIALIZER
     path("marketplace-list/",MarketplaceListView.as_view(), name="marketplace-property-list" ),
@@ -61,5 +61,11 @@ urlpatterns = [
 
     #DASHBOARD ADMIN URLS 
     path("property-managment/",PropertyManagmentListView.as_view(), name="property-managment-admin" ),
-    path("overview-dashboard-admin/",AdminOverviewListView.as_view(), name="overview-dashboard-admin" )
+    path("overview-dashboard-admin/",AdminOverviewListView.as_view(), name="overview-dashboard-admin" ),
+
+    #INVESTORS
+    path('investment-summary/', UserInvestmentSummaryAPIView.as_view(), name='investor-overview'),
+    path('investor-assets/', InvestorAssetsGetView.as_view(), name="investor-assets")
+    #OWNERS
+
 ]

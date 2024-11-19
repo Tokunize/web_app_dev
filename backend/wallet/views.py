@@ -224,7 +224,6 @@ class AddFundsWallet(APIView):
     def post(self, request):
         user_id = request.user.id
         amount_fund = request.data.get('fundAmount')  # Using get() to avoid KeyError
-        print(amount_fund,"----------------------")
         
         # Get the API key from settings
         api_key = settings.CIRCLE_API_KEY
@@ -382,5 +381,7 @@ class CreateTransfersCircle(APIView):
 
         else:
             return Response({"error": "Failed to retrieve user token.", "details": token_response.text}, status=token_response.status_code)
+
+
 
 

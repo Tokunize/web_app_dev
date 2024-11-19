@@ -1,11 +1,10 @@
 import React from 'react';
 import { PaymentFlow } from '../payment/paymentFlow';
-import { useUser } from '@/context/userProvider';
+import { useAuth0 } from '@auth0/auth0-react'; // Importa el hook de Auth0
 import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover'; // Asegúrate de tener un componente Popover para mostrar el mensaje.
 import { TokenPriceGraph } from '../graphs/tokenPriceGraph';
 import { FormatCurrency } from '../currencyConverter';
-
-
+import { useUser } from '@/context/userProvider';
 
 interface PurchaseFormProps {
   tokenPrice: number;
@@ -17,10 +16,11 @@ export const PurchaseForm: React.FC<PurchaseFormProps> = ({
     tokenPrice,
     projected_annual_return,
     property_id,
-  }) => {
-    const { role } = useUser(); // Obtener el rol del usuario
-    const canInvest = role === 'investor'; 
-    const isLoggedIn = !!role; 
+}) => {
+    const {role } = useUser()
+    const { isAuthenticated } = useAuth0(); // Obtén el estado de autenticación y el usuario desde Auth0
+    const canInvest = role === 'investor'; // Verifica si está autenticado y tiene el rol de inversor
+    const isLoggedIn = isAuthenticated; // Solo revisa si el usuario está autenticado
 
     return (
       <section className="sticky w-full space-y-4 top-0 py-4">
@@ -62,4 +62,4 @@ export const PurchaseForm: React.FC<PurchaseFormProps> = ({
         <TokenPriceGraph tokenPrice={tokenPrice}/>
       </section>
     );
-  };
+};

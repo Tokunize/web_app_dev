@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser, PropertyOwnerProfile, InvestorProfile
-
+from .models import CustomUser, PropertyOwnerProfile, InvestorProfile,SubmitApplication
 # Serializadores para perfiles
 class PropertyOwnerProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -69,3 +68,10 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return None
 
 
+
+#SERIALZIER FOR THE APPLICATION SUBMIT
+
+class ApplicationSubmitSerializer(serializers.ModelSerializer):
+    class Meta():
+        model = SubmitApplication
+        fields = [ "__all__"]
