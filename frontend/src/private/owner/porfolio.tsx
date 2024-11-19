@@ -33,7 +33,7 @@ export const Porfolio: React.FC = () => {
 
   // Usar el hook personalizado para obtener las propiedades
   const { error, loading } = useGetAxiosRequest<{ properties: Property[] }>(
-    `${import.meta.env.VITE_APP_BACKEND_URL}property/properties/private/`,
+    `${import.meta.env.VITE_APP_BACKEND_URL}property/properties/private/`,true,
     (data) =>{       
       setProperties(data.properties)},
     (error) => console.error('Error fetching your portfolio:', error)

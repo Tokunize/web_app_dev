@@ -2,37 +2,42 @@ import { useState, useEffect } from 'react';
 import axios, { AxiosRequestConfig } from 'axios';
 import { useAuth0 } from '@auth0/auth0-react';
 
-// Define el estado del hook con un tipo genérico
 interface FetchState<T> {
   data: T | null;
   loading: boolean;
   error: string | null;
 }
 
-// Hook genérico para solicitudes GET con soporte para callbacks
 export const useGetAxiosRequest = <T,>(
   url: string,
+  requiresAuth: boolean = false,  // nuevo parámetro para indicar si requiere autenticación
   onSuccess?: (data: T) => void,
-  onError?: (error: string) => void
+  onError?: (error: string) => void,
 ): FetchState<T> => {
   const { getAccessTokenSilently } = useAuth0();
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Función para hacer la solicitud GET
   const fetchData = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const accessToken = await getAccessTokenSilently();
-      const config: AxiosRequestConfig = {
+      let config: AxiosRequestConfig = {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`
-        }
+        },
       };
+
+      if (requiresAuth) {
+        // Obtener el token solo si se necesita autenticación
+        const accessToken = await getAccessTokenSilently();
+        config.headers = {  // Aseguramos que headers está inicializado
+          ...config.headers,  // Incluye headers existentes, si los hay
+          Authorization: `Bearer ${accessToken}`,
+        };
+      }
 
       const response = await axios.get<T>(url, config);
       setData(response.data);
@@ -49,12 +54,11 @@ export const useGetAxiosRequest = <T,>(
     }
   };
 
-  // useEffect para llamar a fetchData cuando cambie la URL
   useEffect(() => {
     if (url) {
       fetchData();
     }
-  }, [url, getAccessTokenSilently]); // Make sure to use stable dependencies
+  }, [url, getAccessTokenSilently]);
 
   return { data, loading, error };
 };

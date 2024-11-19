@@ -37,8 +37,11 @@ from .serializers import (
     PropertyUpdatesSerializer,
     MarketplaceListViewSerializer,
     AdminPropertyManagment,
-    AdminOverviewSerializer
+    AdminOverviewSerializer,
+    InvestorAssetsSerializer
 )
+from collections import Counter
+
 from rest_framework.pagination import PageNumberPagination
 from datetime import datetime
 from rest_framework import generics
@@ -188,47 +191,48 @@ class PublicPropertyList(APIView):
 class ConditionalPermissionMixin:
     def get_permissions(self):
         view_type = self.request.query_params.get('view', 'overview')
-        if view_type == 'overview' or view_type == 'images':
+        if view_type == 'overview' or view_type == 'images' or view_type == 'financial':
             return [AllowAny()]
         return [IsAuthenticated()]
 
-class PropertyDetailView(ConditionalPermissionMixin, APIView):
-    authentication_classes = [Auth0JWTAuthentication]
-    permission_classes=[AllowAny]
+# class PropertyDetailView(ConditionalPermissionMixin, APIView):
+#     authentication_classes = [Auth0JWTAuthentication]
+#     permission_classes=[AllowAny]
     
-    def get(self, request, pk):
-        try:
-            property = Property.objects.get(pk=pk)
-        except Property.DoesNotExist:
-            return Response({'detail': 'Property not found'}, status=404)
+#     def get(self, request, pk):
+#         try:
+#             property = Property.objects.get(pk=pk)
+#         except Property.DoesNotExist:
+#             return Response({'detail': 'Property not found'}, status=404)
         
-        view_type = request.query_params.get('view', 'overview')
+#         view_type = request.query_params.get('view', 'overview')
         
-        if view_type == 'overview':
-            serializer = PropertyOverviewSerializer(property)
-        elif view_type == 'images':
-            serializer = PropertyImagesSerializer(property)
-        elif view_type == 'financial':
-            serializer = PropertyFinancialsSerializer(property)
-        elif view_type == 'all':
-            serializer = AllDetailsPropertySerializer(property)
-        elif view_type == 'activity':
-            serializer = PropertyFinancialsSerializer(property)
-        elif view_type == 'payment':
-            property_serializer = PropertyTokenPaymentSerializer(property)
-            financials_serializer = PropertyFinancialsSerializer(property)
+#         if view_type == 'overview':
+#             serializer = PropertyOverviewSerializer(property)
+#         elif view_type == 'images':
+#             serializer = PropertyImagesSerializer(property)
+#         elif view_type == 'financial':
+#             serializer = PropertyFinancialsSerializer(property)
+#         elif view_type == 'all':
+#             serializer = AllDetailsPropertySerializer(property)
+#         elif view_type == 'activity':
+#             serializer = PropertyFinancialsSerializer(property)
+#         elif view_type == 'payment':
+#             property_serializer = PropertyTokenPaymentSerializer(property)
+#             financials_serializer = PropertyFinancialsSerializer(property)
             
-            data = property_serializer.data
-            data['financials_details'] = financials_serializer.data
+#             data = property_serializer.data
+#             data['financials_details'] = financials_serializer.data
 
-            return Response(data)
-        else:
-            return Response({'detail': 'Invalid view type'}, status=400)
+#             return Response(data)
+#         else:
+#             return Response({'detail': 'Invalid view type'}, status=400)
         
-        return Response(serializer.data)
+#         return Response(serializer.data)
 
 
-class PropertyDetailLandingPage(APIView):
+class PropertyDetailLandingPage(ConditionalPermissionMixin,APIView):
+    authentication_classes = [Auth0JWTAuthentication]
     permission_classes=[AllowAny]
 
     def get(self, request, pk):
@@ -441,7 +445,6 @@ class TransactionListview(APIView):
         }
 
 
-
         try:
             response = requests.get(url, headers=headers)
             # Check if the request was successful
@@ -576,32 +579,6 @@ class InvestedProperties(APIView):
     
 
 
-class UserInvestmentSummaryAPIView(APIView):
-    authentication_classes = [Auth0JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-    serializer_class = InvestmentOverviewSerializer
-
-    def get(self, request):
-        user_id = request.user.id
-        user = request.user
-
-        total_tokens_owned = get_total_tokens_owned(user)
-
-        # Obtener propiedades del usuario
-        properties = Property.objects.filter(transactions__transaction_owner_code_id=user_id).distinct()
-        
-        # Serializar propiedades
-        properties_data = self.serializer_class(properties, many=True).data
-
-        data = {
-            'total_tokens_owned': total_tokens_owned,
-            'properties': properties_data,
-        }
-
-        return Response(data, status=status.HTTP_200_OK)
-    
-
-
 stripe.api_key = 'sk_test_51Q2roYRqFZlL52ejF4l87u8oFLtm9lyKtUFmNYbeA04DX7aTv3YD1tbSkrQizCqtS5UWWE5RRXbcMdTN9fmU7VMa00MP5yTPjw'
 
 YOUR_DOMAIN = 'http://localhost:3000'
@@ -685,6 +662,14 @@ class MarketplaceListView(APIView):
         ids = [64,65,66]
         properties = Property.objects.filter(pk__in=ids).exclude(status__in=["under_review", "rejected"])
         serializer = self.serializer_class(properties, many=True)
+        return Response(serializer.data)
+
+class PublicPropertyList(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        properties = Property.objects.exclude(status="under_review")        
+        serializer = PropertySerializerList(properties, many=True)        
         return Response(serializer.data)
     
 
@@ -773,3 +758,97 @@ class AdminOverviewListView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             ) 
 
+
+#INVESTOR OVERVIEW 
+
+class UserInvestmentSummaryAPIView(APIView):
+    authentication_classes = [Auth0JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = InvestmentOverviewSerializer
+
+    def get(self, request):
+        user_id = request.user.id
+        user = request.user
+
+        total_tokens_owned = get_total_tokens_owned(user)
+
+        # Obtener propiedades del usuario
+        properties = Property.objects.filter(transactions__transaction_owner_code_id=user_id).distinct()
+        # Contamos las propiedades por 'location' y 'property_type'
+        locations = [property.location for property in properties]
+        property_types = [property.property_type for property in properties]
+        location_count = dict(Counter(locations))
+        property_type_count = dict(Counter(property_types))
+        
+        total_properties = len(properties)
+
+        # Serializar propiedades
+        predefined_colors = ["#299D90", "#C3DF6D", "#667085", "#EAFBBE", "#D0D5DD", "#83A621", "#C8E870", "#A6F4C5", "#FFFAEA"]
+
+            # Aseguramos que la cantidad de colores no sea mayor que los datos
+        location_data = [
+            {
+                'item': location,
+                'percentage': round((count / total_properties) * 100),
+                'fill': predefined_colors[i % len(predefined_colors)]  # Asigna un color, reciclándolo si hay más ubicaciones que colores
+            }
+            for i, (location, count) in enumerate(location_count.items())
+        ]
+
+        # Añadimos el color también para property_type_data
+        property_type_data = [
+            {
+                'item': property_type,
+                'percentage': round((count / total_properties) * 100),
+                'fill': predefined_colors[i % len(predefined_colors)]  # Asigna un color, reciclándolo si hay más tipos de propiedades que colores
+            }
+            for i, (property_type, count) in enumerate(property_type_count.items())
+        ]
+
+        # Serializar propiedades
+        properties_data = self.serializer_class(properties, many=True).data
+
+        # Preparar los datos para la respuesta
+        data = {
+            'total_tokens_owned': total_tokens_owned,
+            'locations': location_data,  # Incluye las localidades con porcentajes
+            'property_types': property_type_data,  # Incluye los tipos de propiedad con porcentajes
+            'properties': properties_data,  # Incluye las propiedades serializadas
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+
+#INVESTOR ASSETS 
+
+class InvestorAssetsGetView(APIView):
+    authentication_classes = [Auth0JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = InvestorAssetsSerializer
+
+    def get(self, request):
+        user_id = request.user.id
+        user = request.user  # Obtienes el usuario directamente desde el request
+        
+        properties = Property.objects.filter(transactions__transaction_owner_code_id=user_id).distinct()
+        property_types = [property.property_type for property in properties]
+        property_type_count = dict(Counter(property_types))
+        total_properties = len(properties)
+        predefined_colors = ["#299D90", "#C3DF6D", "#667085", "#EAFBBE", "#D0D5DD", "#83A621", "#C8E870", "#A6F4C5", "#FFFAEA"]
+        property_type_data = [
+            {
+                'item': property_type,
+                'percentage': round((count / total_properties) * 100),
+                'fill': predefined_colors[i % len(predefined_colors)]  # Asigna un color, reciclándolo si hay más tipos de propiedades que colores
+            }
+            for i, (property_type, count) in enumerate(property_type_count.items())
+        ]
+
+        serializer = self.serializer_class(properties, many=True, context={'request': request, 'user': user})
+        data = {
+            'property_types': property_type_data,  
+            'properties': serializer.data,  
+        }
+
+        return Response(data, status=status.HTTP_200_OK)

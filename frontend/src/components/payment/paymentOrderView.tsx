@@ -1,7 +1,10 @@
 import React from 'react';
+// import GetContract from '../blockchain/contractsAbi';
+import { FormatCurrency } from '../currencyConverter';
+
 interface PaymentOrderViewProps {
-  investmentAmount: string; // String to handle the input format
-  tokenPrice: number; // Token price should be a number
+  investmentAmount: number; // Debería ser un número
+  tokenPrice: number;
   selectedPaymentMethod: string | null;
 }
 
@@ -10,24 +13,24 @@ export const PaymentOrderView: React.FC<PaymentOrderViewProps> = ({
   tokenPrice,
   selectedPaymentMethod,
 }) => {
-  const investmentValue = parseFloat(investmentAmount);
+  const investmentValue = investmentAmount; // Ya es un número, no es necesario parsearlo
   const fee = investmentValue * 0.005; 
- 
+
   return (
     <form className="p-5 border rounded-lg bg-white">
       <h4 className="font-bold text-xl mb-4">Order View</h4>
       <div className="flex items-center justify-center mb-4">
-        <h3 className="font-bold text-3xl text-[#C8E870]">£{investmentAmount}</h3>
+        <h3 className="font-bold text-3xl text-[#C8E870]"><FormatCurrency amount={investmentAmount} /></h3>
         <span className="pl-3 text-gray-500 text-sm">Equity</span>
       </div>
       <ul className="space-y-2">
         <li className="flex justify-between py-2 border-b">
           <span className="font-bold text-sm">Price</span>
-          <span className="text-gray-500">1 Token = £{tokenPrice} GBP</span>
+          <span className="text-gray-500">1 Token = £{tokenPrice} USDC</span>
         </li>
         <li className="flex justify-between py-2 border-b">
           <span className="font-bold text-sm">Fee (0.5%)</span>
-          <span className="text-gray-500">£{fee.toFixed(2)} GBP</span>
+          <span className="text-gray-500">{fee.toFixed(2)} USDC</span>
         </li>
         <li className="flex justify-between py-2">
           <span className="font-bold text-sm">Pay With</span>

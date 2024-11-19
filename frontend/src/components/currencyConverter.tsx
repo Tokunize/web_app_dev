@@ -52,9 +52,9 @@ interface FormatCurrencyProps {
 
 export const FormatCurrency: React.FC<FormatCurrencyProps> = ({ amount }) => {
     // Usar Intl.NumberFormat para formatear como moneda
-    const formatter = new Intl.NumberFormat('en-GB', {
+    const formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
-        currency: 'GBP',
+        currency: 'USD',
         minimumFractionDigits: 0, // No mostrar decimales por defecto
         maximumFractionDigits: 2, // Mostrar hasta 2 decimales si son necesarios
     });

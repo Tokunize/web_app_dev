@@ -1,149 +1,89 @@
 import React from "react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import InputForm from "../forms/inputForm";
+import { formValuesPublicProperty } from "@/private/owner/publicPropertySchema";
+import { Control, FieldErrors, Controller } from "react-hook-form";
+import { ChoosePropertyLocation } from "./propertyLocation";
 
 interface PropertyDetailsProps {
-    propertyDetails: {
-        bedroomCount: number;
-        bathroomCount: number;
-        size: string;
-        title: string;
-        yearBuilt: string;
-    };
-    setPropertyDetails: React.Dispatch<React.SetStateAction<{
-        bedroomCount: number;
-        bathroomCount: number;
-        size: string;
-        title: string;
-        yearBuilt: string;
-    }>>;
+  control: Control<formValuesPublicProperty>;
+  errors: FieldErrors<formValuesPublicProperty>;
 }
 
-export const PropertyDetails: React.FC<PropertyDetailsProps> = ({
-    propertyDetails,
-    setPropertyDetails
-}) => {
-    const { bedroomCount, bathroomCount, size, title, yearBuilt } = propertyDetails;
-    const { toast } = useToast(); // Use the toast hook
+export const PropertyDetails: React.FC<PropertyDetailsProps> = ({ errors, control }) => {
+  return (
+    <div>
+      <h2 className="font-bold text-4xl mb-[60px]">Details about your property</h2>
 
-    const handleIncrementBedroom = () => {
-        setPropertyDetails((prev) => ({
-            ...prev,
-            bedroomCount: prev.bedroomCount + 1,
-        }));
-    };
+      <div className="grid grid-cols-2 gap-5">
+      <InputForm
+        name="propertyTitle"
+        label="Property Title"
+        control={control}
+        type="text"
+        error={errors.propertyTitle?.message}
+      />
 
-    const handleDecrementBedroom = () => {
-        setPropertyDetails((prev) => ({
-            ...prev,
-            bedroomCount: Math.max(prev.bedroomCount - 1, 0),
-        }));
-    };
+        <InputForm
+            name="yearBuilt"
+            label="Year Built"
+            control={control}
+            type="text"
+            error={errors.yearBuilt?.message}
+        />
 
-    const handleIncrementBathroom = () => {
-        setPropertyDetails((prev) => ({
-            ...prev,
-            bathroomCount: prev.bathroomCount + 1,
-        }));
-    };
-
-    const handleDecrementBathroom = () => {
-        setPropertyDetails((prev) => ({
-            ...prev,
-            bathroomCount: Math.max(prev.bathroomCount - 1, 0),
-        }));
-    };
-
-    const handleSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        if (value === "" || !isNaN(Number(value))) {
-            setPropertyDetails((prev) => ({ ...prev, size: value }));
-        }
-    };
-
-    const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setPropertyDetails((prev) => ({ ...prev, title: e.target.value }));
-    };
-
-    const handleYearBuiltChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        const currentYear = new Date().getFullYear(); // Get the current year
-
-        // Validate the year input
-        if (value && (isNaN(Number(value)) || Number(value) > currentYear)) {
-            toast({
-                title: "Invalid Year Built",
-                description: `Year Built cannot be greater than ${currentYear}.`,
-                variant: "destructive", // You can adjust the variant as needed
-            });
-            // Don't update the year if invalid
-            return;
-        }
-
-        // Update property details if valid
-        setPropertyDetails((prev) => ({ ...prev, yearBuilt: value }));
-    };
-
-    return (
-        <div className="p-4 space-y-5">
-            <h2 className="font-bold text-4xl mb-[60px]">Share some basic details about your property</h2>
-            
-            {/* Title */}
-            <div className="flex items-center justify-between">
-                <label className="text-lg">Property Title</label>
-                <Input
-                    value={title}
-                    onChange={handleTitleChange}
-                    placeholder="Enter property title"
-                    className="max-w-xs"
-                />
+      {/* Bedroom Count */}
+      <div className="flex  items-center border-b pb-4 justify-between">
+        <label className="text-lg">Bedrooms</label>
+        <Controller
+          name="bedroomCount"
+          control={control}
+          render={({ field }) => (
+            <div className="flex items-center space-x-2">
+              <Button   type="button"  variant="outline" onClick={() => field.onChange(Math.max((field.value || 0) - 1, 0))}>
+                -
+              </Button>
+              <span className="text-xl">{field.value || 0}</span>
+              <Button  type="button"  variant="outline" onClick={() => field.onChange((field.value || 0) + 1)}>
+                +
+              </Button>
             </div>
+          )}
+        />
+      </div>
 
-          
-
-            {/* Year Built */}
-            <div className="flex items-center justify-between">
-                <label className="text-lg">Year Built</label>
-                <Input
-                    value={yearBuilt}
-                    onChange={handleYearBuiltChange}
-                    placeholder="Enter year built"
-                    className="max-w-xs"
-
-                />
+      {/* Bathroom Count */}
+      <div className="flex items-center border-b pb-4 justify-between">
+        <label className="text-lg">Bathrooms</label>
+        <Controller
+          name="bathroomCount"
+          control={control}
+          render={({ field }) => (
+            <div className="flex items-center space-x-2">
+              <Button type="button" variant="outline" onClick={() => field.onChange(Math.max((field.value || 0) - 1, 0))}>
+                -
+              </Button>
+              <span className="text-xl">{field.value || 0}</span>
+              <Button   type="button"  variant="outline" onClick={() => field.onChange((field.value || 0) + 1)}>
+                +
+              </Button>
             </div>
+          )}
+        />
+      </div>
 
-            {/* Bedrooms */}
-            <div className="flex items-center border-b pb-4 justify-between">
-                <label className="text-lg">Bedrooms</label>
-                <div className="flex items-center space-x-2">
-                    <Button variant="outline" onClick={handleDecrementBedroom}>-</Button>
-                    <span className="text-xl">{bedroomCount}</span>
-                    <Button variant="outline" onClick={handleIncrementBedroom}>+</Button>
-                </div>
-            </div>
-
-            {/* Bathrooms */}
-            <div className="flex items-center border-b pb-4 justify-between">
-                <label className="text-lg">Bathrooms</label>
-                <div className="flex items-center space-x-2">
-                    <Button variant="outline" onClick={handleDecrementBathroom}>-</Button>
-                    <span className="text-xl">{bathroomCount}</span>
-                    <Button variant="outline" onClick={handleIncrementBathroom}>+</Button>
-                </div>
-            </div>
-
-            {/* Size */}
-            <div className="flex items-center justify-between">
-                <label className="text-lg">Size (sqm)</label>
-                <Input
-                    value={size}
-                    onChange={handleSizeChange} 
-                    placeholder="Enter size"
-                    className="max-w-xs"
-                />
-            </div>
-        </div>
-    );
+      {/* Size */}
+      <InputForm
+        name="propertySize"
+        label="Property Size"
+        control={control}
+        type="text"
+        error={errors.propertySize?.message}
+      />
+      </div>
+      <ChoosePropertyLocation control={control} errors={errors} />
+    </div>
+  );
 };
+
+export default PropertyDetails;

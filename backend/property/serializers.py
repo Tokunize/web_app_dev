@@ -233,26 +233,6 @@ class InvestedPropertiesSerialier(serializers.ModelSerializer):
         return obj.image[0] if obj.image and len(obj.image) > 0 else None
     
 
-class InvestmentOverviewSerializer(serializers.ModelSerializer):
-    tokens = TokenSerializer(many=True, read_only=True)
-
-    yield_data = serializers.SerializerMethodField()
-    
-    class Meta:
-        model = Property
-        fields = ['title', 'tokens','location', 'property_type','yield_data']
-
-    def get_yield_data(self, obj):
-        first_image = obj.image[0] if obj.image and len(obj.image) > 0 else None
-
-        return {
-            "title": obj.title,
-            "projected_annual_yield": obj.projected_annual_yield,
-            "projected_rental_yield": obj.projected_rental_yield,
-            "projected_annual_return": obj.projected_annual_return,
-            "image": first_image,
-            "location": obj.location 
-        }
 
 
 class PropertyMetricsSerializer(serializers.ModelSerializer):
@@ -266,10 +246,11 @@ class PropertyUpdatesSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+# ----------------------------------------------------
 
 #NEW SERIALIZER  IMPROVED FOR BETTER PERFORMANCE AND BEST PRACTISES
 
-class MarketplaceTokeInfo(serializers.ModelSerializer):
+class MarketplaceTokenInfo(serializers.ModelSerializer):
     class Meta:
         model = Token
         fields = [
@@ -290,8 +271,10 @@ class MarketplaceListViewSerializer(serializers.ModelSerializer):
     def get_tokens(self, obj):  # Cambia el nombre de getSinglePropertyTokens a get_tokens
         # Aquí asegúrate de que estás usando el campo correcto para el filtro
         tokens = Token.objects.filter(property_code=obj)
-        return MarketplaceTokeInfo(tokens, many=True).data
+        return MarketplaceTokenInfo(tokens, many=True).data
 
+
+#ADMIN SERIALIZERS
 
 class AdminPropertyManagment(serializers.ModelSerializer):
     first_image = serializers.SerializerMethodField()  # Custom method field for the first image
@@ -323,3 +306,64 @@ class AdminOverviewSerializer(serializers.ModelSerializer):
         return obj.image[0]
     
    
+
+
+#INVESTOR SERIALIZERS ---- OVERVIEW
+class InvestmentOverviewSerializer(serializers.ModelSerializer):
+    tokens = TokenSerializer(many=True, read_only=True)
+
+    yield_data = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Property
+        fields = ['title', 'tokens','location', 'property_type','yield_data']
+
+    def get_yield_data(self, obj):
+        first_image = obj.image[0] if obj.image and len(obj.image) > 0 else None
+
+        return {
+            "title": obj.title,
+            "projected_annual_yield": obj.projected_annual_yield,
+            "projected_rental_yield": obj.projected_rental_yield,
+            "projected_annual_return": obj.projected_annual_return,
+            "image": first_image,
+            "location": obj.location 
+        }
+
+
+class InvestorAssetsSerializer(serializers.ModelSerializer):
+    # Se aprovechan los SerializerMethodField solo para los campos dinámicos
+    first_image = serializers.SerializerMethodField()
+    user_tokens = serializers.SerializerMethodField()
+    tokens = MarketplaceTokenInfo(many=True, read_only=True)
+
+
+    class Meta:
+        model = Property
+        fields = [
+            'title', 
+            'ocupancy_status', 
+            'location', 
+            'property_type', 
+            'price', 
+            'projected_rental_yield', 
+            'first_image', 
+            'user_tokens', 
+            'tokens'
+        ]
+
+    def get_first_image(self, obj):
+        # Usar get para obtener el primer valor de la lista
+        return obj.image[0] if obj.image else None
+
+    def get_user_tokens(self, obj):
+        """
+        Obtiene el número de tokens que el usuario tiene para una propiedad.
+        """
+        user = self.context['request'].user  # Obtener el usuario actual
+        tokens_by_property = user.get_tokens_by_property()  # Llamamos al método para obtener los tokens por propiedad
+
+        # Devolvemos el número de tokens para esta propiedad
+        return tokens_by_property.get(obj.id, 0)  # Si no tiene tokens, devolvemos 0
+
+

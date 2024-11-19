@@ -50,7 +50,7 @@ export const Transaction = () => {
   const { loading, error } = useGetAxiosRequest<{
     transactions: Transaction[];
     balance: { data: { tokenBalances: { amount: string }[] } };
-  }>(apiUrl, (data) => {    
+  }>(apiUrl,true, (data) => {    
     setTransactions(data.transactions);
     const balanceAmount = data.balance?.data?.tokenBalances[0]?.amount;
     setBalance(balanceAmount ? parseFloat(balanceAmount) : 0);

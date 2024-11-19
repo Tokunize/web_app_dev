@@ -9,6 +9,7 @@ import { DataTable } from "@/components/dataTable/components/data-table";
 import { AdminOverviewColumns } from "@/components/dataTable/components/columns/overviewAdminColum";
 const ActivityLog  = lazy(()=> import("../admin/activityLog"))
 import { statuses, investmentCategories } from "@/components/dataTable/data/data";
+import { FormatCurrency } from "@/components/currencyConverter";
 
 // Define the structure for property data
 interface Property {
@@ -37,7 +38,7 @@ export const AdminOverview = () => {
     
     // Fetch data with the custom hook
     const { loading, error: fetchError } = useGetAxiosRequest<{ published_properties: number; UR_properties: Property[] ; published_properties_per_month: PropertyChart[] }>(
-        `${import.meta.env.VITE_APP_BACKEND_URL}property/overview-dashboard-admin/`,
+        `${import.meta.env.VITE_APP_BACKEND_URL}property/overview-dashboard-admin/`,true, 
         (fetchedData) => {
             try {
                 console.log(fetchedData);
@@ -73,8 +74,10 @@ export const AdminOverview = () => {
     
 
     // Define overview details only after data is loaded
+    const formattedValue = <FormatCurrency amount={233332} />
+    
     const adminOverviewDetails = [
-        { title: "Total Market Tokenized", value: 232.222 },
+        { title: "Total Market Tokenized", value: formattedValue },
         { title: "Under Review", value: underReviewProperties.length },
         { title: "Active Properties", value: publishedProperties },
         { title: "Sold Out Properties", value: 20 }

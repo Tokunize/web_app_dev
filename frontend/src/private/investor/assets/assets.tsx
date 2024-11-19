@@ -1,87 +1,88 @@
-import { useState } from "react";
-import { AssetsAccordion } from "@/components/dashboard/assetsAccordion";
 import { PieGraph } from "@/components/graphs/pieGraph";
 import { LoadingSpinner } from "@/components/loadingSpinner";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
 import { Card } from "@/components/ui/card";
+import { DataAccordion } from "@/components/dataAccordion/DataAccordion";
+import { MyAssetsTable } from "@/components/dashboard/myAssetsTable";
+import { useState } from "react";
 
 interface Investment {
   first_image: string;
   title: string;
-  user_tokens: Array<{ number_of_tokens: number }>;
+  user_tokens: number;
   projected_rental_yield: number;
   price: number;
   location: string;
   tokens: Array<{ total_tokens: number }>;
   updated_at: string;
   property_type: string;
+  ocupancy_status: string;
+  property_types: Array<{ item: string, percentage: number, fill: string }>;
 }
 
 export const Assests = () => { 
-  // Estado para guardar los datos de inversiones
-  const [investments, setInvestments] = useState<Investment[]>([]);
-  const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/investment/`;
-  const { loading, error } = useGetAxiosRequest<Investment[]>(
-    apiUrl,
-    (data) => {
-      setInvestments(data); // Guarda las inversiones cuando la solicitud sea exitosa
-    },
-    (errorMessage) => {
-      console.error("Failed to fetch investments:", errorMessage);
-    }
-  );
+  const [activeIndex, setActiveIndex] = useState<number>(0); // Default to 'Overview' tab
+  // State to store the investment data
+  const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/investor-assets/`;
 
-  // Lista de colores predefinidos
-  const predefinedColors = [
-    "#299D90",
-    "#C3DF6D",
-    "#667085", // Color 1
-    "#EAFBBE", // Color 2
-    "#D0D5DD", // Color 3
-    "#83A621", // Color 4
-    "#C8E870", // Color 5
-    "#A6F4C5", // Color 6
-    "#FFFAEA"  // Color 7
-  ];
+  const { data: investments, loading, error } = useGetAxiosRequest<{properties: Investment[];property_types: Array<{ item: string, percentage: number, fill: string }>;}>(apiUrl, true);
 
+  if (loading) return <div><LoadingSpinner /></div>;
+  if (error) return <p>Error: {error}</p>;
   
 
-  // Paso 1: Extrae todos los tipos de propiedad (o vacío si no hay) en un array
-const propertyTypeData = investments.map((property) => property.property_type || "");
+  // Ensure investments is defined and has the expected structure
+  const properties = investments?.properties || [];
+  const propertyTypes = investments?.property_types || [];
+  
+  const assetsData = properties.map((property) => ({
+    image: property.first_image,
+    title: property.title,
+    user_tokens: property.user_tokens,
+    projected_rental_yield: property.projected_rental_yield || 0, // Default to 0 if null
+    net_asset_value: property.price || 0, // Default to 0 if null
+    location: property.location,
+    total_tokens: property.tokens?.[0]?.total_tokens || 0, // Safeguard access
+    ocupancy_status: property.ocupancy_status,
+    projected_appreciation: "1.2",
+    total_rental_income: 23343,
+    price_change: 4.7,
+    cap_rate: 3.5,
+  }));
 
-// Paso 2: Filtra los tipos de propiedad únicos
-const uniquePropertyTypes = [...new Set(propertyTypeData)];
+  const tabs =["Listing"]
 
-// Paso 3: Calcula el total de tipos de propiedad únicos
-const totalPropertyTypes = uniquePropertyTypes.length;
+  const tabComponents = [
+    <MyAssetsTable  assetsData={assetsData} key="listing" />,
+  ];
 
-// Paso 4: Genera los datos para `propertyChartData` usando solo tipos únicos
-const propertyChartData = uniquePropertyTypes.map((type, index) => ({
-  location: type,
-  percentage: Math.round((1 / totalPropertyTypes) * 100),
-  fill: predefinedColors[index % predefinedColors.length], // Usamos los colores predefinidos
-}));
-
-  if (loading) return <div><LoadingSpinner/></div>;
-  if (error) return <p>Error: {error}</p>;
+  const handleTabChange = (index: number) => {
+    setActiveIndex(index); // Actualizar el índice activo
+  };
 
   return (
     <div className="rounded-lg px-4">
       <Card className="grid lg:grid-cols-2 bg-white flex items-center justify-between rounded-lg">
-          <div className="space-y-3 text-left  ml-4 p-4">
-            <p className="text-gray-500 text-medium">Total Properties Owned</p>
-            <span className="text-2xl font-bold">{investments?.length}</span>
-            <p className="text-gray-500 text-medium">Projected Rental Yield</p>
-            <span className="text-2xl font-bold">12.6%</span>
-          </div>
+        <div className="space-y-3 text-left ml-4 p-4">
+          <p className="text-gray-500 text-medium">Total Properties Owned</p>
+          <span className="text-2xl font-bold">{properties.length}</span>
+          <p className="text-gray-500 text-medium">Projected Rental Yield</p>
+          <span className="text-2xl font-bold">12.6%</span>
+        </div>
+
+        {/* Render PieGraph only if propertyTypes has data */}
+        {propertyTypes.length > 0 && (
           <PieGraph
-            data={propertyChartData}
+            customHeight="h-[130px]"
+            customRadius="18"
+            data={propertyTypes} // Pass the correct data here
             title="Property Types"
             footerDescription="Showing total properties based on the property type"
           />
+        )}
       </Card>
-     
-      <AssetsAccordion data={investments} />
+        <DataAccordion tabs={tabs} components={tabComponents} onTabChange={handleTabChange}/>
     </div>
   );
 };
+

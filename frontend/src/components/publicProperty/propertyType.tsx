@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
@@ -15,6 +15,8 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
+import { Control, FieldErrors, Controller } from "react-hook-form";
+import { formValuesPublicProperty } from "@/private/owner/publicPropertySchema";
 
 // Define available property types
 const propertyTypes = [
@@ -28,65 +30,71 @@ const propertyTypes = [
     { value: "Industrial", label: "Industrial" },
     { value: "Warehouse", label: "Warehouse" },
     { value: "Student Housing", label: "Student Housing" },
-
 ];
 
-// Component definition with props for propertyType and setPropertyType
-export const ChoosePropertyType: React.FC<{
-    propertyType: string;
-    setPropertyType: React.Dispatch<React.SetStateAction<string>>;
-}> = ({ propertyType, setPropertyType }) => {
-    const [open, setOpen] = React.useState(false);
+interface PropertyTypeProps {
+    control: Control<formValuesPublicProperty>;
+    errors: FieldErrors<formValuesPublicProperty>;
+}
+
+export const ChoosePropertyType: React.FC<PropertyTypeProps> = ({ control, errors }) => {
+    const [open, setOpen] = useState(false); // Estado para controlar la visibilidad del popover
 
     return (
-        <div>
-            <h3 className="font-bold text-2xl text-center mb-[40px]">
+        <div className="w-full">
+            <h3 className="font-bold text-3xl mb-4 text-center mb-[40px]">
                 Which of these best describes your place?
             </h3>
-            <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                    <Button
-                        variant="outline"
-                        role="combobox"
-                        aria-expanded={open}
-                        className="flex w-[100%] justify-center mx-auto"
-                    >
-                        {propertyType
-                            ? propertyTypes.find((type) => type.value === propertyType)?.label
-                            : "Select Property Type..."}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                </PopoverTrigger>
-                <PopoverContent className="mt-3 p-0 w-[100%]">
-                    <Command>
-                        <CommandInput placeholder="Search property type..." />
-                        <CommandList>
-                            <CommandEmpty>No property type found.</CommandEmpty>
-                            <CommandGroup>
-                                {propertyTypes.map((type) => (
-                                    <CommandItem
-                                        key={type.value}
-                                        value={type.value}
-                                        onSelect={(currentValue) => {
-                                            // Update the property type in the parent component
-                                            setPropertyType(currentValue === propertyType ? "" : currentValue);
-                                            setOpen(false);
-                                        }}
-                                    >
-                                        <Check
-                                            className={cn(
-                                                "mr-2 h-4 w-4",
-                                                propertyType === type.value ? "opacity-100" : "opacity-0"
-                                            )}
-                                        />
-                                        {type.label}
-                                    </CommandItem>
-                                ))}
-                            </CommandGroup>
-                        </CommandList>
-                    </Command>
-                </PopoverContent>
-            </Popover>
+            <Controller
+                control={control}
+                name="propertyType"
+                render={({ field }) => (
+                    <Popover open={open} onOpenChange={setOpen}>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant="outline"
+                                role="combobox"
+                                aria-expanded={open ? "true" : "false"}
+                                className="flex w-full justify-center mx-auto"
+                            >
+                                {field.value
+                                    ? propertyTypes.find((type) => type.value === field.value)?.label
+                                    : "Select Property Type..."}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="mt-3 p-0">
+                            <Command>
+                                <CommandInput placeholder="Search property type..." />
+                                <CommandList>
+                                    <CommandEmpty>No property type found.</CommandEmpty>
+                                    <CommandGroup>
+                                        {propertyTypes.map((type) => (
+                                            <CommandItem
+                                                key={type.value}
+                                                value={type.value}
+                                                onSelect={(value) => {
+                                                    field.onChange(value); // Actualiza el valor en react-hook-form
+                                                    setOpen(false); // Cierra el popover después de seleccionar un valor
+                                                }}
+                                            >
+                                                <Check
+                                                    className={cn(
+                                                        "mr-2 h-4 w-4",
+                                                        field.value === type.value ? "opacity-100" : "opacity-0"
+                                                    )}
+                                                />
+                                                {type.label}
+                                            </CommandItem>
+                                        ))}
+                                    </CommandGroup>
+                                </CommandList>
+                            </Command>
+                        </PopoverContent>
+                    </Popover>
+                )}
+            />
+            {errors.propertyType && <p className="text-red-500 text-sm">{errors.propertyType.message}</p>}
         </div>
     );
 };
