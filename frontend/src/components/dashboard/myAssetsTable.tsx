@@ -20,7 +20,8 @@ import {
 } from "@/components/ui/table";
 import PositiveNumber from "../../assets/postiveNumber.svg";
 import { AcceptProperty } from "../acceptProperty";
-import { useUser } from "@/context/userProvider";
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 import { formatDistanceToNow, parseISO } from 'date-fns'; // Import necessary functions from date-fns
 import { useNavigate } from "react-router-dom";
 
@@ -62,7 +63,7 @@ const formatStatus = (status: string): string => {
 export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData }) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
-  const {role } = useUser()
+  const { role} = useSelector((state: RootState) => state.user);
   const navigate = useNavigate()
 
   // Helper function to safely convert a value to number

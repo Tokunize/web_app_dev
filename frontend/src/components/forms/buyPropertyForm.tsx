@@ -4,8 +4,8 @@ import { useAuth0 } from '@auth0/auth0-react'; // Importa el hook de Auth0
 import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover'; // Asegúrate de tener un componente Popover para mostrar el mensaje.
 import { TokenPriceGraph } from '../graphs/tokenPriceGraph';
 import { FormatCurrency } from '../currencyConverter';
-import { useUser } from '@/context/userProvider';
-
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 interface PurchaseFormProps {
   tokenPrice: number;
   projected_annual_return: number;
@@ -17,7 +17,7 @@ export const PurchaseForm: React.FC<PurchaseFormProps> = ({
     projected_annual_return,
     property_id,
 }) => {
-    const {role } = useUser()
+    const { role} = useSelector((state: RootState) => state.user);
     const { isAuthenticated } = useAuth0(); // Obtén el estado de autenticación y el usuario desde Auth0
     const canInvest = role === 'investor'; // Verifica si está autenticado y tiene el rol de inversor
     const isLoggedIn = isAuthenticated; // Solo revisa si el usuario está autenticado

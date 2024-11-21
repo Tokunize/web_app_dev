@@ -1,5 +1,5 @@
 import InputForm from "@/components/forms/inputForm";
-import { formValuesPublicProperty } from "@/private/owner/publicPropertySchema";
+import { formValuesPublicProperty } from "@/components/forms/schemas/publicPropertySchema";
 import {  Control, FieldErrors } from "react-hook-form";
 
 // Asegúrate de recibir control y errores como props

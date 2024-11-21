@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Carousel } from "flowbite-react";
 import token from "../../assets/token.svg";
-import { useUser } from '@/context/userProvider';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
 interface PropertyListCardProps {
     title: string;
@@ -32,7 +33,7 @@ export const OwnerPropertyListCard: React.FC<PropertyListCardProps> = ({
     rejectionReasonComment
 }) => {
     const [badgeType, setBadgeType] = useState<string | null>(null);
-    const { role } = useUser();
+    const { role} = useSelector((state: RootState) => state.user);
     const navigate = useNavigate();
 
     useEffect(() => {

@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import InputForm from "../forms/inputForm";
-import { formValuesPublicProperty } from "@/private/owner/publicPropertySchema";
+import { formValuesPublicProperty } from "@/components/forms/schemas/publicPropertySchema";
 import { Control, FieldErrors, Controller } from "react-hook-form";
 import { ChoosePropertyLocation } from "./propertyLocation";
 

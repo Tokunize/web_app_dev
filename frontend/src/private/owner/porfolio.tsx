@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { useUser } from '@/context/userProvider';
 import { useNavigate } from 'react-router-dom';
 import { OwnerPropertyListCard } from './ownerPropertyListCard';
 import { LoadingSpinner } from '@/components/loadingSpinner';
 import { useGetAxiosRequest } from '@/hooks/getAxiosRequest';
 import { FilterInput } from '@/components/filterInput';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
 interface Token {
   total_tokens: number;
@@ -28,7 +29,7 @@ interface Property {
 export const Porfolio: React.FC = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>(''); // Estado para el término de búsqueda
-  const { role } = useUser();
+  const { role} = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
 
   // Usar el hook personalizado para obtener las propiedades

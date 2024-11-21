@@ -18,16 +18,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatDistanceToNowStrict } from "date-fns";
+import { FormatCurrency } from "./currencyConverter";
 
 // Define el tipo Transaction
 type Transaction = {
   id: number;
-  event: string;
-  transaction_amount: string; // Mantén este tipo como string
-  transaction_tokens_amount: string; // Mantén este tipo como string
-  transaction_owner: string;
-  created_at:string;
-  transaction_owner_email:string
+  event?: string;
+  transaction_amount?: string;
+  transaction_tokens_amount?: string;
+  transaction_owner?: string;
+  created_at?: string;
+  transaction_owner_email?: string;
+  transaction_date?: string;
+  sellOrder?: { orderPrice: number; orderAmount?: number }[]; // Array de objetos con las propiedades orderPrice y orderAmount
+  buyOrder?: { orderPrice: number; orderAmount?: number }[]; // Array de objetos con las propiedades orderPrice y orderAmount
 };
 
 interface TransactionTableProps {
@@ -37,8 +41,12 @@ interface TransactionTableProps {
 export const TransactionTable: React.FC<TransactionTableProps> = ({ transactions }) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
-  const columns: ColumnDef<Transaction>[] = [
-    {
+  // Define las columnas de forma condicional
+  const columns: ColumnDef<Transaction>[] = [];
+
+  // Si existe "event", agrega la columna "Event"
+  if (transactions.some(t => t.event)) {
+    columns.push({
       accessorKey: "event",
       header: "Event",
       cell: ({ row }) => {
@@ -56,16 +64,24 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({ transactions
 
         return <div className={eventColor}>{event}</div>;
       },
-    },
-    {
+    });
+  }
+
+  // Si existe "transaction_owner_email", agrega la columna "Owner"
+  if (transactions.some(t => t.transaction_owner_email)) {
+    columns.push({
       accessorKey: "transaction_owner_email",
       header: "Owner",
       cell: ({ row }) => {
         const owner = row.getValue<string>("transaction_owner_email");
-        return <div className="lowercase">{owner}</div>;
+        return <div className="lowercase">{owner.slice(0,5) + "..."+  owner.slice(-4)}</div>;
       },
-    },
-    {
+    });
+  }
+
+  // Si existe "transaction_amount", agrega la columna "Amount"
+  if (transactions.some(t => t.transaction_amount)) {
+    columns.push({
       accessorKey: "transaction_amount",
       header: () => (
         <div className="flex items-center justify-end">
@@ -88,12 +104,16 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({ transactions
         return <div className="text-right font-medium">{formattedAmount}</div>;
       },
       sortingFn: (rowA, rowB) => {
-        const amountA = Number(rowA.getValue<string>("transaction_amount")) || 0; // Convertir a número
-        const amountB = Number(rowB.getValue<string>("transaction_amount")) || 0; // Convertir a número
-        return amountA - amountB; // Ordenar de menor a mayor
+        const amountA = Number(rowA.getValue<string>("transaction_amount")) || 0;
+        const amountB = Number(rowB.getValue<string>("transaction_amount")) || 0;
+        return amountA - amountB;
       },
-    },
-    {
+    });
+  }
+
+  // Si existe "transaction_tokens_amount", agrega la columna "Token Quantity"
+  if (transactions.some(t => t.transaction_tokens_amount)) {
+    columns.push({
       accessorKey: "transaction_tokens_amount",
       header: () => <div className="text-right">Token Quantity</div>,
       cell: ({ row }) => {
@@ -101,21 +121,76 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({ transactions
         return <div className="text-right">{tokens}</div>;
       },
       sortingFn: (rowA, rowB) => {
-        const tokensA = Number(rowA.getValue<string>("transaction_tokens_amount")) || 0; // Convertir a número
-        const tokensB = Number(rowB.getValue<string>("transaction_tokens_amount")) || 0; // Convertir a número
-        return tokensA - tokensB; // Ordenar de menor a mayor
+        const tokensA = Number(rowA.getValue<string>("transaction_tokens_amount")) || 0;
+        const tokensB = Number(rowB.getValue<string>("transaction_tokens_amount")) || 0;
+        return tokensA - tokensB;
       },
-    },
-    {
-      accessorKey: "transaction_date", // Nueva columna para la fecha de transacción
+    });
+  }
+
+  // Si existe "transaction_date", agrega la columna "Date"
+  if (transactions.some(t => t.transaction_date)) {
+    columns.push({
+      accessorKey: "transaction_date", 
       header: "Date",
       cell: ({ row }) => {
-        const date = new Date(row.getValue<string>("transaction_date"));
+        const dateString = row.getValue<string>("transaction_date");
+        const date = new Date(dateString);
+
+        if (isNaN(date.getTime())) {
+          return <div>Invalid date</div>;
+        }
+
         const formattedDate = formatDistanceToNowStrict(date, { addSuffix: true });
-        return <div>{formattedDate}</div>;
+        return <div className="min-w-[100px]">{formattedDate}</div>;
       },
-    },
-  ];
+    });
+  }
+
+  // Si existe "buyOrder", agrega la columna "Buy Orders"
+  if (transactions.some(t => t.buyOrder && t.buyOrder.length > 0)) {
+    columns.push({
+      accessorKey: "buyOrder", // El nombre de la propiedad
+      header: "Buy Orders",
+      cell: ({ row }) => {
+        const buyOrders = row.getValue<{ orderPrice: number; orderAmount?: number }[]>("buyOrder");
+
+        // Mostrar todas las órdenes de compra de la transacción
+        return (
+          <div>
+            {buyOrders.map((order, index) => (
+              <div key={index} className="flex  min-w-[120px] justify-between">
+                <span ><FormatCurrency amount={order.orderPrice}/></span>
+                <span>{order.orderAmount ? order.orderAmount : "0"} Tokens</span>
+              </div>
+            ))}
+          </div>
+        );
+      },
+    });
+  }
+
+  if (transactions.some(t => t.sellOrder && t.sellOrder.length > 0)) {
+    columns.push({
+      accessorKey: "sellOrder", // El nombre de la propiedad
+      header: "Sell Orders",
+      cell: ({ row }) => {
+        const buyOrders = row.getValue<{ orderPrice: number; orderAmount?: number }[]>("sellOrder");
+
+        // Mostrar todas las órdenes de compra de la transacción
+        return (
+          <div>
+            {buyOrders.map((order, index) => (
+              <div key={index} className="flex min-w-[120px] justify-between">
+                <span><FormatCurrency amount={order.orderPrice}/></span>
+                <span>{order.orderAmount ? order.orderAmount : "0"} Tokens</span>
+              </div>
+            ))}
+          </div>
+        );
+      },
+    });
+  }
 
   const table = useReactTable({
     data: transactions,
@@ -127,7 +202,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({ transactions
     state: {
       sorting,
     },
-    enableSorting: true, // Asegúrate de que la ordenación esté habilitada
+    enableSorting: true, 
   });
 
   return (

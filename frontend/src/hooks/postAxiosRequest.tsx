@@ -11,16 +11,17 @@ interface FetchState<T> {
 
 // Hook para solicitudes POST
 export const usePostAxiosRequest = <T, U>(
-  url: string,
+  url: string, // Se pasa la URL directamente como parámetro del hook
+  dataToPost: U, // Se pasa la data que se quiere enviar en la solicitud POST
   onSuccess?: (data: T) => void,
   onError?: (error: string) => void
-): [FetchState<T>, (data: U) => Promise<void>] => {
+): [FetchState<T>, () => Promise<void>] => {
   const { getAccessTokenSilently } = useAuth0();
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const postData = useCallback(async (dataToPost: U) => {
+  const postData = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -52,7 +53,7 @@ export const usePostAxiosRequest = <T, U>(
     } finally {
       setLoading(false);
     }
-  }, [url, getAccessTokenSilently, onSuccess, onError]);
+  }, [url, dataToPost, getAccessTokenSilently, onSuccess, onError]);
 
   return [{ data, loading, error }, postData];
 };

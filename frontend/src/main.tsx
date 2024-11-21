@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Auth0Provider } from '@auth0/auth0-react';
-import { UserProvider } from './context/userProvider';
 import './styles/index.css';
 import 'leaflet/dist/leaflet.css';
 import Layout from './layouts/layout';
@@ -9,7 +8,11 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import { Buffer } from 'buffer';
 import process from 'process';
-
+import { Provider } from 'react-redux';
+import { store } from "./redux/store"
+import { PersistGate } from 'redux-persist/integration/react';
+import { ModalProvider } from './context/modalContext';
+import { persistor } from './redux/store'; // Importa el persistor
 // Assign Buffer and process to the global object
 window.Buffer = Buffer;
 window.process = process;
@@ -29,12 +32,15 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         scope: "openid profile email read:users write:users" 
       }}
     >
-      <UserProvider>
-        {/* Agregar Elements de Stripe para envolver la aplicación */}
-        <Elements stripe={stripePromise}>
-          <Layout />
-        </Elements>
-      </UserProvider>
+      <Provider store={store}>
+        <ModalProvider>
+          <PersistGate loading={null} persistor={persistor}>
+            <Elements stripe={stripePromise}>
+              <Layout />
+            </Elements>
+            </PersistGate>
+        </ModalProvider>
+      </Provider>
     </Auth0Provider>
   </React.StrictMode>,
 );

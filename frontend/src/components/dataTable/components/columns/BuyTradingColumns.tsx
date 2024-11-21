@@ -1,12 +1,11 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
-import { statuses, propertyType,  } from "../../data/data"
-import { Trading, tradingSchema } from "../../data/schema"
+import {  propertyType,  } from "../../data/data"
+import { Trading } from "../../data/schema"
 import { DataTableColumnHeader } from "../tasdata-table-column-header"
-import { DataTableRowActions } from "../data-table-row-actions"
 import positiveNumber from "../../../../assets/postiveNumber.svg"
 import negativeNumber from "../../../../assets/negativeNumber.svg"
-
+import { DataTableRowActionsInvestorTrading } from "../rows/row-actions-investor-trading"
 
 
 const toNumber = (value: unknown): number => {
@@ -165,7 +164,7 @@ export const BuyTradingColumns: ColumnDef<Trading>[] = [
   },  
   {
     id: "actions",
-    cell: ({ row }) => <DataTableRowActions statuses={statuses} schema={tradingSchema} row={row} id={row.original.id} />,
+    cell: ({ row }) => <DataTableRowActionsInvestorTrading row={row} />,
   },
 ]
 

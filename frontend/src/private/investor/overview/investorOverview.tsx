@@ -9,6 +9,8 @@ import { MyAssetsTable } from "@/components/dashboard/myAssetsTable";
 import { LoadingSpinner } from "@/components/loadingSpinner";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";  
 import { DashboardDetailCard } from "@/components/dashboard/dashboardDetailCard";
+import { FormatCurrency } from "@/components/currencyConverter";
+
 
 interface Investment {
   locations: {
@@ -65,19 +67,9 @@ export const InvestorOverview = () => {
   const propertyChartData = investments?.property_types || [];
 
 
-  // Datos para la gráfica de performance
-  const chartData2 = [
-    { month: "January", value: 3.2 },
-    { month: "February", value: 3.9 },
-    { month: "March", value: 3.5 },
-    { month: "April", value: 3.7 },
-    { month: "May", value: 3.1 },
-    { month: "June", value: 3.8 },
-  ];
-
   const inverstorOverview = [
-    {title:"Current Rent Balance" , value:234443 },
-    {title:"Total Rental Income" ,value: 53443 }
+    {title:"Current Rent Balance" , value:<FormatCurrency amount={323243} /> },
+    {title:"Total Rental Income" , value:<FormatCurrency amount={23243}/> }
   ]
 
   return (
@@ -135,11 +127,7 @@ export const InvestorOverview = () => {
           <RiskOverview />
         </Card>
         <Card className="w-1/2 border-0 shadow-none">
-          <PerformanceGraph  
-            description=""
-            title={"Comparative Analysis Chart"}
-            data={chartData2}
-          />
+          <PerformanceGraph/>
         </Card>
       </div>
     </section>

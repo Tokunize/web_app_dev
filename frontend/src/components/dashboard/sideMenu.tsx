@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth0 } from "@auth0/auth0-react";
-import { LoginButton } from '../buttons/loginButton';
-import { LogoutButton } from '../buttons/logoutBtn';
-import { useUser } from '@/context/userProvider';
+import { UserNavbar } from './useNavbar';
 
 interface MenuItem {
   name: string;
@@ -16,9 +13,7 @@ interface SideMenuProps {
   onMenuClick: () => void;
 }
 
-const SideMenu: React.FC<SideMenuProps> = ({ data, onMenuClick }) => {
-  const { isAuthenticated } = useAuth0();
-  const { name, userImage } = useUser();
+const SideMenu: React.FC<SideMenuProps> = ({ data, onMenuClick }) => {  
   const navigate = useNavigate();
   const location = useLocation();  
   const [menuOpen, setMenuOpen] = useState(false);
@@ -26,9 +21,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ data, onMenuClick }) => {
 
   // Establecer el tab seleccionadooo en función de la ruta actual
   useEffect(() => {
-    setSelectedItem(location.pathname);
-    console.log(location.pathname);
-    
+    setSelectedItem(location.pathname);    
   }, [location.pathname]);
 
   const toggleMenu = () => {
@@ -73,21 +66,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ data, onMenuClick }) => {
             </li>
           ))}
         </ul>
-        <div className="mb-[10px] flex flex-col justify-between">
-          {isAuthenticated && (
-            <div className="flex items-center space-x-1 mb-3">
-              {userImage && (
-                <img
-                  src={userImage}
-                  className="w-8 h-8 rounded-full"
-                  alt={name || 'User profile'}
-                />
-              )}
-              <span className="font-bold text-sm">{name}</span>
-            </div>
-          )}
-          <span>{isAuthenticated ? <LogoutButton /> : <LoginButton />}</span>
-        </div>
+          <UserNavbar/>
       </div>
       {menuOpen && (
         <div

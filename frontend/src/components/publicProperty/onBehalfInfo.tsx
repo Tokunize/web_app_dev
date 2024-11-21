@@ -1,5 +1,5 @@
 import { Control, FieldErrors, Controller } from "react-hook-form";
-import { formValuesPublicProperty } from "@/private/owner/publicPropertySchema";
+import { formValuesPublicProperty } from "@/components/forms/schemas/publicPropertySchema";
 import InputForm from "../forms/inputForm";
 
 interface OnBehalfInfoProps {

@@ -1,12 +1,6 @@
-
-
-import { useUser } from '@/context/userProvider';
-import { useEffect } from "react";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -19,34 +13,32 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Notifications } from '../notifications/notifications';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { LogoutButton } from '../buttons/logoutBtn';
+import ConnectWallet from '../blockchain/connectWallet';
+import { GlobalModal } from '../globalModal';
 
-// Tipado del contexto de usuario
-interface UserContext {
-  userImage?: string;
-  name: string;
-  userEmail: string;
-}
-
-// Componente de navegación de usuario
 export const UserNavbar: React.FC = () => {
-  const { userImage, name, userEmail } = useUser() as UserContext;
+  const { userImage, name, userEmail } = useSelector((state: RootState) => state.user);
+  const {address} = useSelector((state: RootState) => state.wallet)
+  const navigate = useNavigate(); // Inicia el hook navigate
 
   // Función de manejo de atajos de teclado
   const handleShortcuts = (event: KeyboardEvent) => {
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "b") {
       event.preventDefault();
-      window.location.href = "/dashboard/";
+      navigate("/dashboard"); // Usar navigate para redirigir
     }
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "z") {
       event.preventDefault();
-      window.location.href = "/";
+      navigate("/"); // Redirige al inicio
     }
     if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === "q") {
       event.preventDefault();
-      window.location.href = "/logout";
+      navigate("/logout"); // Redirige a logout
     }
   };
-
 
   useEffect(() => {
     // Agrega el evento al montar
@@ -57,13 +49,13 @@ export const UserNavbar: React.FC = () => {
   }, []);
 
   const userNavLinkDropDown = [
-    {name: "Marketplace", url: "/", shortCutLetter: "Z"},
-    {name: "Dashboard", url: "/dashboard/",shortCutLetter:"B" },
-  ]
+    { name: "Marketplace", url: "/", shortCutLetter: "Z" },
+    { name: "Dashboard", url: "/dashboard/", shortCutLetter: "B" },
+  ];
 
   return (
     <div className="flex space-x-4">
-      <Notifications/>
+      <Notifications />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -84,18 +76,25 @@ export const UserNavbar: React.FC = () => {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            {userNavLinkDropDown.map((link, index)=>(
-              <DropdownMenuItem key={index}>
-              {link.name}
-              <DropdownMenuShortcut>⌘{link.shortCutLetter}</DropdownMenuShortcut>
-            </DropdownMenuItem>
+            {userNavLinkDropDown.map((link, index) => (
+              <DropdownMenuItem key={index} onClick={() => navigate(link.url)}>
+                {link.name}
+                <DropdownMenuShortcut>⌘{link.shortCutLetter}</DropdownMenuShortcut>
+              </DropdownMenuItem>
             ))}
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            Log out
-            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-          </DropdownMenuItem>
+          
+          {/* Asegúrate de que el modal se usa correctamente */}
+          <GlobalModal
+            title={address || "Connect Wallet"}
+            id="1"
+            description="Choose the wallet you want to connect"
+            contentComponent={<ConnectWallet />}
+          />
+
+          <DropdownMenuSeparator />
+          <LogoutButton />
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
