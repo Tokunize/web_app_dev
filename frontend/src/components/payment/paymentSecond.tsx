@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import cardIcon from "../../assets/cardIcon.svg";
 import tokenIcon from "../../assets/token.svg";
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
 interface PaymentSecondProps {
   goNext: () => void;
@@ -9,7 +11,7 @@ interface PaymentSecondProps {
   totalTokens: number;
   investmentAmount: number;
   setInvestmentAmount: (amount: number) => void;
-  setTotalAmountInUSDC: (amount: number) => void; // Nuevo prop para enviar el total en USDC
+  setTotalAmountInUSDC: (amount: number) => void; 
 }
 
 export const PaymentSecond: React.FC<PaymentSecondProps> = ({
@@ -23,6 +25,7 @@ export const PaymentSecond: React.FC<PaymentSecondProps> = ({
 }) => {
   const [amount, setAmount] = useState<string>(investmentAmount.toString()); // Store as string to handle empty input
   const inputRef = useRef<HTMLInputElement>(null);
+  const {address} = useSelector((state: RootState) => state.wallet)
 
   const handleFocus = () => {
     if (amount === '0') {
@@ -101,8 +104,10 @@ export const PaymentSecond: React.FC<PaymentSecondProps> = ({
         <span className="flex items-center">
           <img alt="payment-method-icon" src={cardIcon} className="h-8" />
           <span className="flex pl-2 flex-col">
-            <span className="font-bold text-medium">Pay With</span>
-            <span className="text-gray-400">{selectedPaymentMethod ? selectedPaymentMethod : "Please select payment method"}</span>
+            <span className="font-bold text-medium ">Pay With</span>
+            <span className="text-gray-400">{selectedPaymentMethod ? selectedPaymentMethod : "Please select payment method"}
+              <span className="pl-4">{address || ""}</span>
+            </span>
           </span>
         </span>
         <svg

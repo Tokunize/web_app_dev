@@ -4,7 +4,7 @@ import { MapPin, Globe, Compass } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import InputForm from '../forms/inputForm';
 import { Button } from '../ui/button';
-import { formValuesPublicProperty } from "@/private/owner/publicPropertySchema";
+import { formValuesPublicProperty } from "@/components/forms/schemas/publicPropertySchema";
 import { Control, FieldErrors } from "react-hook-form";
 
 interface PropertyDetailsProps {

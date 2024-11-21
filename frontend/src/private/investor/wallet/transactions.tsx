@@ -5,8 +5,6 @@ import { Download } from "lucide-react";
 import { CurrencyConverter } from "@/components/currencyConverter";
 import { AddFundsFlow } from "@/components/funds/addFundsFlow";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
-import { useAuth0 } from "@auth0/auth0-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +16,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LoadingSpinner } from "@/components/loadingSpinner";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
-import { ConfirmPin } from "@/components/dashboard/confirmPin";
 
 type Transaction = {
   id: number;
@@ -37,13 +34,7 @@ export const Transaction = () => {
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [balance, setBalance] = useState<number>(0);
   
-  // Añadir estados para almacenar los datos del token, clave de encriptación y ID de desafío
-  const [userToken, setUserToken] = useState<string | null>(null);
-  const [encryptionKey, setEncryptionKey] = useState<string | null>(null);
-  const [challengeId, setChallengeId] = useState<string | null>(null);
-  
-  const { getAccessTokenSilently } = useAuth0();
-
+ 
   // Use the custom hook to fetch transactions
   const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/transactions/`;
   
@@ -73,29 +64,6 @@ export const Transaction = () => {
   if (loading) return <LoadingSpinner />;
   if (error) return <div>Error: {error}</div>;
 
-  const StartTransfer = async () => {
-    const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}wallet/transfer/`; // URL de la API
-  
-    try {
-      const accessToken = await getAccessTokenSilently();
-      const response = await axios.post(apiUrl, {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${accessToken}` // Si tienes una API key
-          }      
-        });
-  
-      const { challengeId, userToken, encryptionKey } = response.data;
-  
-      // Actualizar los estados con los datos recibidos
-      setUserToken(userToken);
-      setEncryptionKey(encryptionKey);
-      setChallengeId(challengeId);
-      
-    } catch (error) {
-      console.log(error);      
-    }
-  };
 
   // Función para descargar CSV en lugar de PDF
   const downloadCSV = () => {
@@ -148,15 +116,6 @@ export const Transaction = () => {
           <Button>Withdraw</Button>
         </span>
       </div>
-
-      {/* Renderizar ConfirmPin solo si userToken, encryptionKey y challengeId están disponibles */}
-      {userToken && encryptionKey && challengeId ? (
-        <ConfirmPin 
-          userToken={userToken}
-          encryptionKey={encryptionKey}
-          challengeId={challengeId}
-        />
-      ) : null}
 
       <Button onClick={downloadCSV} className="bg-white border">
         Download CSV

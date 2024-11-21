@@ -9,11 +9,11 @@ import { PropertyImagesGallery } from "@/components/PropertyImagesGallery";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
 import { Property } from '@/types';
 
+
+
 export const SingleProperty = () => {
   const { id } = useParams<{ id: string }>();
-  
   const numericId = id ? parseInt(id, 10) : undefined; // Convertir el ID a número, o undefined si es incorrecto
-
   const { data, loading, error } = useGetAxiosRequest<Property>(`${import.meta.env.VITE_APP_BACKEND_URL}property/${id}/landing-page/?view=overview`);
 
   if (loading) {

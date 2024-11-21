@@ -1,8 +1,8 @@
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { publicProperty } from "./publicPropertySchema";
+import { publicProperty } from "../../components/forms/schemas/publicPropertySchema";
 import { PropertyApplicantInfo } from "@/components/publicProperty/propertyApplicantInfo";
-import { formValuesPublicProperty } from "./publicPropertySchema";
+import { formValuesPublicProperty } from "../../components/forms/schemas/publicPropertySchema";
 import { useState } from "react";
 import { ChoosePropertyType } from "@/components/publicProperty/propertyType";
 import { RadioGroupForm } from "@/components/forms/radioGroupForm";

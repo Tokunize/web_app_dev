@@ -12,9 +12,12 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '../ui/use-toast';
 import { LoadingSpinner } from '../loadingSpinner';
 import { useGetAxiosRequest } from '@/hooks/getAxiosRequest';
+import GetContract from '../blockchain/contractsAbi';
+import useSmartContract from '@/hooks/useSmartContract';
+
 
 import { ethers } from 'ethers';
-import contractAbi from "../../contracts/property_investment_abi.json";  // Asegúrate de que este ABI esté correctamente configurado
+import propertyInvestmentABI from "../../contracts/property_investment_abi.json";  // Asegúrate de que este ABI esté correctamente configurado
 import usdcAbi from "../../contracts/usdc_abi.json";  
 
 export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) => {
@@ -25,12 +28,16 @@ export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
   const [investmentAmount, setInvestmentAmount] = useState<string>("0"); // New state for amount
   const [investmentAmountUSDC,setInvestmentAmountUSDC] = useState<number>(0)
-  const [contractAddress, setContractAddress] = useState<string>('0xD7a4b3e38B43453641F6e7e2b924F9937706E90B');
-
+  // const [contractAddress, setContractAddress] = useState<string>('0xCaD0E8DBfFfDf7E53419B5B3d032125FF406E949');
   const usdcAddress = "0xdC48A996F3073d4ADAB7f77B42162c284801A6d9"; // Aquí debes poner la dirección del contrato USDC en Sepolia Testnet
-
-
   const {toast} = useToast()
+
+  const contractAddress="0xCaD0E8DBfFfDf7E53419B5B3d032125FF406E949"
+
+  const contractPropertyInvestment = useSmartContract({
+    contractAddress: contractAddress,
+    contractAbi: propertyInvestmentABI,
+  });
 
   const { data: propertyData, loading, error } = useGetAxiosRequest(
     `${import.meta.env.VITE_APP_BACKEND_URL}property/${property_id}/landing-page/?view=payment`,true);
@@ -124,16 +131,23 @@ export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) 
       console.log('Esperando confirmación...');
       await transaction.wait();
   
-      console.log('Aprobación exitosa para 1 USDC.');
+      toast({
+        title: "Success!",
+        description: "Your approvement was successfully done",
+        variant: "default",
+      });
     } catch (err) {
+      toast({
+        title: "Failed!",
+        description: "Your approvement was not successfully done",
+        variant: "default",
+      });
       console.error('Error en la aprobación:', err);
       throw new Error('Error al aprobar USDC.');
     }
   };
 
-  const investInContract = async (usdcAmount: number) => {
-    console.log("aquiuiiii", usdcAmount);
-    
+  const investInContract = async (usdcAmount: number) => {    
     try {
       if (!usdcAmount || isNaN(Number(usdcAmount)) || Number(usdcAmount) <= 0) {
         throw new Error('Por favor ingresa una cantidad válida de USDC.');
@@ -149,41 +163,20 @@ export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) 
 
       // Verificamos la red de MetaMask
       await checkNetwork();
-
-      // Crear una instancia del contrato de inversión (solo si el signer no es null)
-      const contract = new ethers.Contract(contractAddress, contractAbi, signer!);  // Usamos 'signer!' para asegurar que no es null
-
-      // Convertir el monto a un BigNumber (usando 18 decimales para USDC)
       const usdcAmountInWei = usdcAmount; // Mantén el valor tal cual sin convertir
-
-      // Asegurarse de que el contrato esté listo para recibir la inversión
-      console.log('Llamando a la función invest con el monto:', usdcAmountInWei.toString());
-
-      // Aprobamos el uso de USDC antes de llamar a la función invest
       await approveUSDC();
-
-      // Llamar a la función 'invest' en el contrato
-      const transaction = await contract.invest(usdcAmountInWei, {
+      const transaction = await contractPropertyInvestment.invest(usdcAmountInWei, {
         gasLimit: 1000000,  // Ajusta el límite de gas según sea necesario
       });
 
       // Esperar a que la transacción sea confirmada
       await transaction.wait();
-
-      // Actualizar los datos del contrato (puedes obtener más información si es necesario)
-      // setContractData({ goal: (await contract.goal()).toString() });
-      // setUsdcAmount('');  // Limpiar el campo de cantidad invertida
-      // setError(null);
-
-      alert('Inversión realizada con éxito!');
       handlePurchase()
     } catch (err) {
       (`Error al realizar la inversión: ${err instanceof Error ? err.message : 'Error desconocido'}`);
       console.error(err);
     }
   };
-
-  
 
   const renderStep = () => {
     if (loading) return <LoadingSpinner/>

@@ -2,7 +2,6 @@
 import { Marketplace } from "../public/marketplace";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { SingleProperty } from "../public/singleProperty";
-import { UserProvider } from "../context/userProvider";
 import ProtectedRoute from "./protectedRoutes";
 import CreatePropertyController from "@/private/owner/createPropertyController";
 import DashboardLayout from "./dashboardLayout";
@@ -23,7 +22,6 @@ import { SmartContractFunctions } from "@/private/smartContractsManagment/smartC
 
 const Layout = () => {
   return (
-    <UserProvider>
       <BrowserRouter>
         <Toaster />
         <Routes>
@@ -80,7 +78,7 @@ const Layout = () => {
             <Route
               path="dashboard-property/:propertyId/"
               element={
-                <ProtectedRoute roleRequired="investor,admin" element={<CreatePropertyController />} />
+                <ProtectedRoute roleRequired="admin" element={<CreatePropertyController />} />
               }
             />
             <Route
@@ -92,7 +90,6 @@ const Layout = () => {
           </Route>
         </Routes>
       </BrowserRouter>
-    </UserProvider>
   );
 };
 

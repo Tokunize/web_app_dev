@@ -16,7 +16,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover";
 import { Control, FieldErrors, Controller } from "react-hook-form";
-import { formValuesPublicProperty } from "@/private/owner/publicPropertySchema";
+import { formValuesPublicProperty } from "@/components/forms/schemas/publicPropertySchema";
 
 // Define available property types
 const propertyTypes = [

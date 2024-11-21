@@ -1,13 +1,15 @@
 
-import React from "react";
 import { Outlet } from "react-router-dom";
 import SideMenu from "@/components/dashboard/sideMenu";
-import { useUser } from "@/context/userProvider";
 import { UserNavbar } from "@/components/dashboard/useNavbar";
 import {ChartCandlestick} from "lucide-react"
 import {WalletMinimal, Coins,Grid2x2} from "lucide-react"
-const DashboardLayout: React.FC = () => {
-  const { role } = useUser(); 
+import { useSelector } from 'react-redux';
+import { RootState } from "@/redux/store";
+
+
+const DashboardLayout = () => {
+  const { role } = useSelector((state: RootState) => state.user);
 
   const menuData = role === 'admin' ? [
     { name: 'Overview', link: '/dashboard/',  icon:<Grid2x2 /> },

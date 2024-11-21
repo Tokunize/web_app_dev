@@ -12,7 +12,7 @@ interface GlobalModalProps {
   id: string;
   title: string;
   description: string;
-  contentComponent?: ReactNode;
+  contentComponent?: ReactNode; // Este prop es opcional y puede aceptar un componente React
 }
 
 export const GlobalModal: React.FC<GlobalModalProps> = ({
@@ -23,16 +23,19 @@ export const GlobalModal: React.FC<GlobalModalProps> = ({
 }) => {
   return (
     <Dialog>
+      {/* Asegurarse de que el DialogTrigger está habilitado */}
       <DialogTrigger asChild>
         <button
           id={`trigger-${id}`}
-          className="relative px-2 rounded-sm w-full flex cursor-default hover:bg-accent select-none items-center rounded-sm py-1.5 text-sm outline-none transition-colors  focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+          className="relative px-2 rounded-sm w-full flex cursor-pointer hover:bg-accent select-none items-center py-1.5 text-sm outline-none transition-colors"
         >
           {title}
         </button>
       </DialogTrigger>
+
+      {/* Asegurarse de que el contenido está visible y ajustado */}
       <DialogContent
-        className="sm:max-w-xl max-h-[90vh] overflow-y-auto" // Ajuste para scroll en el contenido
+        className="sm:max-w-xl max-h-[90vh] overflow-y-auto"
         id={`content-${id}`}
       >
         <DialogHeader>
@@ -40,10 +43,8 @@ export const GlobalModal: React.FC<GlobalModalProps> = ({
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
-        {/* Renderiza el contenido dinámico si se proporciona */}
-        <div className="overflow-y-auto h-auto">
-          {contentComponent}
-        </div>
+        {/* Renderizar el contenido dinámico */}
+        <div className="overflow-y-auto h-auto">{contentComponent}</div>
       </DialogContent>
     </Dialog>
   );

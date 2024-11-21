@@ -1,41 +1,62 @@
-// GlobalModal.js
-import React from "react";
-import { AiOutlineClose } from "react-icons/ai"; // Importar el ícono de cierre
+import { useModalContext } from "@/context/modalContext";
+import { useEffect, useRef } from "react"
+import { createPortal } from "react-dom"
+import { CgClose } from "react-icons/cg";
 
-// Definir la interfaz de los props (si usas TypeScript)
-interface GlobalModalProps {
-  isOpen: boolean;
-  closeModal: () => void;
-  customStyles?: React.CSSProperties;
-  children: React.ReactNode;
+interface Props{
+    children : React.ReactNode
 }
 
-// Componente GlobalModal
-export const GlobalModal: React.FC<GlobalModalProps> = ({ isOpen, closeModal, customStyles, children }) => {
-  if (!isOpen) return null;
+export const GlobalModal = ({children}:Props) =>{
+    const modalRef = useRef<HTMLDivElement>(null); // Cambié a HTMLDivElement para simplificar
+    const {state,setState} = useModalContext()
+    const closeModal = () => { setState(false)}
 
-  return (
-    <div
-      className="fixed z-20 inset-0 bg-black bg-opacity-50 flex items-center justify-center transition-opacity duration-300 ease-in-out"
-      style={{ opacity: isOpen ? 1 : 0 }}
-    >
-      <div
-        className={`bg-white rounded-lg shadow-lg p-6 relative max-w-lg w-full mx-4 transition-transform duration-300 ease-in-out transform ${
-          isOpen ? "scale-100" : "scale-95"
-        }`}
-        style={customStyles}
-      >
-        {/* Botón de cierre en la esquina superior derecha */}
-        <button
-          onClick={closeModal}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition-colors"
-        >
-          <AiOutlineClose size={24} />
-        </button>
+    const modalRoot = document.getElementById("modal")
 
-        {/* Contenido dinámico del modal */}
-        <div className="modal-body mb-4">{children}</div>
-      </div>
-    </div>
-  );
-};
+    const handleContentClick = (e:React.MouseEvent<HTMLDivElement>)=>{
+        e.stopPropagation()
+    }
+
+    useEffect(()=>{
+        const handleScape = (e:KeyboardEvent) =>{
+            if(e.key === "Escape"){
+                setState(false)
+            }
+            if(state){
+                document.addEventListener("keydown", handleScape)
+            }
+        }
+        return () =>{
+            document.removeEventListener("keydown", handleScape)
+        }
+    },[state,setState])
+
+    if(!state || !modalRoot){
+        return null;
+    }
+    
+    return createPortal(
+        <div className="overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300">
+            <div
+                className="w-auto min-w-[65%] max-w-3xl flex flex-col space-y-5 bg-white p-4 rounded-lg shadow-lg transform text-black transition-transform duration-300 scale-95"
+                onClick={handleContentClick}
+                ref={modalRef}
+            >
+                {/* Botón de cierre en la parte superior derecha */}
+                <button
+                className="absolute top-2 right-2 text-black "
+                onClick={closeModal}
+                >
+                <CgClose className="w-6 h-6" />
+                </button>
+
+                {/* Contenido del modal */}
+                <div>
+                {children}
+                </div>
+            </div>
+        </div>,
+        modalRoot
+    ); 
+}

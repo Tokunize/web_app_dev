@@ -1,18 +1,17 @@
 import { Control, Controller } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { formValuesPublicProperty } from "@/private/owner/publicPropertySchema";
 
 interface Props {
-    name: keyof formValuesPublicProperty;
+    name: string;
     control: Control<any>;
     label: string;
     type?: string;
     error?: string;
 }
 
-export const InputForm = ({ name, control, label, error, type = "text" }: Props) => {
+const InputForm = ({ name, control, label, error, type = "text" }: Props) => {
     return (
-        <div className="relative z-0 w-full  group">
+        <div className="relative z-0 w-full group">
             <Controller
                 name={name}
                 control={control}
@@ -22,9 +21,10 @@ export const InputForm = ({ name, control, label, error, type = "text" }: Props)
                             id={name}
                             type={type}
                             {...field}
-                            value={field.value || ""} // Esto asegura que el campo se vacíe con reset()
+                            value={field.value || ""}
+                            onChange={(e) => field.onChange(type === "number" ? Number(e.target.value) : e.target.value)}  // Convert to number if type is "number"
                             className={`block py-2.5 px-3 pr-6 w-full text-sm bg-transparent focus:outline-none peer mt-1 ${error ? "border-red-500" : ""}`}
-                            placeholder=" " // Para que el placeholder no se vea
+                            placeholder=" " // To hide the placeholder
                         />
                         <label
                             htmlFor={name}
@@ -40,4 +40,4 @@ export const InputForm = ({ name, control, label, error, type = "text" }: Props)
     );
 };
 
-export default InputForm;
+export default InputForm

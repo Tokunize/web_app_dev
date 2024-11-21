@@ -1,5 +1,4 @@
 import React from 'react';
-import { XCircle } from 'lucide-react';
 import {
   Sheet,
   SheetContent,

@@ -24,15 +24,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {  useModalContext } from "../../../context/modalContext"
 
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
-import { SinglePropertyDetailOnModal } from "@/private/investor/trading/propertyDetails";
-
+import { GlobalModal } from "@/components/globalModal2";
 import { useState } from "react";
-import { GlobalModal } from "@/components/GlobalModal2";
-import { useUser } from "@/context/userProvider";
-
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
+import { TradingBuyFlow } from "@/components/stepperFlows/tradingBuyFlow";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -49,22 +49,17 @@ export function DataTable<TData extends RowData, TValue>({
   filterOptions,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [propertyIdRow, setPropertyIdRow] = useState<string | null>(null);
-  const { role } = useUser(); // Obtener el rol del usuario
-
-  const openModal = (id: string) => {
+  const { role} = useSelector((state: RootState) => state.user);
+  const {setState} = useModalContext()
+  
+  const checkIfInvestor = (id: string) => {
     if (role === "investor") {
       setPropertyIdRow(id);
-      setIsModalOpen(true);
+      setState(true)
     }
   };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setPropertyIdRow(null); // Limpiar el ID seleccionado cuando se cierra el modal
-  };
-
+  
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
     totalTokens: false,
     performanceStatus: false,
@@ -120,7 +115,7 @@ export function DataTable<TData extends RowData, TValue>({
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
                     onClick={() => {
-                      if (role === "investor") openModal(row.original.id);
+                      if (role === "investor") checkIfInvestor(row.original.id);
                     }}
                   >
                     {row.getVisibleCells().map((cell) => (
@@ -145,10 +140,12 @@ export function DataTable<TData extends RowData, TValue>({
 
       {/* Renderizar el modal solo si el rol es "investor" */}
       {role === "investor" && (
-        <GlobalModal isOpen={isModalOpen} closeModal={closeModal}>
-          <SinglePropertyDetailOnModal propertyId={propertyIdRow ? Number(propertyIdRow) : 0} />
+        <GlobalModal>
+         <TradingBuyFlow  propertyId={propertyIdRow ? Number(propertyIdRow) : 0} />
         </GlobalModal>
       )}
     </section>
   );
 }
+
+

@@ -1,5 +1,5 @@
 import { Control, Controller } from "react-hook-form";
-import { formValuesPublicProperty } from "@/private/owner/publicPropertySchema";
+import { formValuesPublicProperty } from "@/components/forms/schemas/publicPropertySchema";
 import { Button } from "../ui/button";
 
 interface Props {

@@ -1,27 +1,22 @@
 import { AlignJustify } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetTrigger, SheetContent } from "./ui/sheet";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { LoginButton } from "./buttons/loginButton";
 import { useAuth0 } from "@auth0/auth0-react";
 import { LogoutButton } from "./buttons/logoutBtn";
 import { Link } from "react-router-dom";
 import Logo from "../assets/img/logo.jpg";
-import { useUser } from "../context/userProvider";
 import { UserNavbar } from "./dashboard/useNavbar";
+import { useSelector } from 'react-redux';
+import { RootState } from "@/redux/store";
 
 export const Navbar = () => {
-  const [scrollPosition, setScrollPosition] = useState(0);
   const { isAuthenticated, getAccessTokenSilently, user, isLoading } = useAuth0();
-  const { role } = useUser();
+  // const { role } = useUser();
   const [isUserAuthenticated, setIsUserAuthenticated] = useState<boolean | null>(null);
+  const { role, } = useSelector((state: RootState) => state.user);
 
-  // Set scroll position to change navbar background opacity
-  useEffect(() => {
-    const handleScroll = () => setScrollPosition(window.scrollY);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   // Sync user authentication status with localStorage to avoid delay
   useEffect(() => {
@@ -75,23 +70,16 @@ export const Navbar = () => {
     }
   }, [isAuthenticated, user, role, getAccessTokenSilently]);
 
-  const navbarClasses = useMemo(
-    () =>
-      `h-14 flex items-center justify-between sticky top-0 z-50 bg-white/${
-        scrollPosition > 0 ? "90" : "95"
-      } backdrop-blur-md border-b border-leaded transition duration-300`,
-    [scrollPosition]
-  );
 
   return (
-    <nav className={navbarClasses}>
+    <nav className="flex justify-between py-4 px-2">
       <div className="ml-10">
         <img src={Logo} className="h-8" alt="Logo" />
       </div>
 
       <div className="hidden md:flex items-center space-x-4 mr-10">
         <Link to="/blog/">Learn</Link>
-        {isUserAuthenticated === true ? (  // Verificar si está autenticado desde el localStorage
+        {isUserAuthenticated === true ? ( 
           <>
             <UserNavbar />
           </>
@@ -114,6 +102,7 @@ export const Navbar = () => {
             <div className="flex flex-col space-y-4">
               <Link to="/">Home</Link>
               <Link to="/blog/">Learn</Link>
+
               {isUserAuthenticated === true ? (
                 <>
                   <Link to="/dashboard/">Dashboard</Link>

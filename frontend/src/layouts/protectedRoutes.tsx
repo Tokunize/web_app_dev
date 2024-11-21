@@ -1,6 +1,8 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useUser } from '@/context/userProvider';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
+
 
 interface ProtectedRouteProps {
   element: React.ReactElement;
@@ -8,8 +10,9 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ element, roleRequired }) => {
-  const { role } = useUser();  // Obtener el rol del usuario desde el contexto
   const location = useLocation();
+  const { role} = useSelector((state: RootState) => state.user);
+
 
   // Si el rol es null o undefined, tratamos el usuario como no autenticado
   if (!role) {
