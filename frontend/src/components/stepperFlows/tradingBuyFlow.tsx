@@ -1,6 +1,5 @@
 import { StepperFlow } from "./stepperFlow";
 import { SinglePropertyDetailOnModal } from "@/private/investor/trading/propertyDetails";
-import { TradingMakeOfferCard } from "../tradingMakeOfferCard";
 import { TradingBooks } from "@/private/investor/trading/TradingBooks";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
 import { LoadingSpinner } from "../loadingSpinner";

@@ -16,7 +16,7 @@ def order_created_or_updated(sender, instance, created, **kwargs):
         'order_price': instance.order_price,
         'order_quantity': str(instance.order_quantity),
         'order_status': instance.order_status,
-        'order_owner': instance.order_owner.username,
+        'order_owner': instance.order_owner.id,
         'property': instance.property.reference_number,
     }
 
