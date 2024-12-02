@@ -8,8 +8,8 @@ interface Step {
     prevStep: () => void;
     goToStep: (stepIndex: number) => void;
   }) => React.ReactNode;
-  showNext?: boolean; // Propiedad opcional para controlar la visibilidad del botón Next
-  showBack?: boolean; // Propiedad opcional para controlar la visibilidad del botón Back
+  showNext?: boolean; 
+  showBack?: boolean; 
 }
 
 interface StepperProps {
@@ -36,7 +36,7 @@ export const StepperFlow: React.FC<StepperProps> = ({ steps, initialStep = 0 }) 
   return (
     <div className="mx-auto ">
       {/* Header del Stepper */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center">
         {steps.map((step, index) => (
           <div
             key={index}
@@ -52,7 +52,7 @@ export const StepperFlow: React.FC<StepperProps> = ({ steps, initialStep = 0 }) 
       </div>
 
       {/* Contenido del Stepper */}
-      <div className="p-4 mb-4">
+      <div className="p-4">
         {steps[currentStep].content({
           nextStep,
           prevStep,

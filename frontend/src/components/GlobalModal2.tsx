@@ -11,7 +11,6 @@ export const GlobalModal = ({children}:Props) =>{
     const modalRef = useRef<HTMLDivElement>(null); // Cambié a HTMLDivElement para simplificar
     const {state,setState} = useModalContext()
     const closeModal = () => { setState(false)}
-
     const modalRoot = document.getElementById("modal")
 
     const handleContentClick = (e:React.MouseEvent<HTMLDivElement>)=>{

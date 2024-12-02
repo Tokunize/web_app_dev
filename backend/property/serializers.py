@@ -93,7 +93,8 @@ class PropertyFinancialsSerializer(serializers.ModelSerializer):
             "monthly_cash_flow",
             "projected_annual_cash_flow",
             "legal_documents_url",
-            "investment_category"
+            "investment_category",
+            "property_blockchain_adress"
         ]
 
 
@@ -178,7 +179,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Transaction
-        fields = '__all__'
+        fields =[ 'transaction_owner_email', 'event','transaction_amount', 'transaction_date' ,'transaction_tokens_amount']
 
     def get_transaction_owner_email(self, obj):
         return obj.transaction_owner_code.email if obj.transaction_owner_code else None
@@ -284,7 +285,7 @@ class AdminPropertyManagment(serializers.ModelSerializer):
             'id', 'title', 'status', 'location', 'first_image', 
             'projected_annual_return', 'property_type', 'created_at',
             "investment_category", "price", "ownershipPercentage",
-            "projected_rental_yield"
+            "projected_rental_yield", "reference_number"
         ]
     
     def get_first_image(self,obj):
@@ -330,9 +331,8 @@ class InvestmentOverviewSerializer(serializers.ModelSerializer):
             "location": obj.location 
         }
 
-
+#INVESTOR ASSETS
 class InvestorAssetsSerializer(serializers.ModelSerializer):
-    # Se aprovechan los SerializerMethodField solo para los campos dinámicos
     first_image = serializers.SerializerMethodField()
     user_tokens = serializers.SerializerMethodField()
     tokens = MarketplaceTokenInfo(many=True, read_only=True)
@@ -349,7 +349,9 @@ class InvestorAssetsSerializer(serializers.ModelSerializer):
             'projected_rental_yield', 
             'first_image', 
             'user_tokens', 
-            'tokens'
+            'tokens',
+            'id',
+            'status'
         ]
 
     def get_first_image(self, obj):
@@ -367,3 +369,77 @@ class InvestorAssetsSerializer(serializers.ModelSerializer):
         return tokens_by_property.get(obj.id, 0)  # Si no tiene tokens, devolvemos 0
 
 
+
+#TRADING - SOLD PROPERTIES
+class PropertyTradeSellSerializer(serializers.ModelSerializer):
+    first_image = serializers.SerializerMethodField()
+    tokens = MarketplaceTokenInfo(many=True, read_only=True)
+    user_tokens = serializers.SerializerMethodField()
+
+
+    class Meta:
+        model = Property
+        fields = [
+            'title', 
+            'location', 
+            'property_type', 
+            'price', 
+            'first_image', 
+            'tokens',
+            'reference_number',
+            'status',
+            'ocupancy_status',
+            'projected_rental_yield',
+            'user_tokens'
+        ]
+
+    def get_first_image(self, obj):
+        # Usar get para obtener el primer valor de la lista
+        return obj.image[0] if obj.image else None
+    
+    def get_user_tokens(self, obj):
+        """
+        Obtiene el número de tokens que el usuario tiene para una propiedad.
+        """
+        user = self.context['request'].user  # Obtener el usuario actual
+        tokens_by_property = user.get_tokens_by_property()  # Llamamos al método para obtener los tokens por propiedad
+
+        # Devolvemos el número de tokens para esta propiedad
+        return tokens_by_property.get(obj.id, 0)  # Si no tiene tokens, devolvemos 0
+
+
+#TRADING PROPERTY DETAILS MODAL SERIALIZER
+
+class InvestorTradingPropertySerializer(serializers.ModelSerializer):
+
+    class Meta():
+        model = Property
+        fields = [
+            'id', 'title', 'location', 'image', 
+            'property_type','projected_annual_yield',
+            'price','projected_rental_yield',
+            'country','property_scrow_address'
+        ] 
+
+
+
+#SERIALIZER FOR THE ORDERS, TO SHOW THE INFORMATION ON THE TRADING TABLES
+
+class TradingTablesPropertyInfo(serializers.ModelSerializer):
+    tokens = serializers.SerializerMethodField()  # Cambiamos a SerializerMethodField para un método personalizado
+    first_image = serializers.SerializerMethodField()
+
+    class Meta():
+        model = Property
+        fields = [
+            'reference_number', 'title', 'location', 'first_image', 'tokens', 'property_scrow_address'
+        ]
+    
+    def get_tokens(self, obj):  # Cambia el nombre de getSinglePropertyTokens a get_tokens
+        # Aquí asegúrate de que estás usando el campo correcto para el filtro
+        tokens = Token.objects.filter(property_code=obj)
+        return MarketplaceTokenInfo(tokens, many=True).data
+    
+    def get_first_image(self, obj):
+        # Usar get para obtener el primer valor de la lista
+        return obj.image[0] if obj.image else None

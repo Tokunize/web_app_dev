@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField, JSONField
 from django.utils import timezone
+import uuid
+
 
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
@@ -16,7 +18,8 @@ class Property(TimeStampedModel):
     ('draft', 'Draft'), 
     ('coming_soon', 'Coming Soon'), 
     ('rejected', 'Rejected'), 
-    ('under_review', 'Under Review')
+    ('under_review', 'Under Review'),
+    ('sold', 'Sold')
     ]
 
     OCUPANCY_STATUS = [
@@ -37,6 +40,8 @@ class Property(TimeStampedModel):
         blank=True,
         related_name='property_application',
     )   
+    reference_number = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    property_scrow_address = models.CharField(max_length=42, unique=True, null=True, blank=True)
     property_code = models.CharField(max_length = 50, unique=True, null=True, blank=True)
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
@@ -50,7 +55,8 @@ class Property(TimeStampedModel):
     property_type = models.CharField(max_length=100, help_text="The type of property, such as apartment, house, or commercial.")
     size = models.DecimalField(max_digits=6, decimal_places=2, help_text="Total interior square footage of the property.")
     year_built = models.IntegerField(help_text="The year in which the property was originally constructed.")
-        
+    property_blockchain_adress = models.CharField(max_length=42, unique=True, blank=True, null=True)
+
 
     ownershipPercentage = models.IntegerField(blank=True, null=True)
     tenant_turnover = models.DecimalField(blank=True, null=True,max_digits=5, decimal_places=2,)
@@ -116,8 +122,7 @@ class Token(models.Model):
     property_code = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='tokens')
     total_tokens = models.PositiveIntegerField()
     tokens_available = models.PositiveIntegerField()
-    token_price = models.PositiveIntegerField(null=True, blank=True )
-
+    token_price = models.PositiveIntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.token_code

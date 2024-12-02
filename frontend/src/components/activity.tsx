@@ -1,8 +1,6 @@
 import { useMemo } from "react";
 import { HistoricalPrice } from "./graphs/historicalGraph";
 import { SmallSignUpForm } from "./property/smallSignUp";
-import { LoadingSpinner } from "./loadingSpinner";
-import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
 import { useAuth0 } from "@auth0/auth0-react";
 
 
@@ -11,7 +9,7 @@ interface ActivityProps {
   data: any; // Ajusta el tipo según la estructura de `data`
 }
 
-export const Activity: React.FC<ActivityProps> = ({ property_id }) => {
+export const Activity: React.FC<ActivityProps> = () => {
   const { isAuthenticated } = useAuth0();
 
   // Dummy data for property updates

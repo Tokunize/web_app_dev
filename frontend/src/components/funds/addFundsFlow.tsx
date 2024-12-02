@@ -15,7 +15,6 @@ export const AddFundsFlow: React.FC = () => {
     const [step, setStep] = useState(1);
     const [fundMethod, setFundMethod] = useState<string | null>(null);
     const [fundAmount, setFundAmount] = useState<number | null>(null);
-    const [responseMessage, setResponseMessage] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false); // New loading state
     const { toast } = useToast();
 
@@ -70,13 +69,10 @@ export const AddFundsFlow: React.FC = () => {
         } catch (error: any) {
             if (error.response) {
                 console.error('Error in response:', error.response.data);
-                setResponseMessage(`Payment failed! Error: ${error.response.data.message}`);
             } else if (error.request) {
                 console.error('No response from server:', error.request);
-                setResponseMessage('Payment failed! No response from server.');
             } else {
                 console.error('Request error:', error.message);
-                setResponseMessage(`Payment failed! Error: ${error.message}`);
             }
         } finally {
             setIsLoading(false); // Stop the loading state

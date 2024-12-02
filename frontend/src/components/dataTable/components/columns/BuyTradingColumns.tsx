@@ -95,11 +95,11 @@ export const BuyTradingColumns: ColumnDef<Trading>[] = [
     },
   }, 
   {
-    accessorKey: "yield",
+    accessorKey: "projectedRentalYield",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Yield" />
+      <DataTableColumnHeader column={column} title="Rental Yield" />
     ),
-    cell: ({ row }) => <div>{row.getValue("yield")}</div>,
+    cell: ({ row }) => <div>{row.getValue("projectedRentalYield")}</div>,
   },  
   {
     accessorKey: "capRate",
@@ -113,8 +113,14 @@ export const BuyTradingColumns: ColumnDef<Trading>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
     ),
-    cell: ({ row }) => <div>{row.getValue("occupancyStatus")}</div>,
-  },
+    cell: ({ row }) => {
+      // Asegura que el valor es un string
+      const occupancyStatus = row.getValue("occupancyStatus") as string;
+      // Capitaliza la primera letra
+      const capitalizedStatus = occupancyStatus.charAt(0).toUpperCase() + occupancyStatus.slice(1);
+      return <div>{capitalizedStatus}</div>;
+    },
+  },  
   {
     accessorKey: "performanceStatus",
     header: ({ column }) => (
@@ -164,7 +170,7 @@ export const BuyTradingColumns: ColumnDef<Trading>[] = [
   },  
   {
     id: "actions",
-    cell: ({ row }) => <DataTableRowActionsInvestorTrading row={row} />,
+    cell: ({ row }) => <DataTableRowActionsInvestorTrading  row={row} />,
   },
 ]
 

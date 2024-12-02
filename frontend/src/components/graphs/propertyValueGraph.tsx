@@ -100,12 +100,6 @@ const chartConfig = {
     // Elimina el estado que cambia entre desktop y mobile
     const activeChart = "desktop"
   
-    const total = React.useMemo(
-      () => ({
-        desktop: chartData.reduce((acc, curr) => acc + curr.desktop, 0),
-      }),
-      []
-    )
   
     return (
       <Card className="h-[450px]">

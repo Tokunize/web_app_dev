@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LoadingSpinner } from "@/components/loadingSpinner";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
+import { DownloadCSV } from "@/components/downloads/DownloadCSV";
 
 type Transaction = {
   id: number;
@@ -64,44 +65,9 @@ export const Transaction = () => {
   if (loading) return <LoadingSpinner />;
   if (error) return <div>Error: {error}</div>;
 
-
-  // Función para descargar CSV en lugar de PDF
-  const downloadCSV = () => {
-    const headers = [
-      "ID",
-      "Event",
-      "Price",
-      "Tokens",
-      "Owner",
-      "Created At"
-    ];
-
-    const csvRows = [
-      headers.join(","), // Crear el encabezado del archivo CSV
-      ...filteredTransactions.map((transaction) =>
-        [
-          transaction.id,
-          transaction.event,
-          (transaction.transaction_amount ? parseFloat(transaction.transaction_amount).toFixed(2) : "N/A"),
-          transaction.transaction_tokens_amount !== undefined ? transaction.transaction_tokens_amount : "N/A",
-          transaction.transaction_owner,
-          new Date(transaction.created_at).toLocaleDateString()
-        ].join(",") // Unir los datos de cada transacción con comas
-      ),
-    ];
-
-    // Crear un blob con el contenido del CSV
-    const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "transactions.csv";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link); // Eliminar el enlace después de descargar
-  };
-
+  const handleDownload = () =>{
+    DownloadCSV(filteredTransactions, "my-assets.csv")
+  }
   return (
     <div className="p-4">
       <div className="flex justify-between bg-white rounded-lg border p-4 mb-4">
@@ -117,9 +83,10 @@ export const Transaction = () => {
         </span>
       </div>
 
-      <Button onClick={downloadCSV} className="bg-white border">
-        Download CSV
-        <Download className="ml-4" /> {/* Icono de descarga */}
+      <Button 
+          onClick={handleDownload}>
+          Download CSV
+          <Download className="ml-4" />
       </Button>
 
       <div className="flex justify-between mt-4 mb-4">

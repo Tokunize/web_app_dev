@@ -39,6 +39,7 @@ export const Marketplace = () => {
       [key]: value,
     }));
   };
+  
 
   const filteredProperties = (properties: Property[]) => {
     return properties.filter((property) => {

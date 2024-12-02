@@ -69,47 +69,47 @@ import {
 
   export const propertyType = [
     {
-      value: "multifamily",
+      value: "Multifamily",
       label: "Multifamily",
       icon: Home, // Icono para viviendas multifamiliares
     },
     {
-      value: "office",
-      label: "Office",
+      value: "Offices",
+      label: "Offices",
       icon: Briefcase, // Icono para oficinas
     },
     {
-      value: "industrial",
+      value: "Industrial",
       label: "Industrial",
       icon: Factory, // Icono para propiedades industriales
     },
     {
-      value: "mixed_use",
+      value: "Mixed Use",
       label: "Mixed Use",
       icon: Building, // Icono para propiedades de uso mixto
     },
     {
-      value: "retail",
+      value: "Retail",
       label: "Retail",
       icon: ShoppingBag, // Icono para propiedades comerciales
     },
     {
-      value: "hospitality",
+      value: "Hospitality",
       label: "Hospitality",
       icon: Hotel, // Icono para propiedades de hospitalidad (hoteles)
     },
     {
-      value: "data_centre",
+      value: "Data Center",
       label: "Data Centre",
       icon: Server, // Icono para centros de datos
     },
     {
-      value: "warehouse",
+      value: "Warehouse",
       label: "Warehouse",
       icon: Package, // Icono para almacenes
     },
     {
-      value: "student_housing",
+      value: "Student Housing",
       label: "Student Housing",
       icon: Users, // Icono para viviendas estudiantiles
     },
@@ -128,3 +128,15 @@ import {
         // icon: Users, // Icono para viviendas estudiantiles
     },
 ];
+
+
+export const orderStatus = [
+  {
+    value: "expired",
+    label: "Expired",
+  },
+  {
+    value: "valid",
+    label: "Valid",
+  }
+]

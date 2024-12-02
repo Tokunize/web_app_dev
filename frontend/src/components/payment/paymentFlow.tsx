@@ -12,7 +12,6 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '../ui/use-toast';
 import { LoadingSpinner } from '../loadingSpinner';
 import { useGetAxiosRequest } from '@/hooks/getAxiosRequest';
-import GetContract from '../blockchain/contractsAbi';
 import useSmartContract from '@/hooks/useSmartContract';
 
 
@@ -28,11 +27,10 @@ export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
   const [investmentAmount, setInvestmentAmount] = useState<string>("0"); // New state for amount
   const [investmentAmountUSDC,setInvestmentAmountUSDC] = useState<number>(0)
-  // const [contractAddress, setContractAddress] = useState<string>('0xCaD0E8DBfFfDf7E53419B5B3d032125FF406E949');
   const usdcAddress = "0xdC48A996F3073d4ADAB7f77B42162c284801A6d9"; // Aquí debes poner la dirección del contrato USDC en Sepolia Testnet
   const {toast} = useToast()
 
-  const contractAddress="0xCaD0E8DBfFfDf7E53419B5B3d032125FF406E949"
+  const contractAddress="0xeEC864BdCDF9F717404bF265A129a3993457CB7E"
 
   const contractPropertyInvestment = useSmartContract({
     contractAddress: contractAddress,

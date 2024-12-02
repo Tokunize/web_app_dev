@@ -9,18 +9,19 @@ interface FetchState<T> {
   error: string | null;
 }
 
+
 // Hook para solicitudes PUT
 export const usePutAxiosRequest = <T, U>(
   url: string,
   onSuccess?: (data: T) => void,
   onError?: (error: string) => void
-): [FetchState<T>, (data: U) => Promise<void>] => {
+): [FetchState<T>, (data?: U) => Promise<void>] => {
   const { getAccessTokenSilently } = useAuth0();
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const putData = useCallback(async (dataToPut: U) => {
+  const putData = useCallback(async (dataToPut?: U) => {
     setLoading(true);
     setError(null);
 
@@ -34,7 +35,7 @@ export const usePutAxiosRequest = <T, U>(
         }
       };
 
-      const response = await axios.put<T>(url, dataToPut, config);
+      const response = await axios.put<T>(url, dataToPut || {}, config);  // Enviar {} si no hay dataToPut
       setData(response.data);
       if (onSuccess) {
         onSuccess(response.data);

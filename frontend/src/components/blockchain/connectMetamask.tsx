@@ -69,7 +69,6 @@ const ConnectMetaMask = () => {
     <div>
       {walletAddress ? (
         <div>
-          <p>Conectado: {walletAddress}</p>
           <CustomButton label="Disconnect MetaMask" onClick={disconnectWallet} />
         </div>
       ) : (

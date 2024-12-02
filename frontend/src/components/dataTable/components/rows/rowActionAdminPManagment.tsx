@@ -43,6 +43,7 @@ export function DataTableRowActionsPManagment({
     navigate(path);
   };
 
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -59,7 +60,7 @@ export function DataTableRowActionsPManagment({
         <DropdownMenuItem onClick={() => navigateTo(`/dashboard-property/${properties.id}/`)}>
           Update
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigateTo(`/smart-contract/`)}>
+        <DropdownMenuItem onClick={() =>  navigateTo(`/property/smart-contract/${properties.referenceNumber}/`)}>
           Smart Contract
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigateTo(`/property-details/${properties.id}`)}>

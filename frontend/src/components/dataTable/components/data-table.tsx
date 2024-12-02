@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import {
   ColumnDef,
@@ -15,6 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
 
 import {
   Table,
@@ -24,41 +23,39 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {  useModalContext } from "../../../context/modalContext"
 
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { GlobalModal } from "@/components/globalModal2";
-import { useState } from "react";
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { TradingBuyFlow } from "@/components/stepperFlows/tradingBuyFlow";
+import { DownloadCSV } from "@/components/downloads/DownloadCSV";
+import { TradingSellFlow } from "@/components/stepperFlows/tradingSellFlow";
+
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  isDownloadable?:boolean,
   filterOptions: Array<{ column: string; title: string; options: Array<{ label: string; value: string }> }>;
 }
 interface RowData {
-  id: string;
+  id?: string;
+  title: string;
   // otros campos
 }
 
 export function DataTable<TData extends RowData, TValue>({
   columns,
   data,
+  isDownloadable,
   filterOptions,
 }: DataTableProps<TData, TValue>) {
-  const [rowSelection, setRowSelection] = React.useState({});
-  const [propertyIdRow, setPropertyIdRow] = useState<string | null>(null);
-  const { role} = useSelector((state: RootState) => state.user);
-  const {setState} = useModalContext()
-  
-  const checkIfInvestor = (id: string) => {
-    if (role === "investor") {
-      setPropertyIdRow(id);
-      setState(true)
-    }
-  };
+  const [rowSelection, setRowSelection] = React.useState<Record<string, boolean>>({});
+  const { role } = useSelector((state: RootState) => state.user);
+  const selectedPropertyId = useSelector((state: RootState) => state.tableActionItem.itemId);  
+  const tradingType = useSelector((state:RootState) => state.tadringType.tradingType)
   
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
     totalTokens: false,
@@ -89,10 +86,30 @@ export function DataTable<TData extends RowData, TValue>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
+  // Filtrar las filas seleccionadas
+  const selectedRows = table.getRowModel().rows.filter(row => rowSelection[row.id]);
+
+// Filtrar los datos según las filas seleccionadas
+const selectedProperties = data.filter((property) => 
+  selectedRows.some((row) => row.original.title === property.title) // Compara el 'id' de la fila con el 'id' de la propiedad
+);
+
+const handleDownload = () =>{
+  DownloadCSV(selectedProperties, "my-assets.csv")
+}
   return (
     <section>
       <div className="space-y-4">
         <DataTableToolbar filterOptions={filterOptions} table={table} />
+        {isDownloadable && (
+          <Button 
+            disabled={selectedProperties.length === 0} 
+            onClick={handleDownload}
+            title="Download CSV">
+            Download CSV
+          </Button>
+        )}
+       
         <div className="rounded-md border flex flex-col w-full overflow-x-auto">
           <Table>
             <TableHeader>
@@ -113,15 +130,13 @@ export function DataTable<TData extends RowData, TValue>({
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    onClick={() => {
-                      if (role === "investor") checkIfInvestor(row.original.id);
-                    }}
-                  >
+                    data-state={row.getIsSelected() && "selected"}>
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
+                      {flexRender(cell.column.columnDef.cell, {
+                        ...cell.getContext(),
+                      })}
+                    </TableCell>
                     ))}
                   </TableRow>
                 ))
@@ -141,11 +156,11 @@ export function DataTable<TData extends RowData, TValue>({
       {/* Renderizar el modal solo si el rol es "investor" */}
       {role === "investor" && (
         <GlobalModal>
-         <TradingBuyFlow  propertyId={propertyIdRow ? Number(propertyIdRow) : 0} />
+          {tradingType === "buy" && <TradingBuyFlow referenceNumber={selectedPropertyId} />}
+          {tradingType === "sell" && <TradingSellFlow referenceNumber={selectedPropertyId} />}
         </GlobalModal>
+
       )}
     </section>
   );
 }
-
-

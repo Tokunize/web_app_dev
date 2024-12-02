@@ -3,19 +3,14 @@ import { Progress } from "flowbite-react";
 import {  useState } from "react";
 import { FormatCurrency } from "@/components/currencyConverter";
 
-// Define types for the expected data structure
-interface FinancialDetails {
-  projected_annual_yield: number;
-  projected_rental_yield: number;
-}
-
 interface PropertyData {
   title: string;
   location: string;
   property_type: string;
   price: number;
   image: string[];
-  financials_details: FinancialDetails;
+  projected_annual_yield: number;
+  projected_rental_yield: number;
 }
 
 interface Props {
@@ -60,11 +55,11 @@ export const SinglePropertyDetailOnModal = ({ propertyData }: Props) => {
             <ul className="space-y-2">
               <li className="flex flex-col text-sm text-gray-500">
                 Est. Annual Yield
-                <span className="text-black text-lg">{propertyData.financials_details.projected_annual_yield} %</span>
+                <span className="text-black text-lg">{propertyData.projected_annual_yield} %</span>
               </li>
               <li className="flex flex-col text-sm text-gray-500">
                 Est. Monthly Yield
-                <span className="text-black text-lg">{propertyData.financials_details.projected_rental_yield} %</span>
+                <span className="text-black text-lg">{propertyData.projected_rental_yield} %</span>
               </li>
               <li className="flex flex-col text-sm text-gray-500">
                 Current Value

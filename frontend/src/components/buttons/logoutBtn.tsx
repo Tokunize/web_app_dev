@@ -1,33 +1,46 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { Button } from '../ui/button';
 import { useDispatch } from 'react-redux';
-import { setUserData } from '../../redux/userSlice'; // Importa la acción de Redux para eliminar los datos del usuario
-import { setWalletAddress } from '@/redux/walletSlice'; // Importa la acción
+import { clearUserData } from '../../redux/userSlice'; // Acción de Redux para eliminar los datos del usuario
+import { setWalletAddress } from '@/redux/walletSlice'; // Acción para limpiar la dirección de la wallet
+import { persistor } from '@/redux/store'; // Importa el persistor
 
 export const LogoutButton = () => {
   const { logout } = useAuth0();
-  const dispatch = useDispatch(); // Usamos el dispatch para borrar los datos del usuario en Redux
+  const dispatch = useDispatch();
 
-  // Función para limpiar el estado de Redux y el localStorage
-  const handleLogout = () => {
-    // Eliminar los datos del usuario en Redux
-    dispatch(setUserData({ role: '', name: '', userEmail: '', userImage: '' }));
-    dispatch(setWalletAddress(null)); // Desconectar la wallet y limpiar el estado
-
-    // Eliminar el usuario en el localStorage
-    localStorage.removeItem("user_role");
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("id");
-
-    // Llamar a la función de logout de Auth0
-    logout();
+  // Función para limpiar el estado de Redux y localStorage
+  const handleLogout = async () => {
+    try {
+      console.log('Purging persisted state...');
+      await persistor.purge(); // Purga el estado persistido
+      console.log('Purged successfully!');
+  
+      dispatch(clearUserData()); // Limpiar datos de usuario en Redux
+      dispatch(setWalletAddress(null)); // Limpiar datos de wallet
+  
+      // Eliminar manualmente datos de localStorage
+      localStorage.removeItem('persist:root');
+      localStorage.removeItem('user_role');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('id');
+      localStorage.clear(); // Limpiar todo el localStorage
+  
+      console.log('Logout completed successfully!');
+  
+      // Cerrar sesión de Auth0
+      logout();
+    } catch (error) {
+      console.error('Error purging persisted state:', error);
+    }
   };
+  
 
   return (
     <Button
       variant="outline"
-      className='duration-300 w-full'
-      onClick={handleLogout} // Llamamos a handleLogout en el clic
+      className="duration-300 w-full"
+      onClick={handleLogout} // Llama a handleLogout en el clic
     >
       Log Out
     </Button>

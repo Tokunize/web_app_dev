@@ -1,7 +1,7 @@
 import { DataAccordion } from "@/components/dataAccordion/DataAccordion";
-import OrderBook from "./orderBook";
+import OrderBook from "./OrderBook";
 import { useState } from "react";
-import RecentOrders from "./recentOrders";
+import RecentOrders from "./RecentOrders";
 
 export const TradingBooks = () =>{
     const [activeIndex, setActiveIndex] = useState<number>(0); // Default to 'Overview' tab
