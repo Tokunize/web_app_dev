@@ -10,7 +10,9 @@ from users.authentication import Auth0JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny,BasePermission
 from property.models import Property
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
+from django.db.models import Q,F
+from django.db import transaction
+from property.models import PropertyToken
 
 
 
@@ -76,6 +78,8 @@ class OrderDetailView(APIView):
     authentication_classes = [Auth0JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
+
+    @transaction.atomic
     def post(self, request, itemId=None):
         try:
             user_id = request.user.id
@@ -94,32 +98,44 @@ class OrderDetailView(APIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
 
-            print(property_obj)
             # Crear el serializer con los datos
             serializer = CreateOrderSerlizer(data={**request.data, "order_owner": user_id, "property": property_obj.id})
-            print(serializer)
 
             if serializer.is_valid():
-                # Guardar la orden
                 order = serializer.save()
-                print("eeee", order)
-                
-                # El id de la orden es el buyOfferId que se crea automáticamente al guardar
-                buy_offer_id = order.id  # Aquí usamos `order.id` como `buyOfferId`
+                if(order.order_type == "sell"):
+                    # Actualización atómica de los tokens
+                    tokens_updated = PropertyToken.objects.filter(
+                        owner_user_code=user_id, 
+                        property_code=property_obj
+                    ).filter(
+                        number_of_tokens__gt=0  # Filtra solo si hay tokens disponibles
+                    ).update(
+                        number_of_tokens=F('number_of_tokens') - order.order_quantity
+                    )
 
-                # Devolver la respuesta con el buyOfferId
+                    if tokens_updated == 0:
+                        # Si no se actualizaron tokens, significa que no hay suficientes
+                        return Response(
+                            {"error": "Insufficient tokens for sell order."},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+
+                # Devuelve la respuesta con el ID de la nueva oferta de compra
+                buy_offer_id = order.id
                 return Response(
                     {"buyOfferId": buy_offer_id},
                     status=status.HTTP_201_CREATED
                 )
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
         except Exception as e:
             return Response(
                 {"error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
 
     def put(self, request, referenceNumber, order_status):
         try:
@@ -265,3 +281,70 @@ class TradeExecutedBlockchain(APIView):
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+
+
+
+
+# class OrderDetailView(APIView):
+#     authentication_classes = [Auth0JWTAuthentication]
+#     permission_classes = [IsAuthenticated]
+
+#     def post(self, request, itemId=None):
+#         try:
+#             user_id = request.user.id
+#             if not itemId:
+#                 return Response(
+#                     {"error": "Property reference number is required."},
+#                     status=status.HTTP_400_BAD_REQUEST
+#                 )
+
+#             # Verificar si la propiedad existe
+#             try:
+#                 property_obj = Property.objects.get(reference_number=itemId)
+#             except Property.DoesNotExist:
+#                 return Response(
+#                     {"error": f"Property with reference number {itemId} does not exist."},
+#                     status=status.HTTP_404_NOT_FOUND
+#                 )
+
+#             # Crear el serializer con los datos
+#             serializer = CreateOrderSerlizer(data={**request.data, "order_owner": user_id, "property": property_obj.id})
+
+#             if serializer.is_valid():
+#                 order = serializer.save()
+
+#                 # Verificar si la orden es de tipo "sell" y proceder a descontar los tokens
+#                 if order.order_type == "sell":
+#                     # Obtener el usuario que realizó la orden
+#                     user = CustomUser.objects.get(id=user_id)
+
+#                     # Verificar si el usuario tiene suficientes tokens
+#                     required_tokens = 10  # Definir los tokens necesarios para la venta (puedes cambiarlo según tu lógica)
+                    
+#                     if user.tokens < required_tokens:
+#                         return Response(
+#                             {"error": "Insufficient tokens to complete the sell order."},
+#                             status=status.HTTP_400_BAD_REQUEST
+#                         )
+                    
+#                     # Descontar los tokens
+#                     user.tokens -= required_tokens
+#                     user.save()
+
+#                 # El id de la orden es el buyOfferId que se crea automáticamente al guardar
+#                 buy_offer_id = order.id
+
+#                 return Response(
+#                     {"buyOfferId": buy_offer_id},
+#                     status=status.HTTP_201_CREATED
+#                 )
+#             else:
+#                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+#         except Exception as e:
+#             return Response(
+#                 {"error": str(e)},
+#                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
+#             )
