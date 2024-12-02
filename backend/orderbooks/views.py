@@ -10,6 +10,7 @@ from users.authentication import Auth0JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny,BasePermission
 from property.models import Property
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 
 
@@ -21,9 +22,12 @@ class OrderListView(APIView):
     # GET ALL ORDERS
     def get(self, request):
         try:
-            # all_orders = Order.objects.select_related('property').all()
-            buy_orders = Order.objects.select_related('property').filter(order_type = "buy")
-            sell_orders = Order.objects.select_related('property').filter(order_type = "sell")
+            valid_orders = Order.objects.select_related('property').filter(
+                Q(order_type="buy") | Q(order_type="sell"),
+                order_status="valid"
+            )
+            buy_orders = valid_orders.filter(order_type="buy")
+            sell_orders = valid_orders.filter(order_type="sell")
 
             # serializer_all = self.serializer_class(all_orders, many=True)
             serializer_buy = self.serializer_class(buy_orders, many=True)
@@ -90,12 +94,15 @@ class OrderDetailView(APIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
 
+            print(property_obj)
             # Crear el serializer con los datos
             serializer = CreateOrderSerlizer(data={**request.data, "order_owner": user_id, "property": property_obj.id})
-            
+            print(serializer)
+
             if serializer.is_valid():
                 # Guardar la orden
                 order = serializer.save()
+                print("eeee", order)
                 
                 # El id de la orden es el buyOfferId que se crea automáticamente al guardar
                 buy_offer_id = order.id  # Aquí usamos `order.id` como `buyOfferId`
