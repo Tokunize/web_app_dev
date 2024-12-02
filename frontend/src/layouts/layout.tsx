@@ -9,7 +9,6 @@ import MainLayout from "./mainLayout";
 import { Porfolio } from "@/private/owner/porfolio";
 import { Assests } from "@/private/investor/assets/assets";
 import { Transaction } from "@/private/investor/wallet/transactions";
-import { Blog } from "../public/blog";
 import { SingleArticleView } from "../public/singleArticleView";
 import { Toaster } from "../components/ui/toaster";
 import { PublicPropertyPage } from "../private/owner/publicProperty";
@@ -29,7 +28,6 @@ const Layout = () => {
           <Route element={<MainLayout />}>
             <Route path="/" element={<Marketplace />} />
             <Route path="property-details/:id/" element={<SingleProperty />} />
-            <Route path="blog/" element={<Blog/>} />
             <Route path="blog/article/:id/" element={<SingleArticleView/>} />
           </Route>
 
@@ -82,7 +80,7 @@ const Layout = () => {
               }
             />
             <Route
-              path="smart-contract/"
+              path="property/smart-contract/:referenceNumber/"
               element={
                 <ProtectedRoute roleRequired="admin" element={<SmartContractFunctions />} />
               }

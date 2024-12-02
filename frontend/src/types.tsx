@@ -86,3 +86,21 @@ export   interface PropertyToken {
     total_tokens: number;
     tokens_available: number;
   }
+
+export interface Transaction{
+  id: number;
+  event?: string;
+  transaction_amount?: string;
+  transaction_tokens_amount?: string;
+  transaction_owner?: string;
+  created_at?: string;
+  transaction_owner_email?: string;
+  transaction_date?: string;
+  sellOrder?: { orderPrice: number; orderAmount?: number }[];
+  buyOrder?: { orderPrice: number; orderAmount?: number }[];
+  seller_address?: string;
+  buyer_address?: string;
+  trade_price?: string;
+  trade_quantity?: string;
+  executed_at?: string;
+};

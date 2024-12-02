@@ -8,7 +8,7 @@ import { LoadingSpinner } from "@/components/loadingSpinner";
 import { DataTable } from "@/components/dataTable/components/data-table";
 import { AdminOverviewColumns } from "@/components/dataTable/components/columns/overviewAdminColum";
 const ActivityLog  = lazy(()=> import("../admin/activityLog"))
-import { statuses, investmentCategories } from "@/components/dataTable/data/data";
+import { statuses } from "@/components/dataTable/data/data";
 import { FormatCurrency } from "@/components/currencyConverter";
 
 // Define the structure for property data

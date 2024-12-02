@@ -1,4 +1,3 @@
-import { Button } from "../ui/button";
 
 interface Props {
   label: string;
@@ -22,16 +21,14 @@ export const CustomButton = ({
   iconLeft,
   iconRight,
   loading = false,
-  style = {},
   isHiddenLabel = false, // Default is false, meaning label is visible
 }: Props) => {
   return (
-    <Button
+    <button 
       onClick={onClick}
       disabled={disabled || loading}
       type={type}
       className={`flex items-center gap-2 ${className}`}
-      style={style}
     >
       {loading ? (
         <span className="loader" /> // Here you can add a spinner or similar
@@ -42,6 +39,6 @@ export const CustomButton = ({
           {iconRight && <span className="icon-right">{iconRight}</span>}
         </>
       )}
-    </Button>
+    </button>
   );
 };

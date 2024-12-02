@@ -19,20 +19,7 @@ import {
 } from "@/components/ui/table";
 import { formatDistanceToNowStrict } from "date-fns";
 import { FormatCurrency } from "./currencyConverter";
-
-// Define el tipo Transaction
-type Transaction = {
-  id: number;
-  event?: string;
-  transaction_amount?: string;
-  transaction_tokens_amount?: string;
-  transaction_owner?: string;
-  created_at?: string;
-  transaction_owner_email?: string;
-  transaction_date?: string;
-  sellOrder?: { orderPrice: number; orderAmount?: number }[]; // Array de objetos con las propiedades orderPrice y orderAmount
-  buyOrder?: { orderPrice: number; orderAmount?: number }[]; // Array de objetos con las propiedades orderPrice y orderAmount
-};
+import { Transaction } from "@/types";
 
 interface TransactionTableProps {
   transactions: Transaction[];
@@ -192,6 +179,78 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({ transactions
     });
   }
 
+  
+  if (transactions.some(t => t.trade_price)) {
+    columns.push({
+      accessorKey: "trade_price",
+      header: "Trade Price",
+      cell: ({ row }) => {
+        const price = Number(row.getValue<string>("trade_price"));
+        const formattedPrice = new Intl.NumberFormat("en-UK", {
+          style: "currency",
+          currency: "GBP",
+        }).format(price);
+        return <div className="text-right font-medium">{formattedPrice}</div>;
+      },
+    });
+  }
+  
+  if (transactions.some(t => t.trade_quantity)) {
+    columns.push({
+      accessorKey: "trade_quantity",
+      header: "Trade Quantity",
+      cell: ({ row }) => {
+        const quantity = Number(row.getValue<string>("trade_quantity"));
+        return <div className="text-right">{quantity}</div>;
+      },
+    });
+  }
+  
+  if (transactions.some(t => t.executed_at)) {
+    columns.push({
+      accessorKey: "executed_at",
+      header: "Traded At",
+      cell: ({ row }) => {
+        const dateString = row.getValue<string>("executed_at");
+        const date = new Date(dateString);
+  
+        if (isNaN(date.getTime())) {
+          return <div>Invalid date</div>;
+        }
+  
+        const formattedDate = formatDistanceToNowStrict(date, { addSuffix: true });
+        return <div className="min-w-[100px]">{formattedDate}</div>;
+      },
+    });
+  }
+  if (transactions.some(t => t.seller_address)) {
+    columns.push({
+      accessorKey: "seller_address",
+      header: "Seller Address",
+      cell: ({ row }) => {
+        const address = row.getValue<string>("seller_address");
+        return (
+          <div className="lowercase">{address.slice(0, 4) + "..." + address.slice(-4)}</div>
+        );
+      },
+    });
+  }
+  
+  if (transactions.some(t => t.buyer_address)) {
+    columns.push({
+      accessorKey: "buyer_address",
+      header: "Buyer Address",
+      cell: ({ row }) => {
+        const address = row.getValue<string>("buyer_address");
+        return (
+          <div className="lowercase">{address.slice(0, 4) + "..." + address.slice(-4)}</div>
+        );
+      },
+    });
+  }
+  
+  
+
   const table = useReactTable({
     data: transactions,
     columns,
@@ -202,7 +261,13 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({ transactions
     state: {
       sorting,
     },
-    enableSorting: true, 
+    enableSorting: true,
+    initialState: {
+      pagination: {
+        pageSize: 3, 
+      },
+    },
+     
   });
 
   return (

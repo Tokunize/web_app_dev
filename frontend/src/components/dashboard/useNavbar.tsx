@@ -34,10 +34,6 @@ export const UserNavbar: React.FC = () => {
       event.preventDefault();
       navigate("/"); // Redirige al inicio
     }
-    if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === "q") {
-      event.preventDefault();
-      navigate("/logout"); // Redirige a logout
-    }
   };
 
   useEffect(() => {

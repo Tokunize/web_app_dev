@@ -3,10 +3,13 @@ import { LoadingSpinner } from "@/components/loadingSpinner";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
 import { Card } from "@/components/ui/card";
 import { DataAccordion } from "@/components/dataAccordion/DataAccordion";
-import { MyAssetsTable } from "@/components/dashboard/myAssetsTable";
 import { useState } from "react";
+import { DataTable } from "@/components/dataTable/components/data-table";
+import { MyAssetsColumns } from "@/components/dataTable/components/columns/MyAssetsColumns";
+import { propertyType } from "@/components/dataTable/data/data";
 
 interface Investment {
+  id:number,
   first_image: string;
   title: string;
   user_tokens: number;
@@ -18,16 +21,27 @@ interface Investment {
   property_type: string;
   ocupancy_status: string;
   property_types: Array<{ item: string, percentage: number, fill: string }>;
+  performance_status: string,
+  cap_rate: string,
+  price_change:string
 }
 
-export const Assests = () => { 
+export const Assests = () => {
+
+  const filterOptions = [
+    { column: "propertyType", title: "Property Type", options: propertyType },
+  ];
+
   const [activeIndex, setActiveIndex] = useState<number>(0); // Default to 'Overview' tab
   // State to store the investment data
   const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/investor-assets/`;
 
+
   const { data: investments, loading, error } = useGetAxiosRequest<{properties: Investment[];property_types: Array<{ item: string, percentage: number, fill: string }>;}>(apiUrl, true);
 
   if (loading) return <div><LoadingSpinner /></div>;
+  console.log(investments);
+  
   if (error) return <p>Error: {error}</p>;
   
 
@@ -36,24 +50,26 @@ export const Assests = () => {
   const propertyTypes = investments?.property_types || [];
   
   const assetsData = properties.map((property) => ({
+    id: property.id,
     image: property.first_image,
+    location: property.location,
     title: property.title,
     user_tokens: property.user_tokens,
-    projected_rental_yield: property.projected_rental_yield || 0, // Default to 0 if null
-    net_asset_value: property.price || 0, // Default to 0 if null
-    location: property.location,
-    total_tokens: property.tokens?.[0]?.total_tokens || 0, // Safeguard access
-    ocupancy_status: property.ocupancy_status,
-    projected_appreciation: "1.2",
-    total_rental_income: 23343,
-    price_change: 4.7,
-    cap_rate: 3.5,
+    price: property.price || 0, // Renombrado a 'price' para coincidir con el accessorKey
+    priceChart: property.price_change || 2, // Renombrado a 'priceChart' para coincidir con el accessorKey
+    yield: property.projected_rental_yield || 0, // Renombrado a 'yield' para coincidir con el accessorKey
+    capRate: property.cap_rate || 3.5, // Renombrado a 'capRate' para coincidir con el accessorKey
+    occupancyStatus: property.ocupancy_status, // Renombrado a 'occupancyStatus' para coincidir con el accessorKey
+    performanceStatus: property.performance_status || "", // Puedes definir un valor por defecto si no lo tienes
+    propertyType: property.property_type, // Puedes agregar esto si tienes un tipo de propiedad
+    totalTokens: property.tokens[0].total_tokens || 0, // Renombrado a 'totalTokens' para coincidir con el accessorKey
   }));
+  
 
-  const tabs =["Listing"]
+  const tabs =["My Assets"]
 
   const tabComponents = [
-    <MyAssetsTable  assetsData={assetsData} key="listing" />,
+    <DataTable isDownloadable={true} columns={MyAssetsColumns} filterOptions={filterOptions} data={assetsData} />,
   ];
 
   const handleTabChange = (index: number) => {

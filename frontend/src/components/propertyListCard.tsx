@@ -18,20 +18,6 @@ interface PropertyListCardProps {
   investment_category: string;
 }
 
-const investmentData: { [key: string]: { risk: string; income: string; capitalGrowth: string; return: string } } = {
-  Core: {
-    risk: "Low",
-    income: "High",
-    capitalGrowth: "Low",
-    return: "Medium-High"
-  },
-  Opportunistic: {
-    risk: "High",
-    income: "None",
-    capitalGrowth: "High",
-    return: "High"
-  },
-};
 
 export const PropertyListCard: React.FC<PropertyListCardProps> = ({
   title,
@@ -48,16 +34,8 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
 }) => {
   const [badgeType, setBadgeType] = useState<string | null>(null);
   const [category, setCategory] = useState<string>(""); 
-  const [isCardBack, setIsCardBack] = useState<boolean>(false)
   const [showControls, setShowControls] = useState(false);
 
-
-  const currentData = investmentData[investment_category] || {
-    risk: "Low",
-    income: "High",
-    capitalGrowth: "Low",
-    return: "High"
-  };
 
   useEffect(() => {
     const createdDate = new Date(createdDay);
@@ -69,7 +47,10 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
     const soldTokens = totalTokens ? totalTokens - tokens_available : 0; // Asegúrate de que totalTokens no sea undefined
     const soldPercentage = totalTokens > 0 ? (soldTokens / totalTokens) * 100 : 0; // Evita división por cero
 
-    if (soldPercentage > 80) {
+    if(status === "sold"){
+      setBadgeType("Sold")
+    }
+    else if (soldPercentage > 80) {
       setBadgeType('Almost Gone!');
     } else if (createdDate >= oneWeekAgo && status === "published") {
       setBadgeType('New');
@@ -87,14 +68,9 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
       }
     }
   }, []); 
-  
-  const taggleCardPosition = () => {
-    setIsCardBack(prevValue => !prevValue);
-  }
 
   return (
     <article className="relative rounded-lg overflow-hidden mt-6">
-      {!isCardBack && (
         <>
           <span 
             className='absolute cursor-pointer left-4 top-[215px] bg-black  text-white text-xs font-semibold py-1 px-2 rounded-full z-20'
@@ -106,6 +82,12 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
           {badgeType === 'New' && (
             <div className="absolute top-4 left-4 bg-[#FFFAEA] border-2 border-[#FDB122] text-[#B54707] text-xs font-semibold py-1 px-2 rounded-full z-20">
               New
+            </div>
+          )}
+
+          {badgeType === 'Sold' && (
+            <div className="absolute top-4 left-4 bg-[#FFFAEA] border-2 border-[#FDB122] text-[#B54707] text-xs font-semibold py-1 px-2 rounded-full z-20">
+              Sold
             </div>
           )}
 
@@ -132,9 +114,6 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
             </span>
           )}
         </>
-      )}
-
-      {/* Link for Image Carousel */}
       <Link
       to={`/property-details/${id}`}
       className="h-64 relative block hover:opacity-80 transition-opacity duration-300"
@@ -162,16 +141,15 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
       </Carousel>
     </Link>
 
-      <div className="py-3"
-        // onMouseOver={taggleCardPosition}
-        // onMouseLeave={taggleCardPosition}
-        >
+      <div className="py-3">
         <div className="flex items-center justify-end">
           <div className="float-right text-sm text-gray-500 flex items-center">
-            {status === "published" ? (
+          {status === "published" ? (
               <>
                 {tokens_available?.toLocaleString()} Tokens Left
               </>
+            ) : status === "sold" ? (
+              'Sold'
             ) : (
               'Coming Soon'
             )}
@@ -186,44 +164,6 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
         <div className="flex justify-between">
           <span className="text-gray-500">Token price</span>
           <p className="font-medium">£{minTokenPrice}</p>
-        </div>
-      </div>
-
-      {/* Overlay for Backside Content */}
-      <div
-        className={`absolute  inset-0 bg-[#C8E869] shadow-xl rounded-lg p-8 transition-transform duration-500 ease-in-out transform ${
-          isCardBack ? "translate-y-0" : "translate-y-full"
-        }`}
-      >
-        <h2 className="text-xl font-semibold mb-2 border-b pb-2">{title}</h2>
-        {/* Tabla para la información */}
-        <div className="overflow-x-auto">
-          <table className="min-w-full table-auto">
-            <thead>
-              <tr className="bg-white">
-                <th className="px-4 py-2 text-left text-gray-600 text-sm font-semibold">Category</th>
-                <th className="px-4 py-2 text-left text-gray-600 text-sm font-semibold">Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-t">
-                <td className="px-4 py-1 text-gray-700 text-sm font-medium">Risk</td>
-                <td className="px-4 py-1 text-sm font-medium">{currentData.risk}</td>
-              </tr>
-              <tr className="border-t">
-                <td className="px-4 py-1 text-gray-700 text-sm font-medium">Income</td>
-                <td className="px-4 py-1 text-sm font-medium">{currentData.income}</td>
-              </tr>
-              <tr className="border-t">
-                <td className="px-4 py-1 text-gray-700 text-sm font-medium">Capital Growth</td>
-                <td className="px-4 py-1 text-sm font-medium">{currentData.capitalGrowth}</td>
-              </tr>
-              <tr className="border-t">
-                <td className="px-4 py-1 text-gray-700 text-sm font-medium">Return</td>
-                <td className="px-4 py-1 text-sm font-medium">{currentData.return}</td>
-              </tr>
-            </tbody>
-          </table>
         </div>
       </div>
     </article>

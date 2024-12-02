@@ -1,32 +1,43 @@
 import { configureStore } from "@reduxjs/toolkit";
-import walletReducer from "./walletSlice";
+import { combineReducers } from "redux";
 import userReducer from "./userSlice";
-import storage from 'redux-persist/lib/storage'; // Usamos el localStorage por defecto
-import { persistStore, persistReducer } from 'redux-persist';
-import { combineReducers } from 'redux';
+import { persistedWalletReducer } from "./walletSlice"; // Wallet reducer con persistencia
+import storage from 'redux-persist/lib/storage'; // Usamos localStorage para persistencia
+import { persistStore, persistReducer } from 'redux-persist'; 
+import tableActionItemReducer from './tableActionItemSlice'; // Reducer de acción de tabla
+import tradingTypeReducer from "./tradingTypeSlice"
 
 // Configuración de redux-persist
 const persistConfig = {
-  key: 'root', // Nombre del almacenamiento persistido
-  storage, // Usamos el almacenamiento local (localStorage)
-  whitelist: ['user'], // Persistimos solo el slice de 'user'
+  key: 'root', // Nombre de la clave en el almacenamiento persistido
+  storage, // Usamos localStorage
+  whitelist: ['user', 'wallet'], // Solo persistimos 'user' y 'wallet'
 };
 
-// Combina los reducers
 const rootReducer = combineReducers({
-  wallet: walletReducer,
-  user: userReducer,
+  wallet: persistedWalletReducer, // Reducer persistido de la wallet
+  user: userReducer, // Reducer del usuario
+  tableActionItem: tableActionItemReducer,
+  tadringType: tradingTypeReducer
 });
 
-// Aplica persistReducer sobre el rootReducer
+// Aplicamos persistReducer sobre el rootReducer
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
+// Configuración del store de Redux
 export const store = configureStore({
-  reducer: persistedReducer, // El store usará el rootReducer persistido
+  reducer: persistedReducer, // Reducer con persistencia
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ['persist/PURGE'], // Ignorar acción de purga que no es serializable
+      },
+    }),
 });
 
-export const persistor = persistStore(store); // Crea el persistor
+// Crear el persistor
+export const persistor = persistStore(store);
 
-// Tipos para el estado y el dispatch de Redux
+// Tipos para el estado y dispatch
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

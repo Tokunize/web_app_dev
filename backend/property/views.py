@@ -38,7 +38,9 @@ from .serializers import (
     MarketplaceListViewSerializer,
     AdminPropertyManagment,
     AdminOverviewSerializer,
-    InvestorAssetsSerializer
+    InvestorAssetsSerializer,
+    PropertyTradeSellSerializer,
+    InvestorTradingPropertySerializer
 )
 from collections import Counter
 
@@ -82,7 +84,6 @@ class PropertyListView(APIView):
 
 
     def get(self, request):
-        print(request.user.email)
         user_role = getattr(request, 'user_role', None)
         user_id = request.user.id
         
@@ -672,9 +673,7 @@ class PublicPropertyList(APIView):
         serializer = PropertySerializerList(properties, many=True)        
         return Response(serializer.data)
     
-
 #ADMIN DASHBOARD VIEWS 
-
     #PROPERTY MANAGMENT VIEW
     
 class PropertyManagmentListView(APIView):
@@ -820,6 +819,9 @@ class UserInvestmentSummaryAPIView(APIView):
 
 
 
+
+
+
 #INVESTOR ASSETS 
 
 class InvestorAssetsGetView(APIView):
@@ -829,7 +831,7 @@ class InvestorAssetsGetView(APIView):
 
     def get(self, request):
         user_id = request.user.id
-        user = request.user  # Obtienes el usuario directamente desde el request
+        user = request.user 
         
         properties = Property.objects.filter(transactions__transaction_owner_code_id=user_id).distinct()
         property_types = [property.property_type for property in properties]
@@ -852,3 +854,61 @@ class InvestorAssetsGetView(APIView):
         }
 
         return Response(data, status=status.HTTP_200_OK)
+    
+
+#INVESTOR TRADING PROPERTY DETAILS MODAL 
+
+class InvestorTradingPropertyDetails(APIView):
+
+    def get(self, request, referenceNumber):
+        try:
+            property= Property.objects.get(reference_number=referenceNumber)            
+            serializer = InvestorTradingPropertySerializer(property)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        except Property.DoesNotExist:
+            # Si no se encuentra la propiedad
+            return Response({"detail": "Property not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+
+
+#BLOCKCHAIN VIEWS
+
+#GET THE BLOCKHAIN ADDRESS OF A SPECIFIC PROPERTY
+
+class PropertySmartContract(APIView):
+    authentication_classes = [Auth0JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, referenceNumber):
+
+        try:
+            selected_property = Property.objects.get(reference_number=referenceNumber)            
+            data = {
+                'chain_address': selected_property.property_blockchain_adress,  # remplaza 'other_field' por el campo real que quieras retornar
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        
+        except Property.DoesNotExist:
+            # Si no se encuentra la propiedad
+            return Response({"detail": "Property not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+
+class PropertyTradeSellListView(APIView):
+    authentication_classes = [Auth0JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        try:
+            user = request.user 
+            sold_properties = Property.objects.filter(status='sold')
+            serialzier = PropertyTradeSellSerializer(sold_properties,many=True, context={'request': request, 'user': user})
+            return Response(serialzier.data, status=status.HTTP_200_OK)
+        
+        except Property.DoesNotExist:
+            # Si no se encuentra la propiedad
+            return Response({"detail": "Property not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+
+

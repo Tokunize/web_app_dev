@@ -3,10 +3,10 @@
 import { ColumnDef } from "@tanstack/react-table"
 
 import { Checkbox } from "@/components/ui/checkbox"
-import { investmentCategories, statuses } from "../../data/data"
+import {  statuses } from "../../data/data"
 import { Properties, propertySchema } from "../../data/schema"
 import { DataTableColumnHeader } from "../tasdata-table-column-header"
-import { DataTableRowActions } from "../data-table-row-actions"
+// import { DataTableRowActions } from "../data-table-row-actions"
 
 const formatStatus = (status: string): string => {
     return status
@@ -109,10 +109,10 @@ export const AdminOverviewColumns: ColumnDef<Properties>[] = [
         );
     },
   },
-  {
-    id: "actions",
-    cell: ({ row }) => <DataTableRowActions row={row} statuses={statuses} schema={propertySchema}  id={row.original.id}/>,
-  },
+  // {
+  //   id: "actions",
+  //   cell: ({ row }) => <DataTableRowActions row={row} statuses={statuses} schema={propertySchema}  id={row.original.id}/>,
+  // },
 ]
 
 

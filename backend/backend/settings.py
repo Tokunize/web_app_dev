@@ -59,7 +59,9 @@ INSTALLED_APPS = [
     'users',
     'blog',
     'wallet',
-    'notifications'
+    'notifications',
+    'orderbooks',
+    'channels',  # Channels está correctamente incluido
 ]
 
 
@@ -69,7 +71,9 @@ CORS_ALLOWED_ORIGINS = [
     "https://monkfish-app-o6nz8.ondigitalocean.app",
     "https://dev-2l2jjwfm5ekzae3u.us.auth0.com",
     "http://localhost:5174",
-    "https://www.tokunize.com"
+    "https://www.tokunize.com",
+    "http://127.0.0.1:5173",  # Si estás usando 127.0.0.1 para el frontend
+
 
 ]
 
@@ -210,3 +214,12 @@ cloudinary.config(
 
 
 CIRCLE_API_KEY = config('CIRCLE_API_KEY')
+
+
+ASGI_APPLICATION = 'backend.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}

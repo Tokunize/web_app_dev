@@ -2,9 +2,12 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { visualizer } from 'rollup-plugin-visualizer';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 export default defineConfig({
-  plugins: [react(),
+  plugins: [
+    react(),
+    nodePolyfills(), // Sin propiedades como crypto, stream, etc.
     visualizer({
       filename: './stats.html', // Archivo donde se genera el análisis
       open: true, // Abre el reporte automáticamente al generar el bundle
@@ -13,15 +16,15 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      stream: 'stream-browserify', // Ensure stream is aliased
-      buffer: 'buffer/', // Ensure buffer is aliased
-      util: 'util/', // Ensure util is aliased
-      // Add other aliases if needed
+      stream: 'stream-browserify', // Alias para stream
+      buffer: 'buffer', // Alias para buffer
+      util: 'util/', // Alias para util
+      // Otros alias si es necesario
     },
   },
   define: {
-    global: 'globalThis',
-    'process.env': {},
+    global: 'globalThis', // Asegúrate de que globalThis esté disponible
+    'process.env': {},    // Asegura que process.env esté vacío para evitar errores de Node
   },
   optimizeDeps: {
     include: [
@@ -30,7 +33,7 @@ export default defineConfig({
       'stream-browserify',
       'util',
       'events',
-      // Add other dependencies if necessary
+      // Agrega otras dependencias si es necesario
     ],
   },
 });

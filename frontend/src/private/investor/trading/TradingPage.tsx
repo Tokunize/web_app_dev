@@ -1,8 +1,10 @@
 import { TradingHeader } from "./TradingHeader";
 import { DataAccordion } from "@/components/dataAccordion/DataAccordion";
 import { SelltabInvestor } from "./Selltab";
-import { BuytabInvestor } from "./Buytab";
+import { BuyTabInvestor } from "./Buytab";
 import { useState } from "react";
+import { TradingOffersMade } from "./OffersMadeTab";
+import { TraddingOfferGiven } from "./OfferGivenTab";
 
 export const TradingPage = () => {
   const [activeIndex, setActiveIndex] = useState<number>(0); // Default to 'Overview' tab
@@ -13,10 +15,12 @@ export const TradingPage = () => {
   };
 
 
-  const tabs = ['Sell', 'Buy', 'Offer Made', 'Offer Given']; // Nombres de las pestañas
+  const tabs = ['Buy', 'Sell', 'Received Offers', 'My Selling']; // Nombres de las pestañas
   const components = [
+    <BuyTabInvestor key="buy" />,
     <SelltabInvestor key="sell" />,
-    <BuytabInvestor key="buy" />
+    <TradingOffersMade key="offersMade" />,
+    <TraddingOfferGiven key={"offerGiven"} />
   ]; 
 
   return (

@@ -1,18 +1,14 @@
 import { StepperFlow } from "./stepperFlow";
 import { SinglePropertyDetailOnModal } from "@/private/investor/trading/propertyDetails";
 import { TradingMakeOfferCard } from "../tradingMakeOfferCard";
-import { TradingBooks } from "@/private/investor/trading/tradingBooks";
+import { TradingBooks } from "@/private/investor/trading/TradingBooks";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
 import { LoadingSpinner } from "../loadingSpinner";
 import checkBoxSuccesIcon from "../../assets/bigCheckBox.svg";
+import { TradingBuySellCard } from "../tradingBuySellCard";
 
 interface Props {
-  propertyId: number;
-}
-
-interface FinancialDetails {
-  projected_annual_yield: number;
-  projected_rental_yield: number;
+  referenceNumber: string | null;
 }
 
 interface PropertyData {
@@ -21,18 +17,21 @@ interface PropertyData {
   property_type: string;
   price: number;
   image: string[];
-  financials_details: FinancialDetails;
+  projected_annual_yield: number;
+  projected_rental_yield: number;
+  property_scrow_address:string;
 }
-export const TradingBuyFlow = ({ propertyId }: Props) => {
+export const TradingBuyFlow = ({ referenceNumber }: Props) => {  
+  
     const { data, loading, error } = useGetAxiosRequest<PropertyData>(
-      `${import.meta.env.VITE_APP_BACKEND_URL}property/${propertyId}/landing-page/?view=payment`,
+      `${import.meta.env.VITE_APP_BACKEND_URL}property/trading/property/${referenceNumber}`,
       true
     );
   
     if (loading) return <LoadingSpinner />;
     if (error) return <div>Error loading data.</div>;
     if (!data) return <div>No data found for this property.</div>;
-  
+      
     const steps = [
       {
         label: "Property Details",
@@ -51,18 +50,22 @@ export const TradingBuyFlow = ({ propertyId }: Props) => {
       },
       {
         label: "Make an Offer",
-        content: ({ nextStep }: { nextStep: () => void }) => (
+        content: ({ nextStep, prevStep }: { nextStep: () => void; prevStep: () => void }) => (
           <div>
-            <TradingMakeOfferCard
+            <TradingBuySellCard
+              actionType="buy"
+              properyScrowAddress={data.property_scrow_address}
+              cardTitle="Buy Equity"
               propertyAddress={data.location}
               propertyType={data.property_type}
               propertyImage={data.image[0]}
               onSubmitSuccess={nextStep}
+              onBackClick={prevStep}
             />
           </div>
         ),
         showNext: false,  // No mostrar el botón Next
-        showBack: true,   // Mostrar el botón Back
+        showBack: false,   // Mostrar el botón Back
       },
       {
         label: "Summary",

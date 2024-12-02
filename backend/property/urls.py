@@ -17,7 +17,10 @@ from .views import (
     PropertyDetailLandingPage,
     PropertyManagmentListView,
     AdminOverviewListView,
-    InvestorAssetsGetView
+    InvestorAssetsGetView,
+    PropertySmartContract,
+    PropertyTradeSellListView,
+    InvestorTradingPropertyDetails
 )
 
 urlpatterns = [
@@ -65,7 +68,15 @@ urlpatterns = [
 
     #INVESTORS
     path('investment-summary/', UserInvestmentSummaryAPIView.as_view(), name='investor-overview'),
-    path('investor-assets/', InvestorAssetsGetView.as_view(), name="investor-assets")
+    path('investor-assets/', InvestorAssetsGetView.as_view(), name="investor-assets"),
+    path('trading/property/<str:referenceNumber>/', InvestorTradingPropertyDetails.as_view(), name="details-property-trading"),
     #OWNERS
+
+
+    #BLOCKCHAIN
+    path('smart-contract/<str:referenceNumber>/', PropertySmartContract.as_view(), name="property-smart-contract-address"),
+    path('sold/', PropertyTradeSellListView.as_view(), name="sold-properties"),
+
+
 
 ]

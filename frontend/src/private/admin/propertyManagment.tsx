@@ -18,7 +18,8 @@ interface Property {
   projected_rental_yield: number;
   created_at: string;
   investment_category: string,
-  property_type: string
+  property_type: string,
+  reference_number:string
 }
 
 export const PropertyManagement = () => {
@@ -37,6 +38,7 @@ export const PropertyManagement = () => {
       listingDate: property.created_at,
       propertyType: property.property_type || "",
       investmentCategory: property.investment_category || "",
+      referenceNumber: property.reference_number
     }));
   };
 
@@ -44,7 +46,7 @@ export const PropertyManagement = () => {
   const { loading, error: fetchError } = useGetAxiosRequest<Property[]>(
     `${import.meta.env.VITE_APP_BACKEND_URL}property/property-managment/`,true,
     (fetchedData) => {
-      try {                
+      try {                        
         const mappedProperties = mapPropertiesToCamelCase(fetchedData);
         const parsedProperties = z.array(propertySchema).parse(mappedProperties);
         setProperties(parsedProperties); // Set validated properties
