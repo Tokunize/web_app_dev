@@ -30,7 +30,7 @@ export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) 
   const usdcAddress = "0xdC48A996F3073d4ADAB7f77B42162c284801A6d9"; // Aquí debes poner la dirección del contrato USDC en Sepolia Testnet
   const {toast} = useToast()
 
-  const contractAddress="0xeEC864BdCDF9F717404bF265A129a3993457CB7E"
+  const contractAddress="0xCaD0E8DBfFfDf7E53419B5B3d032125FF406E949"
 
   const contractPropertyInvestment = useSmartContract({
     contractAddress: contractAddress,
