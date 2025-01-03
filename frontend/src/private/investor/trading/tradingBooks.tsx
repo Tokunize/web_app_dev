@@ -7,7 +7,7 @@ export const TradingBooks = () =>{
     const [activeIndex, setActiveIndex] = useState<number>(0); // Default to 'Overview' tab
 
     const handleTabChange = (index: number) => {
-        setActiveIndex(index); // Actualizar el índice activo
+        setActiveIndex(index); // Actualizar el índice activoooo
     };
 
     const tabs = ['Order Book', 'Recent Orders']; // Nombres de las pestañas

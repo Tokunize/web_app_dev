@@ -2,20 +2,23 @@ import React, { useEffect, useState } from 'react';
 import { FaBell } from 'react-icons/fa';
 import { getNotifications, markNotificationAsRead } from './notificationService';
 import { useAuth0 } from '@auth0/auth0-react';
+import { BellRing, Check } from "lucide-react"
+ import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { formatDistanceToNow } from 'date-fns';
-
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
-
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface Notification {
@@ -114,6 +117,21 @@ export const Notifications: React.FC = () => {
     </div>
   );
 
+  const notificationss = [
+    {
+      title: "Your call has been confirmed.",
+      description: "1 hour ago",
+    },
+    {
+      title: "You have a new message!",
+      description: "1 hour ago",
+    },
+    {
+      title: "Your subscription is expiring soon!",
+      description: "2 hours ago",
+    },
+  ]
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -130,42 +148,49 @@ export const Notifications: React.FC = () => {
         </button>
       </PopoverTrigger>
 
-      <PopoverContent side="bottom" align="end" className="mt-2 max-h-80 max-w-lg bg-white shadow-lg rounded-lg overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-        <div className="flex items-center justify-between p-2">
-          <div className="text-sm font-medium leading-none">Notifications</div>
-          {unreadCount > 0 && (
-            <button onClick={handleMarkAllAsRead} className="text-green-500 hover:underline">
-              Mark All as Read
-            </button>
-          )}
-        </div>
-
-        {loading ? (
-            <SkeletonDemo />
-        ) : (
-          <Tabs defaultValue="all" className="max-w-lg space-y-4">
-            <TabsList className="grid w-full grid-cols-2 text-3xl ">
-              <TabsTrigger value="all" className='text-sm font-medium leading-none'>All</TabsTrigger>
-              <TabsTrigger value="unread" className='text-sm font-medium leading-none'>Unread  <span className='text-xs translate-y-[-10%] pl-1'>{unreadCount}</span> </TabsTrigger>
-            </TabsList>
-            <TabsContent value="all">
-              {notifications.length > 0 ? (
-                notifications.map(notification => renderNotification(notification))
-              ) : (
-                <p className="p-4 text-center text-sm text-gray-500">No notifications yet</p>
-              )}
-            </TabsContent>
-            <TabsContent value="unread">
-              {notifications.filter(notification => !notification.is_read).length > 0 ? (
-                notifications
-                  .filter(notification => !notification.is_read)
-                  .map(notification => renderNotification(notification))
-              ) : (
-                <p className="p-4 text-center text-sm text-gray-500">No unread notifications</p>
-              )}
-            </TabsContent>
-          </Tabs>
-        )}
+      <PopoverContent side="bottom" align="end" className="mt-2 p-0 max-h-80 bg-white shadow-lg rounded-lg overflow-y-auto scrollbar-thin  scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+        <Card className="border-none">
+          <CardHeader>
+            <CardTitle>Notifications</CardTitle>
+            <CardDescription>You have 3 unread messages.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <div className=" flex items-center space-x-4 rounded-md border p-4">
+              <BellRing />
+              <div className="flex-1 space-y-1">
+                <p className="text-sm font-medium leading-none">
+                  Push Notifications
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Send notifications to device.
+                </p>
+              </div>
+            </div>
+            <div>
+              {notificationss.map((notification, index) => (
+                <div
+                  key={index}
+                  className="mb-4 grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0"
+                >
+                  <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      {notification.title}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {notification.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button onClick={handleMarkAllAsRead} className="w-full">
+              <Check  /> Mark all as read
+            </Button>
+          </CardFooter>
+        </Card>
       </PopoverContent>
     </Popover>
   );

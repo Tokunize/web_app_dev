@@ -1,42 +1,39 @@
-import { useState } from "react";
-import yellowCardIcon from "../../assets/yellowCardIcon.svg";
-import cardIcon from "../../assets/cardIcon.svg";
+import { IoWalletOutline } from "react-icons/io5";
+import { useDispatch, useSelector } from 'react-redux'; // Para despachar las acciones
+import { setInvestMethodTitle} from "../../redux/investSelectAsset"
 
-// Define the props type
+
 interface PaymentTypeProps {
-  onPaymentSelect: (paymentType: string) => void;
+  goNext: () => void;
+
 }
 
-export const PaymentType: React.FC<PaymentTypeProps> = ({ onPaymentSelect }) => {
-  const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
+export const PaymentType = ({goNext }:PaymentTypeProps) => {
+  const { investMethodTitle } = useSelector((state: any) => state.investAsset); 
+  const dispatch = useDispatch();
 
-  const handlePaymentSelect = (paymentType: string) => {
-    setSelectedPayment(paymentType);
-    onPaymentSelect(paymentType); // Call the callback with the selected payment type
-  };
+  const handleAssetSelect = (investMethodTitle: string) => {      
+        dispatch(setInvestMethodTitle(investMethodTitle));
+    };
 
   return (
     <article className="space-y-5">
       <h4 className="font-bold text-xl">Select Payment Type</h4>
-      <div>
-        <span
-          className={`flex items-center  hover:bg-[#C8E870] p-2 rounded-lg ${selectedPayment === 'Wallet' ? 'bg-[#C8E870]' : ''}`}
-          onClick={() => handlePaymentSelect("Wallet")}
-        >
-          <img alt="E-Wallet icon" className="h-8" src={cardIcon} />
-          <p className="pl-4">Wallet</p>
-        </span>
-        <ul>
-          </ul>
-      </div>
-
-      <span
-        className={`flex items-center hover:bg-[#C8E870] p-2 rounded-lg ${selectedPayment === 'Bank Card' ? 'bg-[#C8E870]' : ''}`}
-        onClick={() => handlePaymentSelect("Bank Card")}
+        <button
+          className={`flex items-center  hover:bg-[#C8E870] w-full duration-300 p-2 rounded-lg ${investMethodTitle != 'Bank Card' ? 'bg-[#C8E870]' : ''}`}
+          onClick={goNext}
+          >
+          <span className="bg-black rounded-full p-3"><IoWalletOutline className="text-white text-xl"/></span>
+          <p className="pl-4">My Asset Tokens</p>
+        </button>
+  
+      <button
+        className={`flex items-center hover:bg-[#C8E870] w-full  p-2 duration-300 rounded-lg ${investMethodTitle === 'Bank Card' ? 'bg-[#C8E870]' : ''}`}
+        onClick={() => handleAssetSelect("Bank Card")}
       >
-        <img alt="Bank Card icon" className="h-8" src={yellowCardIcon} />
-        <p className="pl-4">Bank Card</p>
-      </span>
+          <span className="p-3 bg-[#FDB022] rounded-full"><IoWalletOutline className="text-xl"/></span>
+          <p className="pl-4">Wallet (USDC)</p>
+      </button>
     </article>
   );
 };

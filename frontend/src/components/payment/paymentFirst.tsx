@@ -1,7 +1,7 @@
-import { Carousel } from "flowbite-react";
 import { Progress } from "../ui/progress";
 import { useEffect, useState } from "react";
 import { FormatCurrency } from "../currencyConverter";
+import CustomCarousel from "../CustomCarousel";
 
 interface PaymentFirstProps {
   property_id: number; 
@@ -22,7 +22,7 @@ interface PaymentFirstProps {
   };
 }
 
-export const PaymentFirst: React.FC<PaymentFirstProps> = ({ propertyData }) => {
+export const PaymentFirst = ({ propertyData }:PaymentFirstProps) => {
   const [progressEquity, setProgressEquity] = useState<number>(0);
 
   if (!propertyData) {
@@ -41,22 +41,13 @@ export const PaymentFirst: React.FC<PaymentFirstProps> = ({ propertyData }) => {
   }, [propertyData]);
 
   return (
-    <section className="flex flex-col ">
+    <section className="flex flex-col">
       <div>
         <h2 className="font-bold text-xl mb-4">Buy Equity</h2>
       </div>
       <div className="flex flex-row space-x-3">
         <aside className="w-1/2 flex flex-col text-left">
-          <Carousel indicators={true} slide={false} className="h-[50%]">
-            {propertyData.image.map((img: string, index: number) => (
-              <img
-                key={index}
-                src={img}
-                alt={`${propertyData.title || "Property"} image ${index + 1}`}
-                className="w-full h-full object-cover"
-              />
-            ))}
-          </Carousel>
+          <CustomCarousel title="property-images-invest" images={propertyData.image} />
 
           <header className="mt-3">
             <h1 className="font-semibold">{propertyData.title}</h1>
@@ -84,24 +75,24 @@ export const PaymentFirst: React.FC<PaymentFirstProps> = ({ propertyData }) => {
               </li>
               <li className="flex flex-col text-sm text-gray-500">
                 Current Value
-                <span className="text-black text-lg"><FormatCurrency  amount={propertyData.price}/></span>
+                <span className="text-black text-lg "><FormatCurrency  amount={propertyData.price}/></span>
               </li>
             </ul>
           </div>
 
           <div className="border rounded-lg p-4">
             <header>
-              <h3 className="font-bold text-2xl text-[#C7E770]">{propertyData.title}</h3>
+              <h3 className="font-bold text-xl text-[#C7E770] mb-3">Investment Summary</h3>
             </header>
-            <ul className="space-y-2">
+            <ul className="space-y-2 ">
               <li className="flex justify-between">
                 Equity Listed <span> <FormatCurrency amount={propertyData.price}/> </span>
               </li>
-              <Progress value={progressEquity} className="w-[60%]" />
+              <Progress value={progressEquity}/>
               <li className="flex justify-between">
                 Equity Sold <span>{progressEquity.toFixed(2)} %</span>
               </li>
-              <Progress value={progressEquity} className="w-[60%]" />
+              <Progress value={progressEquity} />
             </ul>
           </div>
         </article>

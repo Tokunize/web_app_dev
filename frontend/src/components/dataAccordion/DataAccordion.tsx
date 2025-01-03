@@ -1,21 +1,20 @@
 import React, { useState } from "react";
 import { AccordionContent } from "./AccordionContent";
 import { AccordionHeader } from "./AccordionHeader";
+import { TabItem } from "@/types";
 
 interface DataAccordionProps {
-  tabs: string[]; // Nombres de las pestañas
-  components: React.ReactNode[]; // Componentes dinámicos a renderizar
-  onTabChange: (index: number) => void; // Callback para enviar el índice al padre
+  tabs: TabItem[];
+  components: React.ReactNode[]; 
 }
 
-export const DataAccordion: React.FC<DataAccordionProps> = ({ tabs, components, onTabChange }) => {
+export const DataAccordion = ({ tabs, components }:DataAccordionProps) => {
   const [activeIndex, setActiveIndex] = useState<number>(0); // Establecemos la primera pestaña como activa
 
   // Función para manejar el clic en las pestañas
   const handleTabClick = (index: number) => {
     if (index !== activeIndex) {      
       setActiveIndex(index); // Cambiar el índice si es un tab diferente
-      onTabChange(index); // Notificar al padre sobre el cambio de índice
     }
   };
 

@@ -18,17 +18,20 @@ import { useNavigate } from 'react-router-dom';
 import { LogoutButton } from '../buttons/logoutBtn';
 import ConnectWallet from '../blockchain/connectWallet';
 import { GlobalModal } from '../globalModal';
+import { useAuth0 } from '@auth0/auth0-react';
 
-export const UserNavbar: React.FC = () => {
-  const { userImage, name, userEmail } = useSelector((state: RootState) => state.user);
+
+export const UserNavbar = () => {
   const {address} = useSelector((state: RootState) => state.wallet)
+  const { user } = useAuth0();
+  
   const navigate = useNavigate(); // Inicia el hook navigate
 
   // Función de manejo de atajos de teclado
   const handleShortcuts = (event: KeyboardEvent) => {
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "b") {
       event.preventDefault();
-      navigate("/dashboard"); // Usar navigate para redirigir
+      navigate("/dashboard/"); // Usar navigate para redirigir
     }
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "z") {
       event.preventDefault();
@@ -56,7 +59,7 @@ export const UserNavbar: React.FC = () => {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-8 w-8 rounded-full">
             <Avatar className="h-9 w-9">
-              <AvatarImage src={userImage || undefined} alt="@user" />
+              <AvatarImage src={user?.picture} alt="@user" />
               <AvatarFallback>SC</AvatarFallback>
             </Avatar>
           </Button>
@@ -64,9 +67,9 @@ export const UserNavbar: React.FC = () => {
         <DropdownMenuContent className="w-56" align="end" forceMount>
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">{name}</p>
+              <p className="text-sm font-medium leading-none">{user?.name}</p>
               <p className="text-xs leading-none text-muted-foreground">
-                {userEmail}
+                {user?.email}
               </p>
             </div>
           </DropdownMenuLabel>

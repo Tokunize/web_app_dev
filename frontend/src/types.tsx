@@ -1,5 +1,6 @@
 export interface Asset {
     id:number;
+    reference_number: string;
     image?: string[]; // Cambia a string[] para representar un array de URLs de imagen
     title: string;
     location: string;
@@ -16,11 +17,12 @@ export interface Asset {
 
 
 export interface Property {
+    reference_number: string;
     id: string;
     title: string;
     location: string;
     property_type: string;
-    tokens: { token_price: string; tokensSold: number; total_tokens: number; tokens_available: number }[];
+    tokens: { token_price: number; tokensSold: number; total_tokens: number; tokens_available: number }[];
     projected_annual_return: string;
     image: string[];
     status: string;
@@ -65,7 +67,7 @@ export interface PropertyFinancialData {
   projected_rental_yield?: string;
   property_management?: string;
   property_taxes?: string;
-  token_price?: string;
+  token_price?: number;
   tokensSold?: number;
   total_investment_value?: string;
   total_tokens?: number;
@@ -81,7 +83,7 @@ export type Filters = {
   
 
 export   interface PropertyToken {
-    token_price: string;
+    token_price: number;
     tokensSold: number;
     total_tokens: number;
     tokens_available: number;
@@ -104,3 +106,9 @@ export interface Transaction{
   trade_quantity?: string;
   executed_at?: string;
 };
+
+
+export interface TabItem {
+  type: "icon" | "text";  // Tipo de contenido (icono o texto)
+  content: string | React.ReactNode;  // El contenido puede ser texto o un icono
+}

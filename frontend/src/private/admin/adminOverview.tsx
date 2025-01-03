@@ -41,7 +41,6 @@ export const AdminOverview = () => {
         `${import.meta.env.VITE_APP_BACKEND_URL}property/overview-dashboard-admin/`,true, 
         (fetchedData) => {
             try {
-                console.log(fetchedData);
                 setPropertiesChart(fetchedData.published_properties_per_month)
                 setPublishedProperties(fetchedData.published_properties);
                 setUnderReviewProperties(fetchedData.UR_properties);

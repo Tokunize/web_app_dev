@@ -60,6 +60,12 @@ class Order(models.Model):
     
     class Meta:
         ordering = ['-created_at'] 
+        indexes = [
+            models.Index(fields=['order_type']),  # Índice para el tipo de orden (buy/sell)
+            models.Index(fields=['order_status']),  # Índice para el estado de la orden (valid, expired, etc.)
+            models.Index(fields=['order_price']),  # Índice para el precio de la orden
+            models.Index(fields=['order_type', 'order_price']),  # Índice combinado para consultas por tipo y precio
+        ]
 
    
 class Trade(models.Model):

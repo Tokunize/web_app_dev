@@ -2,9 +2,8 @@ import { useState } from "react";
 import { TransactionTable } from "@/components/transactionsTable";
 import { DatePickerWithRange } from "@/components/dashboard/DatePickerRange";
 import { Download } from "lucide-react"; 
-import { CurrencyConverter } from "@/components/currencyConverter";
-import { AddFundsFlow } from "@/components/funds/addFundsFlow";
 import { Button } from "@/components/ui/button";
+import WalletTabView from "@/components/wallet/walletTabView";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +16,7 @@ import {
 import { LoadingSpinner } from "@/components/loadingSpinner";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
 import { DownloadCSV } from "@/components/downloads/DownloadCSV";
+import WalletConnectButton from "@/components/buttons/walletConnectButton";
 
 type Transaction = {
   id: number;
@@ -35,14 +35,14 @@ export const Transaction = () => {
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [balance, setBalance] = useState<number>(0);
   
- 
+
   // Use the custom hook to fetch transactions
-  const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/transactions/`;
+  const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}transaction/user/all/`;
   
   const { loading, error } = useGetAxiosRequest<{
     transactions: Transaction[];
     balance: { data: { tokenBalances: { amount: string }[] } };
-  }>(apiUrl,true, (data) => {    
+  }>(apiUrl,true, (data) => {        
     setTransactions(data.transactions);
     const balanceAmount = data.balance?.data?.tokenBalances[0]?.amount;
     setBalance(balanceAmount ? parseFloat(balanceAmount) : 0);
@@ -68,26 +68,17 @@ export const Transaction = () => {
   const handleDownload = () =>{
     DownloadCSV(filteredTransactions, "my-assets.csv")
   }
+
   return (
     <div className="p-4">
-      <div className="flex justify-between bg-white rounded-lg border p-4 mb-4">
-        <div className="space-y-3">
-          <p className="text-sm text-gray-500">Total Balance</p>
-          <CurrencyConverter amountInUSD={balance} />
-          <br/> 
-        </div>
-        <span className="space-x-3">
-          {/* <Button onClick={StartTransfer}>Transfer</Button> */}
-          <AddFundsFlow />
-          <Button>Withdraw</Button>
-        </span>
-      </div>
-
+      <WalletTabView balance={balance}/>
       <Button 
           onClick={handleDownload}>
           Download CSV
           <Download className="ml-4" />
       </Button>
+
+      <WalletConnectButton/>
 
       <div className="flex justify-between mt-4 mb-4">
         <DatePickerWithRange
@@ -115,10 +106,14 @@ export const Transaction = () => {
       </div>
       
       {filteredTransactions.length > 0 ? (
-        <TransactionTable transactions={filteredTransactions} />
+    <TransactionTable transactions={filteredTransactions} />
       ) : (
-        <p>No transactions yet</p>
+          <div className="text-center mt-8">
+              <i className="fas fa-exclamation-circle text-yellow-500 text-3xl mb-4"></i>
+              <p className="text-lg font-semibold text-gray-500">No transactions yet</p>
+          </div>
       )}
+
     </div>
   );
 };

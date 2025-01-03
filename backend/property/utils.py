@@ -1,5 +1,6 @@
 from django.db.models import Sum
-from .models import Transaction, PropertyToken
+from .models import  PropertyToken
+from blockchain.models import Token
 
 
 def get_total_tokens_owned(user):

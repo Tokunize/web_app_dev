@@ -14,7 +14,6 @@ class NotificationAPIView(APIView):
 
     def get(self, request):
         notifications = Notification.objects.filter(user=request.user)
-        print(request.user.id)
         serializer = NotificationSerializer(notifications, many=True)
         return Response(serializer.data)
 

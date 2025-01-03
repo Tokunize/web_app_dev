@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField, JSONField
 from django.utils import timezone
 import uuid
+from django.core.exceptions import ValidationError
 
 
 class TimeStampedModel(models.Model):
@@ -28,19 +29,16 @@ class Property(TimeStampedModel):
         ('occupied', 'Occupied')
     ]
 
+    INVESTMENT_CATEGORY =[
+        ('core', 'Core'),
+        ('opportunistic', 'Opportunistic' )
+    ]
 
+    property_owner = models.ForeignKey("users.CustomUser",null=True, blank=True , on_delete=models.CASCADE, related_name='properties', help_text="El usuario que posee o gestiona esta propiedad.")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="listing", help_text="The current status of the property listing.")
     ocupancy_status = models.CharField(max_length=25, choices=OCUPANCY_STATUS, default="rented")
-    
-    
-    application_ref_number = models.OneToOneField(
-        'users.SubmitApplication',
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name='property_application',
-    )   
-    reference_number = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    reference_number = models.UUIDField(default=uuid.uuid4, unique=True, blank=True, null=False, help_text="Automatically generated unique identifier for the property.")
+
     property_scrow_address = models.CharField(max_length=42, unique=True, null=True, blank=True)
     property_code = models.CharField(max_length = 50, unique=True, null=True, blank=True)
     title = models.CharField(max_length=255)
@@ -64,7 +62,8 @@ class Property(TimeStampedModel):
     rejection_reason = models.TextField(blank=True, null=True)  # Campo para el motivo de rechazo
     rejection_reason_comment = models.TextField(blank=True, null=True, help_text="Extra information for the rejection reason")
 
-    investment_category =  models.CharField(blank=True, null=True)
+    investment_category =  models.CharField(max_length=25, choices=INVESTMENT_CATEGORY, default="core")
+
     # admin fill form 
     image = ArrayField(models.URLField(max_length=500), blank=True, null=True, help_text="A list of URLs pointing to images of the property.")
     video_urls = ArrayField(models.URLField(max_length=500), blank=True, null=True, help_text="A list of URLs pointing to videos of the property.")
@@ -96,13 +95,46 @@ class Property(TimeStampedModel):
     # Indicadores de estado
     owner_fields_completed = models.BooleanField(default=False)
     admin_fields_completed = models.BooleanField(default=False)
-    owner_profile = models.ForeignKey('users.PropertyOwnerProfile',null=True, blank=True, on_delete=models.CASCADE, related_name='properties', help_text="The PropertyOwnerProfile associated with this property.")
 
     def __str__(self):
         return self.title
 
     class Meta:
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['reference_number'], name='reference_number_idx'),
+        ]
+    
+    # Function to get the first image
+    def get_first_image(self):
+        if self.image and len(self.image) > 0:
+            return self.image[0]
+        return None
+    
+     # Function to get associated tokens
+    def get_tokens(self):
+        tokens = self.tokens.all()  # Using the related_name "tokens" from Token model
+        return [{'token_code': token.token_code, 'total_tokens': token.total_tokens, 'tokens_available': token.tokens_available, 'token_price': token.token_price} for token in tokens]
+
+     # Function to change status
+    def change_status(self, new_status):
+        """
+        Change the status of the property to a valid value.
+
+        Args:
+            new_status (str): The new status to assign.
+
+        Raises:
+            ValidationError: If the new status is not valid.
+        """
+        valid_statuses = [choice[0] for choice in self.STATUS_CHOICES]
+        if new_status not in valid_statuses:
+            raise ValidationError(f"{new_status} is not a valid status. Valid options are: {valid_statuses}")
+        
+        self.status = new_status
+        self.save(update_fields=["status"])  # Optimized save for just the 'status' field
+
+
 
 class PropertyUpdates(models.Model):
     property = models.ForeignKey(Property,on_delete=models.CASCADE, related_name='updates', help_text="The property associated with this update." )
@@ -116,65 +148,14 @@ class PropertyUpdates(models.Model):
 
     def __str__(self):
         return f"Update on {self.property.title}: {self.title}"
-
-class Token(models.Model):
-    token_code = models.CharField(max_length=255, unique=True)
-    property_code = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='tokens')
-    total_tokens = models.PositiveIntegerField()
-    tokens_available = models.PositiveIntegerField()
-    token_price = models.PositiveIntegerField(null=True, blank=True)
-
-    def __str__(self):
-        return self.token_code
-
+    
 
 class PropertyToken(models.Model):
     property_code = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='property_tokens')
-    token_code = models.ForeignKey(Token, on_delete=models.CASCADE, related_name='property_tokens')
+    token_code = models.ForeignKey("blockchain.Token", on_delete=models.CASCADE, related_name='property_tokens')
     owner_user_code = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE, related_name='property_tokens')
     number_of_tokens = models.PositiveIntegerField()
 
     def __str__(self):
         return f"{self.number_of_tokens} tokens for {self.property_code} ({self.token_code})"
     
-
-class Transaction(TimeStampedModel):
-    property_id = models.ForeignKey(Property, blank=True, null=True, related_name='transactions', on_delete=models.CASCADE)
-    transaction_owner_code = models.ForeignKey("users.CustomUser", related_name='transactions', on_delete=models.CASCADE)
-    token_code = models.ForeignKey(Token, on_delete=models.CASCADE, related_name='transactions')
-    transaction_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    transaction_date = models.DateTimeField(auto_now_add=True)
-    additional_details = models.JSONField(null=True, blank=True)
-    transaction_tokens_amount = models.BigIntegerField(null=True, blank=True)
-    referene_number = models.CharField(null=True,blank=True, unique=True)
-    class Event(models.TextChoices):
-        BUY = 'BUY', 'Buy'
-        SELL = 'SELL', 'Sell'
-        CANCELLATION = 'CANCELLATION', 'Cancellation'
-
-    event = models.CharField(
-        max_length=20,
-        choices=Event.choices,
-    )
-
-    def __str__(self):
-        return f"{self.event} - {self.transaction_amount} on {self.transaction_date.strftime('%Y-%m-%d')}"
-
-    class Meta:
-        verbose_name = "Token Transaction"
-        verbose_name_plural = "Token Transactions"
-        ordering = ['-transaction_date']  # Ordenar de recientes a más antiguos
-
-
-
-
-class PropertyMetrics(models.Model):
-    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='metrics')
-    date = models.DateField()
-    tenant_turnover = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    vacancy_rate = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    average_yield = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    net_asset_value = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.property.title} Metrics on {self.date}"

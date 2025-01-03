@@ -1,4 +1,3 @@
-import React from 'react';
 // import GetContract from '../blockchain/contractsAbi';
 import { FormatCurrency } from '../currencyConverter';
 
@@ -8,11 +7,11 @@ interface PaymentOrderViewProps {
   selectedPaymentMethod: string | null;
 }
 
-export const PaymentOrderView: React.FC<PaymentOrderViewProps> = ({
+export const PaymentOrderView = ({
   investmentAmount,
   tokenPrice,
   selectedPaymentMethod,
-}) => {
+}:PaymentOrderViewProps) => {
   const investmentValue = investmentAmount; // Ya es un número, no es necesario parsearlo
   const fee = investmentValue * 0.005; 
 
@@ -33,7 +32,7 @@ export const PaymentOrderView: React.FC<PaymentOrderViewProps> = ({
           <span className="text-gray-500">{fee.toFixed(2)} USDC</span>
         </li>
         <li className="flex justify-between py-2">
-          <span className="font-bold text-sm">Pay With</span>
+          <span className="font-bold text-sm">Invest With</span>
           <span className="text-gray-500">{selectedPaymentMethod}</span>
         </li>
       </ul>

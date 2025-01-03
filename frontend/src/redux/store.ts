@@ -1,43 +1,43 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from "redux";
+import { persistStore, persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage";
 import userReducer from "./userSlice";
-import { persistedWalletReducer } from "./walletSlice"; // Wallet reducer con persistencia
-import storage from 'redux-persist/lib/storage'; // Usamos localStorage para persistencia
-import { persistStore, persistReducer } from 'redux-persist'; 
-import tableActionItemReducer from './tableActionItemSlice'; // Reducer de acción de tabla
-import tradingTypeReducer from "./tradingTypeSlice"
+import { persistedWalletReducer } from "./walletSlice";
+import tableActionItemReducer from "./tableActionItemSlice"; // Nuevo reducer
+import tradingTypeReducer from "./tradingTypeSlice"; // Nuevo reducer
+import investSelectAsset from "./investSelectAsset"
 
-// Configuración de redux-persist
-const persistConfig = {
-  key: 'root', // Nombre de la clave en el almacenamiento persistido
-  storage, // Usamos localStorage
-  whitelist: ['user', 'wallet'], // Solo persistimos 'user' y 'wallet'
+// Configuración de persistencia para el userSlice
+const userPersistConfig = {
+  key: "user",
+  storage,
+  whitelist: ["role"],
 };
 
+// Reducer persistido para el userSlice
+const persistedUserReducer = persistReducer(userPersistConfig, userReducer);
+
+// Combina los reducers
 const rootReducer = combineReducers({
-  wallet: persistedWalletReducer, // Reducer persistido de la wallet
-  user: userReducer, // Reducer del usuario
-  tableActionItem: tableActionItemReducer,
-  tadringType: tradingTypeReducer
+  user: persistedUserReducer,
+  wallet: persistedWalletReducer,
+  tableActionItem: tableActionItemReducer, // Añadido
+  tradingType: tradingTypeReducer,         // Añadido
+  investAsset: investSelectAsset
 });
 
-// Aplicamos persistReducer sobre el rootReducer
-const persistedReducer = persistReducer(persistConfig, rootReducer);
-
-// Configuración del store de Redux
+// Crea el store
 export const store = configureStore({
-  reducer: persistedReducer, // Reducer con persistencia
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: ['persist/PURGE'], // Ignorar acción de purga que no es serializable
-      },
+      serializableCheck: false,
     }),
 });
 
 // Crear el persistor
 export const persistor = persistStore(store);
 
-// Tipos para el estado y dispatch
+// Exporta el tipo RootState para tipado
 export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;

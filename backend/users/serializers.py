@@ -1,20 +1,8 @@
 from rest_framework import serializers
-from .models import CustomUser, PropertyOwnerProfile, InvestorProfile,SubmitApplication
+from .models import CustomUser
+
+
 # Serializadores para perfiles
-class PropertyOwnerProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PropertyOwnerProfile
-        fields = ['number_of_properties']
-
-class InvestorProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = InvestorProfile
-        fields = ['total_investment']
-
-ROLE_PROFILE_MAPPING = {
-    'owner': PropertyOwnerProfileSerializer,
-    'investor': InvestorProfileSerializer,
-}
 
 class CustomUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False)
@@ -59,19 +47,5 @@ class CustomUserSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-    def get_profile(self, obj):
-        profile_class = ROLE_PROFILE_MAPPING.get(obj.rol)
-        if profile_class:
-            profile = profile_class.Meta.model.objects.filter(user=obj).first()
-            if profile:
-                return profile_class(profile).data
-        return None
 
 
-
-#SERIALZIER FOR THE APPLICATION SUBMIT
-
-class ApplicationSubmitSerializer(serializers.ModelSerializer):
-    class Meta():
-        model = SubmitApplication
-        fields = [ "__all__"]

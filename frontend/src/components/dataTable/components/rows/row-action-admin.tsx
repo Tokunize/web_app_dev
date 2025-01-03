@@ -15,9 +15,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ZodType } from "zod"; // Importa Zod para validaciones
 import { useNavigate } from "react-router-dom";
-import { GlobalModal } from "@/components/globalModal";
-import { RejectPropertyForm } from "@/components/forms/rejectPropertyForm";
-import { AcceptProperty } from "@/components/acceptProperty";
 
 // Definir los tipos de los estados posibles
 interface Status {
@@ -69,24 +66,6 @@ export function DataTableRowActionsAdmin<TData>({
         <DropdownMenuItem onClick={() => navigateUpdate(properties.id)}>
           Update
         </DropdownMenuItem>
-
-        {/* Modal para rechazar la propiedad */}
-        <GlobalModal
-          id="rejectProperty"
-          contentComponent={<RejectPropertyForm propertyId={id} />}
-          title="Reject"
-          description="Reject the property with further details."
-          onClose={() => console.log(`Property rejected: ${id}`)} // Callback de rechazo
-        />
-
-        {/* Modal para aceptar la propiedad */}
-        <GlobalModal
-          id="acceptProperty"
-          contentComponent={<AcceptProperty allPropertiesUnderReview={[properties]} />}
-          title="Accept"
-          description="Accept the property after review."
-          onClose={() => console.log(`Property accepted: ${id}`)} // Callback de aceptación
-        />
 
         <DropdownMenuSeparator />
 
