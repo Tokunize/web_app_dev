@@ -42,18 +42,3 @@ export const CheckoutForm = () => {
     </div>
   );
 }
-
-// const App = () => {
-//   return (
-//     <div className="App">
-//       <Router>
-//         <Routes>
-//           <Route path="/checkout" element={<CheckoutForm />} />
-//           <Route path="/return" element={<Return />} />
-//         </Routes>
-//       </Router>
-//     </div>
-//   )
-// }
-
-// export default App;

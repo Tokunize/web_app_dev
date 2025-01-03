@@ -10,7 +10,7 @@ from users.authentication import Auth0JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny,BasePermission
 from property.models import Property
 from django.shortcuts import get_object_or_404
-from django.db.models import Q,F
+from django.db.models import Q,F,Case,When,IntegerField
 from django.db import transaction
 from property.models import PropertyToken
 
@@ -24,30 +24,39 @@ class OrderListView(APIView):
     # GET ALL ORDERS
     def get(self, request):
         try:
-            valid_orders = Order.objects.select_related('property').filter(
-                Q(order_type="buy") | Q(order_type="sell"),
-                order_status="valid"
+            # Anotar las prioridades de ordenamiento y filtrar por tipo al serializar
+            valid_orders = Order.objects.filter(order_status="valid").annotate(
+                sort_priority=Case(
+                    When(order_type="buy", then=-1),  # Prioridad más alta para "buy"
+                    When(order_type="sell", then=1),  # Prioridad más baja para "sell"
+                    default=0,
+                    output_field=IntegerField()
+                )
+            ).order_by('sort_priority', 'order_price')  # Ordenar por prioridad y precio
+
+            # Serializar directamente las órdenes de compra y venta
+            serializer_buy = self.serializer_class(
+                valid_orders.filter(order_type="buy"), many=True
             )
-            buy_orders = valid_orders.filter(order_type="buy")
-            sell_orders = valid_orders.filter(order_type="sell")
+            serializer_sell = self.serializer_class(
+                valid_orders.filter(order_type="sell"), many=True
+            )
 
-            # serializer_all = self.serializer_class(all_orders, many=True)
-            serializer_buy = self.serializer_class(buy_orders, many=True)
-            serializer_sell = self.serializer_class(sell_orders, many=True)
-
+            # Construir la respuesta
             response_data = {
-                # "all_orders": serializer_all.data,
                 "buyOrders": serializer_buy.data,
                 "sellOrders": serializer_sell.data,
             }
+
             return Response(response_data, status=status.HTTP_200_OK)
 
         except Exception as e:
+            # Manejo de errores con un mensaje claro
             return Response(
-                {"error": str(e)},
+                {"error": f"An error occurred: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-            
+
 
 class UserOrderListView(APIView):
     authentication_classes = [Auth0JWTAuthentication]

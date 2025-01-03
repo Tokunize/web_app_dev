@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { PropertyValueGraph } from "@/components/graphs/propertyValueGraph";
 import { PieGraph } from "@/components/graphs/pieGraph";
 import { RiskOverview } from "@/components/graphs/riskGraph";
-import { PerformanceGraph } from "@/components/graphs/performanceGraph";
+// import { PerformanceGraph } from "@/components/graphs/performanceGraph";
 import { MyAssetsTable } from "@/components/dashboard/myAssetsTable";
 import { LoadingSpinner } from "@/components/loadingSpinner";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";  
@@ -35,9 +35,7 @@ interface Investment {
 export const InvestorOverview = () => {
   const { data: investments, loading, error } = useGetAxiosRequest<Investment>(`${import.meta.env.VITE_APP_BACKEND_URL}property/investment-summary/`,true
   );
-  console.log(investments);
   
-
   if (loading) {
     return <div><LoadingSpinner/></div>
   }
@@ -126,9 +124,7 @@ export const InvestorOverview = () => {
         <Card className="shadow-none  w-1/2 border-0">
           <RiskOverview />
         </Card>
-        <Card className="w-1/2 border-0 shadow-none">
-          <PerformanceGraph/>
-        </Card>
+       
       </div>
     </section>
   );

@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 interface CurrencyConverterProps {
-    amountInUSD: number; // amount can now be 0
+    amountInUSD: number;
 }
 
 export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({ amountInUSD }) => {
     const [exchangeRate, setExchangeRate] = useState<number | null>(null);
     const [amountInGBP, setAmountInGBP] = useState<number | null>(null);
+    const [isVisible, setIsVisible] = useState<boolean>(true);
 
     const getExchangeRate = async () => {
-        const apiUrl = "https://api.exchangerate-api.com/v4/latest/USD"; // Uses a real exchange rate API
+        const apiUrl = "https://api.exchangerate-api.com/v4/latest/USD";
         try {
             const response = await axios.get(apiUrl);
             const rate = response.data.rates.GBP;
@@ -28,23 +30,49 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({ amountInUS
         if (exchangeRate !== null) {
             setAmountInGBP(amountInUSD * exchangeRate);
         } else {
-            setAmountInGBP(0); // Set to 0 if exchangeRate is null
+            setAmountInGBP(0);
         }
     }, [exchangeRate, amountInUSD]);
 
+    const toggleVisibility = (e: React.MouseEvent) => {
+        setIsVisible(!isVisible);
+        e.stopPropagation();
+    };
+
     return (
         <div>
-            {amountInGBP !== null ? (
-                <p className="font-bold">
-                    ${amountInUSD?.toFixed(2) || 0.00} USD <br /> 
-                    <span className="text-xs text-muted-foreground">= £{amountInGBP?.toFixed(2) || 0.00} GBP</span>
-                </p>
-            ) : (
-                <p>Loading conversion...</p>
-            )}
+            <div className="flex  items-center justify-between">
+                <div >
+                    {amountInGBP !== null ? (
+                        isVisible ? (
+                            <p className="font-semibold text-lg">
+                                $ {amountInUSD.toFixed(2)} USD
+                                <span className="text-sm text-muted-foreground">
+                                     =  £ {amountInGBP.toFixed(2)} GBP
+                                </span>
+                            </p>
+                        ) : (
+                            <p className="font-semibold text-lg">
+                                ********
+                            </p>
+                        )
+                    ) : (
+                        <p className="text-muted-foreground">Loading conversion...</p>
+                    )}
+                </div>
+                <button
+                    className="ml-4 text-gray-500 hover:text-gray-700"
+                    onClick={toggleVisibility}
+                    aria-label={isVisible ? "Hide amounts" : "Show amounts"}
+                >
+                    {isVisible ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+                </button>
+            </div>
         </div>
     );
 };
+
+
 
 interface FormatCurrencyProps {
     amount: number;

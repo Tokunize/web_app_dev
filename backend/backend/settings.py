@@ -46,6 +46,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -57,11 +58,12 @@ INSTALLED_APPS = [
     'corsheaders', #CORS]
     'django_filters',
     'users',
-    'blog',
     'wallet',
     'notifications',
     'orderbooks',
-    'channels',  # Channels está correctamente incluido
+    'channels',
+    'blockchain',
+    'transactions',
 ]
 
 
@@ -133,9 +135,9 @@ DATABASES = {
         'PASSWORD': config('DATABASE_PWD'),
         'HOST': config('DATABASE_HOST'),
         'PORT': config('DATABASE_PORT', cast=int),
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
+        # 'OPTIONS': {
+        #     'sslmode': 'require',
+        # },
     }
 }
 
@@ -199,8 +201,27 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,  
+    'PAGE_SIZE': 10, 
+
+    'DEFAULT_THROTTLE_CLASSES': [
+        'throttling.CustomAnonRateThrottle',  # Sin espacios extra
+        'rest_framework.throttling.UserRateThrottle',  # Limita a los usuarios autenticados
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/minute',  # Limita a 5 solicitudes por minuto para usuarios anónimos
+        'user': '100/minute',  # Limita a 10 solicitudes por minuto para usuarios autenticados
+    },
 }
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+
+X_FRAME_OPTIONS = 'DENY'  # Esto evitará que tu página se cargue dentro de un iframe en cualquier otro dominio
+
 
 
 import cloudinary
@@ -212,14 +233,39 @@ cloudinary.config(
     api_secret='LhkuFGSvQWYkISi9a0PONdfj27o'
 )
 
-
 CIRCLE_API_KEY = config('CIRCLE_API_KEY')
-
 
 ASGI_APPLICATION = 'backend.asgi.application'
 
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
     },
 }
+
+# Configuración de Auth0
+AUTH0_DOMAIN = config('AUTH0_DOMAIN')
+AUTH0_CLIENT_ID = config('AUTH0_CLIENT_ID')
+AUTH0_CLIENT_SECRET = config('AUTH0_CLIENT_SECRET')
+
+
+# Celery Configuración
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # URL del broker Redis
+CELERY_ACCEPT_CONTENT = ['json']  # El formato que Celery va a aceptar
+CELERY_TASK_SERIALIZER = 'json'  # El formato de serialización de las tareas
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # Backend para almacenar los resultados de las tareas
+
+
+#WEB3 PROVIDER VARIBALES 
+PROVIDER_TOKEN_URL = config('PROVIDER_TOKEN_URL')
+PROVIDER_CLIENT_ID = config('PROVIDER_CLIENT_ID')
+PROVIDER_CLIENT_SECRET = config('PROVIDER_CLIENT_SECRET')
+PROVIDER_WALLET_URL = config('PROVIDER_TOKEN_URL')
+
+PROVIDER_USERS_VAULT = config('PROVIDER_USERS_VAULT')
+
+
+

@@ -2,33 +2,31 @@ from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from .models import CustomUser, InvestorProfile, PropertyOwnerProfile,SubmitApplication
-from .serializers import CustomUserSerializer,ApplicationSubmitSerializer
+from .models import CustomUser
+from .serializers import CustomUserSerializer
 from rest_framework import status
 from .authentication import Auth0JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.views.decorators.csrf import csrf_exempt
 import json
-
+from django.conf import settings
+import requests
 from django.http import JsonResponse
 
 @csrf_exempt
-
 def hola_view(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         print(data)
-        email = data.get('email', 'No email provideddd')
+        email = data.get('email', 'No email provided')
         name = data.get('name', 'No name provided')
-        role = data.get('role', 'No role provided')
 
             # Imprimir o registrar los datos (aquí usaremos print para debug)
-        print(f"Email: {email}, Name: {name}, Role: {role}")
+        print(f"Email: {email}, Name: {name}")
 
         return JsonResponse({'message': 'Hola'}, status=200)
     return JsonResponse({'error': 'Invalid request method'}, status=405)
  
-
 
 class SyncUserView(APIView):
     authentication_classes = [Auth0JWTAuthentication]
@@ -48,12 +46,6 @@ class SyncUserView(APIView):
         user.rol = role
         user.save()
 
-        # Create a profile based on the role if it doesn't already exist
-        if role == 'owner':
-            PropertyOwnerProfile.objects.get_or_create(user=user)
-        elif role == 'investor':
-            InvestorProfile.objects.get_or_create(user=user)
-
         # Serialize and return the user data
         serializer = CustomUserSerializer(user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -66,13 +58,11 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CustomUserSerializer
     permission_classes = [IsAuthenticated]
 
-
 # Para listar todos los usuarios
 class UserListView(generics.ListAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = [IsAuthenticated]
-
 
 # Vista para obtener el perfil del usuario autenticado
 class UserProfileView(APIView):
@@ -83,76 +73,59 @@ class UserProfileView(APIView):
         serializer = CustomUserSerializer(user)
         return Response(serializer.data)
 
+# Configura la URL y credenciales de tu aplicación Auth0
+AUTH0_DOMAIN = settings.AUTH0_DOMAIN
+AUTH0_CLIENT_ID = settings.AUTH0_CLIENT_ID
+AUTH0_CLIENT_SECRET = settings.AUTH0_CLIENT_SECRET
 
+# Obtén el token de acceso para la Management API
+def get_management_token():
+    url = f"https://{AUTH0_DOMAIN}/oauth/token"
+    headers = {
+        "Content-Type": "application/json"
+    }
+    data = {
+        "client_id": AUTH0_CLIENT_ID,
+        "client_secret": AUTH0_CLIENT_SECRET,
+        "audience": f"https://{AUTH0_DOMAIN}/api/v2/",
+        "grant_type": "client_credentials",
+        "scope": "read:users update:users"  # Asegúrate de incluir los scopes necesarios
 
-#VIEW TO APPLICATION SUBMIT
-class ApplicationSubmitListView(APIView):
-    authentication_classes = [Auth0JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    }
 
-    # Obtener todas las aplicaciones de un usuario
-    def get(self, request):
-        user_id = request.user.id
+    response = requests.post(url, json=data, headers=headers)
+    response.raise_for_status()
+    return response.json()['access_token']
 
-        try:
-            # Usamos `filter()` para obtener todas las aplicaciones del usuario
-            applications = SubmitApplication.objects.filter(user_id=user_id)            
-            if not applications.exists():
-                return Response({"message": "No applications found for this user."}, status=status.HTTP_404_NOT_FOUND)
+# Vista para reenviar el correo de verificación
+class ResendEmailVerification(APIView):
+    permission_classes = [AllowAny]
 
-            # Serializamos las aplicaciones
-            serializer = ApplicationSubmitSerializer(applications, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        except Exception as e:
-            # Capturamos cualquier error no esperado y lo reportamos
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-    # Crear una nueva aplicación
     def post(self, request):
-        request.data['user'] = request.user.id
-        serializer = ApplicationSubmitSerializer(data=request.data)
-        if serializer.is_valid():
-            # Si los datos son válidos, crea la solicitud de aplicación
-            serializer.save()
-            # Devuelve la respuesta con los datos de la solicitud creada
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
-        # Si los datos no son válidos, devuelve un error con los detalles
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+        email = request.data.get('email')
 
-    # Actualizar una aplicación existente
-    def put(self, request, reference_number):
+        if not email:
+            return Response({"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            # Recupera la solicitud de aplicación usando el reference_number (uuid)
-            application = SubmitApplication.objects.get(reference_number=reference_number)
+            # Obtén el token de acceso
+            management_token = get_management_token()
+            print(management_token)
 
-        except SubmitApplication.DoesNotExist:
-            return Response({"error": "Application not found."}, status=status.HTTP_404_NOT_FOUND)
-        
-        # Serializa los datos con los nuevos datos enviados en la solicitud
-        serializer = ApplicationSubmitSerializer(application, data=request.data, partial=True)
+            # Llamada a la API de Auth0 para reenviar el correo de verificación
+            url = f"https://{AUTH0_DOMAIN}/api/v2/jobs/verification-email"
+            headers = {
+                "Authorization": f"Bearer {management_token}",
+                "Content-Type": "application/json"
+            }
+            data = {
+                "email": email
+            }
 
-        if serializer.is_valid():
-            # Guarda los cambios de la solicitud
-            serializer.save()
+            response = requests.post(url, json=data, headers=headers)
+            response.raise_for_status()
 
-            # Devuelve la respuesta con los datos actualizados
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response({"message": "Verification email sent successfully!"}, status=status.HTTP_200_OK)
 
-        # Si los datos no son válidos, devuelve un error con los detalles
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    # Obtener una aplicación específica usando el reference_number
-    def get(self, request, reference_number=None):
-        try:
-            # Recupera la solicitud de aplicación usando el reference_number (uuid)
-            application = SubmitApplication.objects.get(reference_number=reference_number)
-
-            # Serializa la solicitud de aplicación encontrada
-            serializer = ApplicationSubmitSerializer(application)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        except SubmitApplication.DoesNotExist:
-            return Response({"error": "Application not found."}, status=status.HTTP_404_NOT_FOUND)
+        except requests.exceptions.RequestException as e:
+            return Response({"error": f"Error sending verification email: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    

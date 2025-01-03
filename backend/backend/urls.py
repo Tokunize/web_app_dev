@@ -21,8 +21,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('property/',include("property.urls")),
     path('users/', include('users.urls')),
-    path('blog/',include('blog.urls') ),
     path('wallet/', include('wallet.urls')),
     path('notifications/', include('notifications.urls')),
-    path('orderbooks/',include('orderbooks.urls') )
+    path('orderbooks/',include('orderbooks.urls') ),
+    path('blockchain/',include('blockchain.urls') ),
+    path('transaction/',include('transactions.urls') ),
+
 ]

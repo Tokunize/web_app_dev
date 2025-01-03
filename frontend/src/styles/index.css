@@ -148,3 +148,29 @@
   max-width: 80%;
   text-align: center;
 }
+
+
+
+.text-animated-gradient {
+  background: #000000; /* Fondo negro */
+  background-image: linear-gradient(45deg, #000000 20%, rgba(189, 252, 16, 0.171) 50%, #000000 80%);
+  background-size: 400% 400%; /* Mayor tamaño para el gradiente */
+  animation: gradientMove 30s ease-in-out infinite; /* Movimiento suave del gradiente */
+  border-radius: 12px; /* Bordes redondeados para mayor elegancia */
+  display: block;
+  position: relative;
+  overflow: hidden; /* Asegura que el gradiente no se salga */
+}
+
+/* Animación suave del gradiente */
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}

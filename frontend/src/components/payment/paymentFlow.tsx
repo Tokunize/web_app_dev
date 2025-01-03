@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { PaymentFirst } from './paymentFirst';
@@ -13,18 +13,27 @@ import { useToast } from '../ui/use-toast';
 import { LoadingSpinner } from '../loadingSpinner';
 import { useGetAxiosRequest } from '@/hooks/getAxiosRequest';
 import useSmartContract from '@/hooks/useSmartContract';
+import PaymentMyAssets from './paymentMyAssets';
 
 
 import { ethers } from 'ethers';
 import propertyInvestmentABI from "../../contracts/property_investment_abi.json";  // Asegúrate de que este ABI esté correctamente configurado
 import usdcAbi from "../../contracts/usdc_abi.json";  
+import { useSelector } from 'react-redux';
 
-export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) => {
+interface Props {
+  property_id: string;
+}
+
+const PaymentFlow = ({ property_id }:Props) => {
   
-  const navigate = useNavigate()
+
+  // 0x95f7D484AbEaf398885D73876Be7FFD3C54c3760
+  const navigate = useNavigate();
+  const { investMethodTitle } = useSelector((state: any) => state.investAsset); 
+
   const { getAccessTokenSilently } = useAuth0(); 
   const [step, setStep] = useState(1);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
   const [investmentAmount, setInvestmentAmount] = useState<string>("0"); // New state for amount
   const [investmentAmountUSDC,setInvestmentAmountUSDC] = useState<number>(0)
   const usdcAddress = "0xdC48A996F3073d4ADAB7f77B42162c284801A6d9"; // Aquí debes poner la dirección del contrato USDC en Sepolia Testnet
@@ -38,20 +47,15 @@ export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) 
   });
 
   const { data: propertyData, loading, error } = useGetAxiosRequest(
-    `${import.meta.env.VITE_APP_BACKEND_URL}property/${property_id}/landing-page/?view=payment`,true);
+    `${import.meta.env.VITE_APP_BACKEND_URL}property/single/${property_id}/?view=payment`,true);
 
   const goNext = () => setStep((prev) => prev + 1);
   const goBack = () => {
-    if (step === 4 && selectedPaymentMethod) {
-      setStep(2); // Go back to step 2 if a payment method is selected
+    if (step === 5 && investMethodTitle) {
+      setStep(2); 
     } else {
       setStep((prev) => Math.max(prev - 1, 1)); // Ensure we don’t go below step 1
     }
-  };
-
-  const handlePaymentSelect = (paymentType: string) => {
-    setSelectedPaymentMethod(paymentType);
-    setStep(2); // Move to step 2 upon selecting a payment method
   };
 
   const handlePurchase = async () => {
@@ -190,7 +194,6 @@ export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) 
         return (
           <PaymentSecond 
             goNext={() => setStep(3)} 
-            selectedPaymentMethod={selectedPaymentMethod} 
             tokenPrice={propertyData?.tokens[0]?.token_price}
             totalTokens={propertyData?.tokens[0]?.total_tokens}
             investmentAmount={investmentAmount} 
@@ -199,18 +202,19 @@ export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) 
           />
         );
       case 3:
-        return <PaymentType onPaymentSelect={handlePaymentSelect} />;
-      case 4:
+        return <PaymentType goNext={()=> setStep(4)} />;
+      
+      case 4: 
+        return <PaymentMyAssets />
+
+      case 5:
         return <PaymentOrderView 
                   tokenPrice={propertyData?.tokens[0]?.token_price}
-                  selectedPaymentMethod={selectedPaymentMethod} 
+                  selectedPaymentMethod={investMethodTitle} 
                   investmentAmount={investmentAmountUSDC}
                   />
-      case 5:
-        return <PaymentSummary 
-                  investmentAmount={investmentAmountUSDC}
-
-              />;
+      case 6:
+        return <PaymentSummary  investmentAmount={investmentAmountUSDC}  />;
       default:
         return null;
     }
@@ -222,17 +226,17 @@ export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) 
         <Button className="w-full">Buy</Button>
       </DialogTrigger>
 
-      <DialogContent >
+      <DialogContent className="min-w-[45vw]">
         <DialogHeader>
           <DialogTitle className="hidden">Payment Flow</DialogTitle>
           <DialogDescription>
-            Please follow the steps to complete your payment process.
+            Please follow the steps to complete your investment process.
           </DialogDescription>
         </DialogHeader>
         {renderStep()}
 
         <DialogFooter>
-          {step > 1 && step < 5 && (
+          {step > 1 && step < 6 && (
             <Button variant="outline" onClick={goBack}>
               Back
             </Button>
@@ -245,18 +249,18 @@ export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) 
           {step === 2 && (
             <Button 
               className="w-full" 
-              onClick={() => selectedPaymentMethod && setStep(4)} 
-              disabled={!selectedPaymentMethod}
+              onClick={() => investMethodTitle && setStep(5)} 
+              disabled={!investMethodTitle}
             >
               Overview
             </Button>
           )}
-          {step === 4 && (
+          {step === 5 && (
              <Button onClick={() => investInContract(investmentAmountUSDC)} disabled={!investmentAmountUSDC}>
              Invest
            </Button>
           )}
-          {step === 5 && (
+          {step === 6 && (
             <Button className="w-full" onClick={() =>{navigate("/transactions/")}}>
               Check My Wallet
             </Button>
@@ -266,3 +270,6 @@ export const PaymentFlow: React.FC<{ property_id: number }> = ({ property_id }) 
     </Dialog>
   );
 };
+
+
+export default PaymentFlow;

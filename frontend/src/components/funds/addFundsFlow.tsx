@@ -104,7 +104,7 @@ export const AddFundsFlow: React.FC = () => {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button>Add Funds</Button>
+                <Button  variant="outline" className="w-full">Add Funds</Button>
             </DialogTrigger>
 
             <DialogContent>

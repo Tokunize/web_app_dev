@@ -70,6 +70,9 @@ urllib3 = "==2.2.3"
 websockets = "==13.1"
 yarl = "==1.14.0"
 channels = "*"
+daphne = "*"
+channels-redis = "*"
+celery = {extras = ["redis"], version = "*"}
 
 [dev-packages]
 

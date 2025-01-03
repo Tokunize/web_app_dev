@@ -22,36 +22,15 @@ interface SoldProperty {
   reference_number: string;
   status: string;
   ocupancy_status: string;
-  projected_rental_yield: string,
-  user_tokens: number,
+  projected_rental_yield: string;
+  user_tokens: number;
 }
-
-const mapSoldProperties = (data: SoldProperty[]) => {
-  return data.map(property => ({
-    id: property.reference_number, // Usamos el reference_number como id
-    title: property.title,
-    image: property.first_image,
-    location: property.location,
-    price: parseFloat(property.price), // Convierte el precio a número
-    capRate: "3", // Aquí puedes agregar la lógica para calcular o dejar como 'N/A'
-    priceChart: 2, // Esta propiedad parece no estar presente en los datos de la API
-    occupancyStatus: property.ocupancy_status,
-    totalTokens: property.tokens[0]?.total_tokens || 0,
-    availableTokens: property.tokens[0]?.tokens_available || 0,
-    projectedRentalYield: property.projected_rental_yield || 0,
-    propertyType: property.property_type, // Convertir el tipo de propiedad a minúsculas
-    performanceStatus:"Best", // O cualquier otra lógica que se ajuste,
-    userTokens : property.user_tokens 
-  }));
-};
 
 export const SelltabInvestor = () => {
   const { data, loading, error } = useGetAxiosRequest<SoldProperty[]>(
-    `${import.meta.env.VITE_APP_BACKEND_URL}property/sold/`,
-    true
+    `${import.meta.env.VITE_APP_BACKEND_URL}property/invested-properties/`, true
   );
-  
- 
+
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -60,10 +39,10 @@ export const SelltabInvestor = () => {
     return <div>Error: {error}</div>;
   }
 
-  
-  // Mapea los datos de la API
-  const mappedProperties = mapSoldProperties(data ?? []);
-  const parsedProperties = z.array(tradingSchema).parse(mappedProperties);
+  console.log(data);
+
+  // Asegurarse de que data sea un array vacío si está vacío o no está disponible
+  const parsedProperties = z.array(tradingSchema).parse(data || []);
 
   // Define los filtros que deseas pasar
   const filterOptions = [

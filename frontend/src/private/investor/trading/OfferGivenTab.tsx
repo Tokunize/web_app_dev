@@ -27,7 +27,7 @@ export const TraddingOfferGiven = () => {
   if (loading) {
     return <LoadingSpinner />;
   }
-
+  
   // Si hubo un error al hacer la solicitud o no se recibieron datos, mostramos un mensaje de error
   if (error || !data) {
     return <div className="error-message">Error: {error ? error : 'No data received'}</div>;
@@ -38,7 +38,7 @@ export const TraddingOfferGiven = () => {
   try {
     parsedProperties = z.array(orderSchema).parse(data); // Parseo de los datos con Zod
   } catch (err) {
-    return <div className="error-message">Error al procesar los datos</div>; // Mensaje si el parseo falla
+    return <div className="error-message">Not Buy Offers</div>; // Mensaje si el parseo falla
   }
 
   // Opciones de filtrado de la tabla

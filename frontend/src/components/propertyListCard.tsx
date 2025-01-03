@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import shareIcon from "../assets/share.png"
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import CustomCarousel from './CustomCarousel';
 
 interface PropertyListCardProps {
   title: string;
   location: string;
-  minTokenPrice: string;
+  minTokenPrice: number;
   estAnnualReturn: string;
   propertyImgs: string[];
-  id: string;
-  tokensSold: number | undefined;  // Permitir undefined temporalmente
-  totalTokens: number | undefined;  // Permitir undefined temporalmente
+  reference_number: string;
+  tokensSold: number | undefined;  
+  totalTokens: number | undefined;  
   createdDay: string;
   status: string;  
   tokens_available: number;
@@ -19,22 +19,21 @@ interface PropertyListCardProps {
 }
 
 
-export const PropertyListCard: React.FC<PropertyListCardProps> = ({
+export const PropertyListCard = ({
   title,
   location,
   minTokenPrice,
   estAnnualReturn,
   propertyImgs,
-  id,
   totalTokens = 0,  
   createdDay,
   status,
+  reference_number,
   tokens_available,
   investment_category
-}) => {
+}:PropertyListCardProps) => {
   const [badgeType, setBadgeType] = useState<string | null>(null);
   const [category, setCategory] = useState<string>(""); 
-  const [showControls, setShowControls] = useState(false);
 
 
   useEffect(() => {
@@ -115,30 +114,11 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
           )}
         </>
       <Link
-      to={`/property-details/${id}`}
-      className="h-64 relative block hover:opacity-80 transition-opacity duration-300"
-      onMouseEnter={() => setShowControls(true)} // Mostrar botones al hacer hover
-      onMouseLeave={() => setShowControls(false)} // Ocultar botones al salir
-    >
-      <Carousel className="h-full">
-        <CarouselContent>
-          {propertyImgs.slice(0, 3).map((img, index) => (
-            <CarouselItem key={index}>
-              <img
-                src={img}
-                alt={`${title} image ${index + 1}`}
-                className="w-full rounded-lg h-[250px] object-cover"
-              />
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-
-        {/* Controles de navegación */}
-        <div className={`carousel-controls ${showControls ? 'visible' : ''}`}>
-          <CarouselPrevious/>
-          <CarouselNext />
-        </div>
-      </Carousel>
+      to={`/property/${reference_number}/`}
+      className="h-64 relative block hover:opacity-80 transition-opacity duration-300">
+      
+    <CustomCarousel title='property-images' images={propertyImgs.slice(0, 3)}  />
+      
     </Link>
 
       <div className="py-3">
@@ -146,7 +126,7 @@ export const PropertyListCard: React.FC<PropertyListCardProps> = ({
           <div className="float-right text-sm text-gray-500 flex items-center">
           {status === "published" ? (
               <>
-                {tokens_available?.toLocaleString()} Tokens Left
+                {tokens_available} Tokens Left
               </>
             ) : status === "sold" ? (
               'Sold'

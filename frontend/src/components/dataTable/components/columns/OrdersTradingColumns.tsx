@@ -86,26 +86,6 @@ export const OrdersTradingColumns: ColumnDef<Order>[] = [
     },
   },
   {
-    accessorKey: "availableTokens",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Available Tokens" />
-    ),
-    cell: ({ row }) =>{
-      const tokensPorcentage = (parseInt(row.getValue("availableTokens"))*100)/parseInt(row.getValue("totalTokens"))
-      return(
-        <div className="flex flex-col">
-          <span className="text-[#82A621] font-bold">{tokensPorcentage.toFixed(2)}%</span>
-          <span>{row.getValue("availableTokens")} of {row.getValue("totalTokens")}</span>
-        </div>
-      )
-    }
-  },
-  {
-    accessorKey: "totalTokens",
-    header: "Total Tokens", // No se mostrará ya que estará oculta
-    cell: ({ row }) => <div>{row.getValue("totalTokens")}</div>, // Este valor será accesible
-  },  
-  {
     id: "actions",
     cell: ({ row }) => <DataTableRowActionsInvestorTradingOffermade  row={row} />,
   },

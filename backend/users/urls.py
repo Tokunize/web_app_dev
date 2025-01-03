@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import SyncUserView, UserDetailView, UserListView, UserProfileView,hola_view, ApplicationSubmitListView
+from .views import SyncUserView, UserDetailView, UserListView, UserProfileView,hola_view,ResendEmailVerification
 
 urlpatterns = [
     # Ruta para sincronizar o crear un usuario basado en el JWT
@@ -14,15 +14,9 @@ urlpatterns = [
     # Ruta para obtener el perfil del usuario autenticado
     path('profile/', UserProfileView.as_view(), name='user-profile'),
 
-    path('hola/', hola_view, name='hola'),
+    path('resend-email/', ResendEmailVerification.as_view(), name='resend_email'),
 
 
-#URLS FOR THE APPLICATION SUBMIT
-   # Ruta para obtener una aplicación por su reference_number
-    path('applications/<uuid:reference_number>/', ApplicationSubmitListView.as_view(), name='application-submit-detail'),
-    
-    # Otras rutas para obtener todas las aplicaciones o crear/actualizar aplicaciones
-    path('applications/', ApplicationSubmitListView.as_view(), name='application-submit-list'),
-    path('applications/create/', ApplicationSubmitListView.as_view(), name='application-submit-create'),
-    path('applications/update/<uuid:reference_number>/', ApplicationSubmitListView.as_view(), name='application-submit-update'),
+    path('hola/', hola_view, name='hola'), 
+ 
 ]

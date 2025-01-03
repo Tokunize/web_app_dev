@@ -1,25 +1,15 @@
 from rest_framework import serializers
-from property.models import(
-    Property,
-    Token,
-    Transaction,
-    PropertyToken,
-    PropertyMetrics,
-    PropertyUpdates
-)
-
-
+from property.models import(Property,PropertyToken,PropertyUpdates)
+from blockchain.models import Token
+from transactions.models import Transaction
+from blockchain.serializers import TokenSerializer
 #SERIALZERS FOR TOKENS 
 
-class TokenSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Token
+class PropertySerializer(serializers.ModelSerializer):
+    class Meta():
+        model = Property
         fields = '__all__'
 
-class UpdatePropertyStatusSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Property
-        fields = ['status', 'rejection_reason', 'rejection_reason_comment']  # Asegúrate de incluir solo los campos que deseas actualizar
 
 #SERIALIZER FOR THE PROPERTY ON MARKETPLACE LANDING PAGE
 class PropertySerializerList(serializers.ModelSerializer):
@@ -112,7 +102,6 @@ class PropertyTokenPaymentSerializer(serializers.ModelSerializer):
 
 #SERIALIZER TO CREATE A PROPERTY, TWO STEPS, OWNER FILL BASIC DATA AND ADMIN FILL THE FINANCTIAL DATA
 class CreatePropertySerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(required=False)  # Definir `id` como opcional para actualizaciones
 
     class Meta:
         model = Property
@@ -142,13 +131,8 @@ class CreatePropertySerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         user = self.context['request'].user
-        if 'owner' in user.rol:
-            required_fields = ['title','status','owner_profile', 'description', 'bedrooms', 'amenities', 'bathrooms', 'price', 'location', 'country', 'property_type', 'size', 'year_built']
-            missing_fields = [field for field in required_fields if field not in data]
-            if missing_fields:
-                raise serializers.ValidationError({field: f"{field.replace('_', ' ').capitalize()} is required for owners." for field in missing_fields})
-
-        elif 'admin' in user.rol:
+     
+        if 'admin' in user.rol:
             property_instance = Property.objects.filter(id=data.get('id')).first()
             if not property_instance:
                 raise serializers.ValidationError({'id': 'Property with the given ID does not exist.'})
@@ -170,82 +154,11 @@ class CreatePropertySerializer(serializers.ModelSerializer):
         return data
 
 
-
-
-#SERIALIZER FOR TRANSACTIONS
-
-class TransactionSerializer(serializers.ModelSerializer):
-    transaction_owner_email = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Transaction
-        fields =[ 'transaction_owner_email', 'event','transaction_amount', 'transaction_date' ,'transaction_tokens_amount']
-
-    def get_transaction_owner_email(self, obj):
-        return obj.transaction_owner_code.email if obj.transaction_owner_code else None
-
 class PropertyTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = PropertyToken
         fields = ['number_of_tokens']
         
-class InvestedPropertiesSerialier(serializers.ModelSerializer):
-    tokens = TokenSerializer(many=True, read_only=True)
-    user_tokens = serializers.SerializerMethodField()  # Añadir el campo para tokens del usuario
-    first_image = serializers.SerializerMethodField()  # Custom method field for the first image
-
-    class Meta:
-        model = Property
-        fields = ['title', 'tokens', 'user_tokens','first_image',
-            "total_investment_value", 
-            "underlying_asset_price",
-            "closing_costs",
-            "upfront_fees",
-            "operating_reserve",
-            "projected_annual_yield",
-            "projected_rental_yield", 
-            "projected_annual_return",
-            "annual_gross_rents",
-            "property_taxes",
-            "homeowners_insurance",
-            "property_management",
-            "dao_administration_fees",
-            "annual_cash_flow",
-            "monthly_cash_flow",
-            "property_type",
-            "price",
-            "projected_annual_cash_flow",
-            "legal_documents_url",
-            "location",
-            "updated_at",
-            "ownershipPercentage"
-        ]
-
-    def get_user_tokens(self, obj):
-        user = self.context['request'].user        
-        property_tokens = PropertyToken.objects.filter(
-            property_code=obj,
-            owner_user_code=user
-        )
-        
-        return PropertyTokenSerializer(property_tokens, many=True).data
-    def get_first_image(self, obj):
-        # Return the first image from the image ArrayField if available, else None
-        return obj.image[0] if obj.image and len(obj.image) > 0 else None
-    
-
-
-
-class PropertyMetricsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PropertyMetrics
-        fields = '__all__'
-
-class PropertyUpdatesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PropertyUpdates
-        fields = '__all__'
-
 
 # ----------------------------------------------------
 
@@ -258,22 +171,38 @@ class MarketplaceTokenInfo(serializers.ModelSerializer):
             "total_tokens", "tokens_available", "token_price"
         ]
 
+class AssetToAssetSerializer(serializers.ModelSerializer):
+    first_image = serializers.SerializerMethodField()
+    tokens = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Property
+        fields = ['title', 'property_scrow_address', 'first_image', 'tokens']
+
+    def get_first_image(self, obj):
+        return obj.get_first_image()
+
+    def get_tokens(self, obj):
+        return obj.get_tokens()  # Llamando a tu método get_tokens en el modelo
+
+
 class MarketplaceListViewSerializer(serializers.ModelSerializer):
     tokens = serializers.SerializerMethodField()  # Cambiamos a SerializerMethodField para un método personalizado
-    
+    investment_category = serializers.CharField(source='get_investment_category_display', read_only=True)
+
     class Meta():
         model = Property
         fields = [
-            'id', 'title', 'status', 'location', 'image', 
+            'title', 'status', 'location', 'image', 
             'projected_annual_return', 'property_type', 'created_at',
-            'tokens', "investment_category"
+            'tokens', "reference_number", "investment_category"
         ]
     
     def get_tokens(self, obj):  # Cambia el nombre de getSinglePropertyTokens a get_tokens
         # Aquí asegúrate de que estás usando el campo correcto para el filtro
         tokens = Token.objects.filter(property_code=obj)
         return MarketplaceTokenInfo(tokens, many=True).data
-
+    
 
 #ADMIN SERIALIZERS
 
@@ -366,7 +295,8 @@ class InvestorAssetsSerializer(serializers.ModelSerializer):
         tokens_by_property = user.get_tokens_by_property()  # Llamamos al método para obtener los tokens por propiedad
 
         # Devolvemos el número de tokens para esta propiedad
-        return tokens_by_property.get(obj.id, 0)  # Si no tiene tokens, devolvemos 0
+        return tokens_by_property.get(obj.id, 0) 
+
 
 
 
@@ -406,6 +336,67 @@ class PropertyTradeSellSerializer(serializers.ModelSerializer):
 
         # Devolvemos el número de tokens para esta propiedad
         return tokens_by_property.get(obj.id, 0)  # Si no tiene tokens, devolvemos 0
+
+
+#TRADING GET ALL PROPERTIES AN INVESTOR INVESTED
+class InvestorInvestedSoldProperties(serializers.ModelSerializer):
+    first_image = serializers.SerializerMethodField()
+    user_tokens = serializers.SerializerMethodField()
+    tokens = MarketplaceTokenInfo(many=True, read_only=True)
+
+    class Meta:
+        model = Property
+        fields = [
+            'title', 
+            'ocupancy_status', 
+            'location', 
+            'property_type', 
+            'price', 
+            'projected_rental_yield', 
+            'first_image', 
+            'user_tokens', 
+            'tokens',
+            'id',
+            'status',
+            'reference_number'  # Agregamos el reference_number para usarlo como id
+        ]
+
+    def get_first_image(self, obj):
+        # Usar get para obtener el primer valor de la lista
+        return obj.image[0] if obj.image else None
+
+    def get_user_tokens(self, obj):
+        """
+        Obtiene el número de tokens que el usuario tiene para una propiedad.
+        """
+        user = self.context['request'].user  # Obtener el usuario actual
+        tokens_by_property = user.get_tokens_by_property()  # Llamamos al método para obtener los tokens por propiedad
+
+        # Devolvemos el número de tokens para esta propiedad
+        return tokens_by_property.get(obj.id, 0)
+
+    def to_representation(self, instance):
+        # Obtener la representación original
+        representation = super().to_representation(instance)
+
+        # Transformar los datos al formato personalizado que necesitas
+        transformed_data = {
+            "id": representation.get("reference_number", ""),  # Usamos el reference_number como id
+            "title": representation.get("title", ""),
+            "image": representation.get("first_image", ""),
+            "location": representation.get("location", ""),
+            "price": float(representation.get("price", 0)),  # Convierte el precio a número
+            "capRate": "3",  # Aquí puedes agregar la lógica para calcular o dejar como 'N/A'
+            "priceChart": 2,  # Esta propiedad parece no estar presente en los datos de la API
+            "occupancyStatus": representation.get("ocupancy_status", ""),
+            "totalTokens": representation.get("tokens", [{}])[0].get("total_tokens", 0),
+            "projectedRentalYield": representation.get("projected_rental_yield", 0),
+            "propertyType": representation.get("property_type", "").lower(),  # Convertir el tipo de propiedad a minúsculas
+            "performanceStatus": "Best",  # O cualquier otra lógica que se ajuste
+            "userTokens": representation.get("user_tokens", 0),
+        }
+
+        return transformed_data
 
 
 #TRADING PROPERTY DETAILS MODAL SERIALIZER

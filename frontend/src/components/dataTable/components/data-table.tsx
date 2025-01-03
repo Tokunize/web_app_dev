@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -33,7 +33,6 @@ import { TradingBuyFlow } from "@/components/stepperFlows/tradingBuyFlow";
 import { DownloadCSV } from "@/components/downloads/DownloadCSV";
 import { TradingSellFlow } from "@/components/stepperFlows/tradingSellFlow";
 
-
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -55,12 +54,13 @@ export function DataTable<TData extends RowData, TValue>({
   const [rowSelection, setRowSelection] = React.useState<Record<string, boolean>>({});
   const { role } = useSelector((state: RootState) => state.user);
   const selectedPropertyId = useSelector((state: RootState) => state.tableActionItem.itemId);  
-  const tradingType = useSelector((state:RootState) => state.tadringType.tradingType)
+  const tradingType = useSelector((state:RootState) => state.tradingType.tradingType)
   
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
     totalTokens: false,
     performanceStatus: false,
   });
+
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
 

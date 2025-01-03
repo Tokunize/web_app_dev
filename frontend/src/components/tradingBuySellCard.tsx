@@ -32,6 +32,7 @@ export const TradingBuySellCard = ({
         label="Back"
         iconLeft={<FaArrowCircleLeft className="text-[#C8E870] text-2xl" />}
       />
+      
       <div className="flex flex-col md:flex-row mt-4">
         <div className="md:w-1/2 pr-5">
           <h2 className="text-2xl font-semibold mb-4">{cardTitle}</h2>

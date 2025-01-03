@@ -19,11 +19,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import PositiveNumber from "../../assets/postiveNumber.svg";
-import { AcceptProperty } from "../acceptProperty";
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { formatDistanceToNow, parseISO } from 'date-fns'; // Import necessary functions from date-fns
-import { useNavigate } from "react-router-dom";
 
 // Interface for the Asset attributes (optional fields)
 interface Asset {
@@ -64,7 +62,6 @@ export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData })
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
   const { role} = useSelector((state: RootState) => state.user);
-  const navigate = useNavigate()
 
   // Helper function to safely convert a value to number
   const toNumber = (value: unknown): number => {
@@ -273,32 +270,6 @@ export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData })
           return <div>{value.toFixed(2)}%</div>;
         },
       });
-
-      if (role === "admin") {
-        columns.push({
-          accessorKey: "actions",
-          header: "Actions",
-          cell: ({ row }) => {
-            const propertyStatus = row.getValue("property_status") as string;
-
-            // Only show actions if property is under review
-            if (propertyStatus === "under_review") {
-              const handleReject = () => {                
-               navigate(`/dashboard-property/${row.original.id}/`)
-              };
-
-              return (
-                <div className="flex space-x-2">
-                  <AcceptProperty allPropertiesUnderReview={assetsData} />
-                  <Button variant="destructive" onClick={handleReject}>
-                    Reject
-                  </Button>
-                </div>
-              );
-            }
-            return null; // Do not render anything if not under review
-          },
-        });}
     }
     return columns; // Returning the memoized columns
   }, [assetsData]); // Depend on assetsData

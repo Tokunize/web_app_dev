@@ -27,7 +27,23 @@ class OrderSerializerOrderbook(serializers.ModelSerializer):
                 "order_quantity",
                 "order_status"
           ]
-    
+
+# class OrderSerializerTableRows(serializers.ModelSerializer):
+
+#     class Meta:
+#         model = Order
+#         fields = [
+#             "order_type",
+#             "order_price",
+#             "order_quantity",
+#             "created_at",
+#             "order_reference_number",
+#             "order_owner",
+#             "order_status",
+#         ]
+
+
+
 class OrderSerializer(serializers.ModelSerializer):
     # Usamos 'TradingTablesPropertyInfo' para serializar la propiedad relacionada
     property = TradingTablesPropertyInfo(read_only=True)
@@ -35,6 +51,7 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = [
+            "order_blockchain_identifier",
             "order_type",
             "order_price",
             "order_quantity",
@@ -54,14 +71,15 @@ class OrderSerializer(serializers.ModelSerializer):
         
         # Estructura personalizada según lo que necesitas
         transformed_data = {
+            "bcId":representation.get("order_blockchain_identifier"),
             "title": property_data.get("title", ""),
             "image": property_data.get("first_image", ""),
             "location": property_data.get("location", ""),
             "created_at": representation.get("created_at", ""),
             "orderStatus": representation.get("order_status", ""),
             "referenceNumber": representation.get("order_reference_number"),
-            "totalTokens": property_data.get("tokens", [{}])[0].get("total_tokens", 0),
-            "availableTokens": property_data.get("tokens", [{}])[0].get("tokens_available", 0),
+            # "totalTokens": property_data.get("tokens", [{}])[0].get("total_tokens", 0),
+            # "availableTokens": property_data.get("tokens", [{}])[0].get("tokens_available", 0),
             "orderTokenPrice": representation.get("order_price", 0),
             "orderQuantity": representation.get("order_quantity", ""),
             "propertyScrowAddress": property_data.get("property_scrow_address", "")

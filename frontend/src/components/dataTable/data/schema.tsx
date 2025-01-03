@@ -33,7 +33,7 @@ export const tradingSchema = z.object({
   projectedRentalYield: z.string().optional(),
   capRate: z.string(),
   totalTokens:z.number(),
-  availableTokens: z.number(),
+  availableTokens: z.number().optional(),
   propertyType:z.string(),
   priceChart:z.number(),
   performanceStatus:z.string(),
@@ -58,7 +58,7 @@ export const myAssetsSchema = z.object({
   occupancyStatus: z.string().optional(), // Estado de ocupación, opcional (renombrado de 'ocupancy_status')
   performanceStatus: z.string().optional(), // Estado de rendimiento, opcional (añadido según el código)
   propertyType: z.string(), // Tipo de propiedad (añadido según el código)
-  availableTokens: z.number().default(0), // Tokens disponibles (renombrado de 'availableTokens')
+  availableTokens: z.number().default(0).optional(), // Tokens disponibles (renombrado de 'availableTokens')
   totalTokens: z.number().default(0), // Tokens totales (renombrado de 'totalTokens')
   location: z.string(), // Ubicación de la propiedad
   projected_appreciation: z.string().default("1.2"), // Apreciación proyectada
@@ -69,6 +69,7 @@ export type MyAssets = z.infer<typeof myAssetsSchema>
 
 
 export const orderSchema = z.object({
+  bcId:z.string().optional(),
   referenceNumber:z.string(),
   propertyScrowAddress: z.string(),
   title: z.string(),
@@ -76,8 +77,8 @@ export const orderSchema = z.object({
   location: z.string(),
   created_at : z.string(),
   orderStatus: z.string().optional(),
-  totalTokens:z.number(),
-  availableTokens: z.number(),
+  totalTokens:z.number().optional(),
+  availableTokens: z.number().optional(),
   orderTokenPrice: z.number(),
   orderQuantity:z.string()
 })
