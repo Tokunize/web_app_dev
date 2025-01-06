@@ -1,9 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import '@rainbow-me/rainbowkit/styles.css';
-import { getDefaultConfig, RainbowKitProvider } from '@rainbow-me/rainbowkit';
+import {  RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { WagmiProvider } from 'wagmi';
-import { mainnet, polygon, optimism, arbitrum, base } from 'wagmi/chains';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { Auth0Provider } from '@auth0/auth0-react';
 import './styles/index.css';
@@ -16,6 +15,7 @@ import { store } from './redux/store';
 import { PersistGate } from 'redux-persist/integration/react';
 import { ModalProvider } from './context/modalContext';
 import { persistor } from './redux/store';
+import { config } from './wagmi';
 
 // Asignar Buffer y process a window (esto es necesario para ciertas dependencias)
 window.Buffer = Buffer;
@@ -23,12 +23,6 @@ window.process = process;
 
 // Configuración de Wagmi (para conectarse a Ethereum, Polygon, etc.)
 const queryClient = new QueryClient();
-const wagmiConfig = getDefaultConfig({
-  appName: 'Tokunize',
-  projectId: '12184fc228d5cf049f0dc62830574ffc', // Reemplázalo con tu ID de proyecto de WalletConnect
-  chains: [mainnet, polygon, optimism, arbitrum, base],
-  ssr: true, // Si usas renderizado del lado del servidor (SSR)
-});
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -44,7 +38,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <Provider store={store}>
         <ModalProvider>
           <PersistGate loading={null} persistor={persistor}>
-            <WagmiProvider config={wagmiConfig}>
+            <WagmiProvider config={config}>
               <QueryClientProvider client={queryClient}>
                 <RainbowKitProvider>
                   <Layout />

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { UserNavbar } from './useNavbar';
+import { LogoutButton } from '../buttons/logoutBtn';
 
 interface MenuItem {
   name: string;
@@ -66,7 +66,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ data, onMenuClick }) => {
             </li>
           ))}
         </ul>
-          <UserNavbar/>
+          <LogoutButton/>
       </div>
       {menuOpen && (
         <div

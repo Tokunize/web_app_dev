@@ -59,7 +59,7 @@ const DashboardLayout = () => {
     <div className="flex min-h-screen">
       <SideMenu data={menuData} onMenuClick={() => {}} />
       <div className="flex-grow px-7 py-4 mt-[64px] md:mt-[0px]">
-        <div className="flex justify-end mb-5 px-[20px]">
+        <div className="flex items-center justify-end mb-5 px-[20px]">
           <UserNavbar />
         </div>
         <Outlet />

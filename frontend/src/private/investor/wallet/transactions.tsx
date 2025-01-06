@@ -16,7 +16,6 @@ import {
 import { LoadingSpinner } from "@/components/loadingSpinner";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
 import { DownloadCSV } from "@/components/downloads/DownloadCSV";
-import WalletConnectButton from "@/components/buttons/walletConnectButton";
 
 type Transaction = {
   id: number;
@@ -27,6 +26,7 @@ type Transaction = {
   transaction_date: string;
   created_at: string;
 };
+
 
 export const Transaction = () => {
   const [position, setPosition] = useState("all");
@@ -42,7 +42,9 @@ export const Transaction = () => {
   const { loading, error } = useGetAxiosRequest<{
     transactions: Transaction[];
     balance: { data: { tokenBalances: { amount: string }[] } };
-  }>(apiUrl,true, (data) => {        
+  }>(apiUrl,true, (data) => {       
+    console.log(data);
+     
     setTransactions(data.transactions);
     const balanceAmount = data.balance?.data?.tokenBalances[0]?.amount;
     setBalance(balanceAmount ? parseFloat(balanceAmount) : 0);
@@ -78,7 +80,6 @@ export const Transaction = () => {
           <Download className="ml-4" />
       </Button>
 
-      <WalletConnectButton/>
 
       <div className="flex justify-between mt-4 mb-4">
         <DatePickerWithRange
