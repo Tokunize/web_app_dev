@@ -1,5 +1,3 @@
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,13 +14,11 @@ import { Notifications } from '../notifications/notifications';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogoutButton } from '../buttons/logoutBtn';
-import ConnectWallet from '../blockchain/connectWallet';
-import { GlobalModal } from '../globalModal';
 import { useAuth0 } from '@auth0/auth0-react';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 
 export const UserNavbar = () => {
-  const {address} = useSelector((state: RootState) => state.wallet)
   const { user } = useAuth0();
   
   const navigate = useNavigate(); // Inicia el hook navigate
@@ -53,10 +49,10 @@ export const UserNavbar = () => {
   ];
 
   return (
-    <div className="flex space-x-4">
+    <div className="flex items-center space-x-4">
       <Notifications />
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+        <DropdownMenuTrigger  asChild>
           <Button variant="ghost" className="relative h-8 w-8 rounded-full">
             <Avatar className="h-9 w-9">
               <AvatarImage src={user?.picture} alt="@user" />
@@ -83,19 +79,10 @@ export const UserNavbar = () => {
             ))}
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          
-          {/* Asegúrate de que el modal se usa correctamente */}
-          <GlobalModal
-            title={address || "Connect Wallet"}
-            id="1"
-            description="Choose the wallet you want to connect"
-            contentComponent={<ConnectWallet />}
-          />
-
-          <DropdownMenuSeparator />
           <LogoutButton />
         </DropdownMenuContent>
       </DropdownMenu>
+      <ConnectButton chainStatus="none" showBalance={false} />
     </div>
   );
 };

@@ -233,7 +233,6 @@ cloudinary.config(
     api_secret='LhkuFGSvQWYkISi9a0PONdfj27o'
 )
 
-CIRCLE_API_KEY = config('CIRCLE_API_KEY')
 
 ASGI_APPLICATION = 'backend.asgi.application'
 

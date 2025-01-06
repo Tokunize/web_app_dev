@@ -1,6 +1,6 @@
 import { useState } from "react";
-import WalletCard from "./walletCard";
-
+import InternalWallet from "./internalWallet";
+import ExternalWallet from "./externalWallet";
 interface Props {
   balance: number;
 }
@@ -17,35 +17,13 @@ const ListWalletView = ({ balance }: Props) => {
   return (
     <div className="relative w-full h-[350px]">
       {/* Primera WalletCard */}
-      <div
-        onClick={handleClick}
-        className={`absolute transition-all w-full duration-300 ${
-          isTokunizeFront ? "top-[0px] z-10" : "top-[60px] z-20"
-        }`}
-      >
-        <WalletCard
-          walletName="Tokunize Wallet"
-          balance={balance}
-          address="0x1234...abcd"
-          blockchain="Arbitrum"
-          walletType="tokunize"
-        />
+      <div onClick={handleClick}  className={`absolute cursor-pointer transition-all w-full duration-300 ${isTokunizeFront ? "top-[0px] z-10" : "top-[60px] z-20" }`} >
+        <InternalWallet walletName="Tokunize Wallet" walletType="tokunize"  address="0x1234...abcd" blockchain="Arbitrum" balance={balance}/>
       </div>
 
       {/* Segunda WalletCard */}
-      <div
-        onClick={handleClick}
-        className={`absolute cursor-pointer w-full transition-all duration-300 ${
-          isTokunizeFront ? "top-[60px] z-20" : "top-[0px] z-10"
-        }`}
-      >
-        <WalletCard
-          walletName="Personal Wallet"
-          balance={balance}
-          address="0x5678...efgh"
-          blockchain="Ethereum"
-          walletType="personal"
-        />
+      <div onClick={handleClick}  className={`absolute cursor-pointer w-full transition-all duration-300 ${isTokunizeFront ? "top-[60px] z-20" : "top-[0px] z-10"}`}>
+        <ExternalWallet className="min-h-[250px]" />
       </div>
     </div>
   );

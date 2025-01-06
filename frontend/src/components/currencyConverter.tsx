@@ -57,7 +57,7 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({ amountInUS
                             </p>
                         )
                     ) : (
-                        <p className="text-muted-foreground">Loading conversion...</p>
+                        <p className="text-muted-foreground">Loading...</p>
                     )}
                 </div>
                 <button

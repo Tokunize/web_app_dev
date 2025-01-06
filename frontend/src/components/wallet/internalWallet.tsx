@@ -10,11 +10,12 @@ interface WalletCardProps {
     address: string;
     blockchain: string;
     walletType: 'personal' | 'tokunize';
-    className?:String;
+    className?:string;
 }
 
-const WalletCard = ({ walletName, balance, address, blockchain, walletType, className }: WalletCardProps) => {
+const InternalWallet = ({ walletName, balance, address, blockchain, walletType, className }: WalletCardProps) => {
     const [tourStarted, setTourStarted] = useState(false);
+
 
     const handleButtonClick = (e: React.MouseEvent) => {
         // Evitar que el clic en el botón se propague al contenedor padre
@@ -102,13 +103,18 @@ const WalletCard = ({ walletName, balance, address, blockchain, walletType, clas
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <h3 id="tour-wallet-name" className="text-2xl font-bold">{walletName}</h3>
-                <span className="text-sm text-gray-400 uppercase">{blockchain}</span>
+                <div className="flex flex-col items-center">
+                    <span className="text-sm text-gray-400 uppercase">{blockchain}</span>
+                     <img loading="lazy" src="https://www.tokunize.com/assets/logo_only_black-DlYer6eb.png" className="h-8" alt="Tokunize logo" />
+                </div>
             </div>
 
             {/* Address */}
             <div className="mb-4">
                 <p className="text-sm text-gray-500">Wallet Address</p>
-                <p id="tour-wallet-address" className="text-sm font-mono text-gray-200 truncate">{address}</p>
+                <p id="tour-wallet-address" className="text-sm font-mono text-gray-200 truncate">
+                {address ? `${address.slice(0, 4)}...${address.slice(-4)}` : ''}
+                </p>            
             </div>
 
             {/* Balance */}
@@ -117,22 +123,16 @@ const WalletCard = ({ walletName, balance, address, blockchain, walletType, clas
                 <CurrencyConverter amountInUSD={balance}/>
             </div>
 
-            {/* Buttons */}
             <div  onClick={handleButtonClick} className="flex z-30 justify-between">
                 <button   id="tour-send-button" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
                     Send
                 </button>
-                
-                {/* Conditionally render the "More" button */}
-                {walletType === 'tokunize' && (
-                    <div  onClick={handleButtonClick}>
+                <div  onClick={handleButtonClick}>
                     <RowActionaWallet/>
-                    </div>
-                )}
-
+                </div>
             </div>
         </div>
     );
 };
 
-export default WalletCard;
+export default InternalWallet;

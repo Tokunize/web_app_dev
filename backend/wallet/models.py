@@ -3,6 +3,8 @@ from django.core.validators import RegexValidator, ValidationError
 import re
 import requests
 from django.conf import settings
+from django.utils import timezone
+
 
 
 class Wallet(models.Model):
@@ -14,11 +16,14 @@ class Wallet(models.Model):
     
     wallet_id = models.CharField(max_length=100, unique=True)  # ID único de la wallet devuelto por Circle
     wallet_address = models.CharField(max_length=42, unique=True,null=True, blank=True,  validators=[wallet_address_validator])
-    wallet_user_id = models.ForeignKey("users.customuser", on_delete=models.CASCADE)
+    wallet_user_id = models.OneToOneField("users.customuser", on_delete=models.CASCADE, related_name="wallet")
     wallet_user = models.CharField(max_length=20, unique=True, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_enabled = models.BooleanField(default=False)
+    allowed_address = models.CharField( null=True, blank=True,  validators=[wallet_address_validator])
+    last_balance_sync = models.DateTimeField(null=True, blank=True)  # Timestamp de la última sincronización
+
 
     balance = models.DecimalField(max_digits=20, decimal_places=8, null=True, blank=True)  
 
@@ -36,10 +41,11 @@ class Wallet(models.Model):
         # Verifica el formato de la dirección de Ethereum
         return re.match(r'^0x[a-fA-F0-9]{40}$', address) is not None
     
-    def get_balance(self):
+    def update_balance_from_provider(self):
         """
-        Consulta el balance desde el proveedor externo y lo actualiza en la base de datos.
+        Método para actualizar el balance desde el proveedor externo y actualizar la base de datos.
         """
+        print("aquiii")
         PROVIDER_TOKEN_URL = settings.PROVIDER_TOKEN_URL
         PROVIDER_CLIENT_ID = settings.PROVIDER_CLIENT_ID
         PROVIDER_CLIENT_SECRET = settings.PROVIDER_CLIENT_SECRET
@@ -54,40 +60,78 @@ class Wallet(models.Model):
             "content-type": "application/json"
         }
 
-        response = requests.post(PROVIDER_TOKEN_URL, json=payload, headers=headers)
-
-        # Verificamos si la respuesta es exitosa (status code 200)
-        if response.status_code == 200:
-            access_token = response.json().get("accessToken")
-            if access_token:
-                print("access token successfully ")
-
-        provider_balace_url = F"https://api.sandbox.palisade.co/v2/vaults/{PROVIDER_USERS_VAULT}/wallets/{self.wallet_id}/balances"
-
-        headers = {
-            "Authorization": f"Bearer {access_token}",
-            "Content-Type": "application/json"
-        }
-     
         try:
-            response = requests.get(provider_balace_url, headers=headers)
-            if response.status_code == 200:
-                balance_data = response.json()
-                new_balance = balance_data["balances"][0]["balance"]
-                self.balance = new_balance
-                self.save()
-                return new_balance
+            # Obtener el token de acceso
+            response = requests.post(PROVIDER_TOKEN_URL, json=payload, headers=headers)
+            response.raise_for_status()
+            access_token = response.json().get("accessToken")
+
+            if not access_token:
+                raise ValueError("No access token received from the provider.")
             
-            else:
-                raise Exception(f"Failed to fetch balance. Status code: {response.status_code}. Response: {response.text}")
+            # Obtener el balance de la wallet desde el proveedor
+            provider_balance_url = f"https://api.sandbox.palisade.co/v2/vaults/{PROVIDER_USERS_VAULT}/wallets/{self.wallet_id}/balances"
+            balance_headers = {
+                "Authorization": f"Bearer {access_token}",
+                "Content-Type": "application/json"
+            }
+
+            balance_response = requests.get(provider_balance_url, headers=balance_headers)
+            balance_response.raise_for_status()
+            balance_data = balance_response.json()
+
+            # Validación de la respuesta
+            if "balances" not in balance_data or len(balance_data["balances"]) == 0:
+                raise ValueError("Balance data not found in the provider's response.")
+            
+            new_balance = balance_data["balances"][0]["balance"]
+            self.balance = new_balance
+            self.last_balance_sync = timezone.now()  # Fecha de la última sincronización
+            self.save()
+
+            return new_balance
+
         except Exception as e:
-            raise Exception(f"An error occurred while updating the balance: {str(e)}")
+            raise Exception(f"Error actualizando balance: {str(e)}")
+
+    def get_balance(self):
+        """
+        Devuelve el balance sincronizado con el proveedor, actualizándolo si es necesario.
+        """
+        # Si el balance no se ha sincronizado o ha pasado más de 5 minutos desde la última sincronización
+        if not self.last_balance_sync or (timezone.now() - self.last_balance_sync).total_seconds() / 60 > 10:
+            self.update_balance_from_provider()
+        return self.balance
         
     
     def enable_wallet(self):
         """
         Habilita la wallet.
         """
+        PROVIDER_USERS_VAULT = settings.PROVIDER_USERS_VAULT
+
         self.is_enabled = True
         self.save()
+
+        wallet_settings_url = f"https://api.sandbox.palisade.co/v2/vaults/{PROVIDER_USERS_VAULT}/wallets/{self.wallet_id}/settings"
+
+        payload = { "settings": {
+                "enabled": True,
+                "rawSigningEnabled": False
+            } }
+        
+        headers = {
+            "accept": "application/json",
+            "content-type": "application/json"
+        }
+
+        try:
+            response = requests.put(wallet_settings_url, json=payload, headers=headers)
+            if response.status_code == 200:
+                return {"detail": "Wallet enabled successfully.", "data": response.json()}
+            else:
+                raise Exception(f"Failed to enabling the wallet. Status code: {response.status_code}. Response: {response.text}")
+        except Exception as e:
+            raise Exception(f"An error occurred while enabling the wallet: {str(e)}")
+        
 

@@ -43,16 +43,20 @@ class TransactionListview(APIView):
     def get(self, request):
         user_id = request.user.id
         
-        # Get user's transactions
+        # Obtener las transacciones del usuario
         transactions = Transaction.objects.filter(transaction_owner_code=user_id)
+
+        # Serializar las transacciones con paginación automática aplicada por DRF
         transaction_serializer = TransactionSerializer(transactions, many=True)
 
-        # Try to get the user's wallet
-        wallet = Wallet.objects.filter(wallet_user_id=user_id).first()  # Use .first() to avoid exception
+        # Obtener el balance de la wallet
+        wallet = request.user.wallet
         balance_data = wallet.get_balance()
+        
+        # Construir la respuesta con los datos
         response_data = {
             "transactions": transaction_serializer.data,
-            "balance": balance_data  # Balance will be None if wallet doesn't exist
+            "balance": balance_data  
         }
 
         return Response(response_data, status=status.HTTP_200_OK)
@@ -136,24 +140,6 @@ class TransactionListview(APIView):
         return Response({'message': 'Transaction completed successfully'}, status=status.HTTP_201_CREATED)
 
 
-
-# GET all the  Transactions for a single property for the dashboard and for a especific user
-class TransactionSinglePropertyDashboard(APIView):
-    authentication_classes = [Auth0JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-    serializer_class = TransactionSerializer
-
-    def get(self,request,reference_number):
-        user_id = request.user.id
-        
-        # Filtrar transacciones por usuario y propiedad
-        transactions = Transaction.objects.filter(
-            transaction_owner_code=user_id, 
-            reference_number=reference_number
-        )
-        
-        serializer = self.serializer_class(transactions, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 # GET all the  Transactions for a single property for the marketplace
