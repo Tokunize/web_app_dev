@@ -70,7 +70,7 @@ INSTALLED_APPS = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://monkfish-app-o6nz8.ondigitalocean.app",
+    "https://octopus-app-zlell.ondigitalocean.app",
     "https://dev-2l2jjwfm5ekzae3u.us.auth0.com",
     "http://localhost:5174",
     "https://www.tokunize.com",
