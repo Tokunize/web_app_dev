@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-7rd+ggxl@zmwna&zce-n20qv!s-&jacl9eu8ivyo-#d*$kk9me
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'octopus-app-zlell.ondigitalocean.app/',
+    'octopus-app-zlell.ondigitalocean.app',
     '127.0.0.1',
     'localhost',
     'localhost:5173',
@@ -70,7 +70,7 @@ INSTALLED_APPS = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://monkfish-app-o6nz8.ondigitalocean.app",
+    "https://octopus-app-zlell.ondigitalocean.app",
     "https://dev-2l2jjwfm5ekzae3u.us.auth0.com",
     "http://localhost:5174",
     "https://www.tokunize.com",
