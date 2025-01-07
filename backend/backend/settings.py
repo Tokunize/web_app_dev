@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-7rd+ggxl@zmwna&zce-n20qv!s-&jacl9eu8ivyo-#d*$kk9me
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'monkfish-app-o6nz8.ondigitalocean.app',
+    'octopus-app-zlell.ondigitalocean.app',
     '127.0.0.1',
     'localhost',
     'localhost:5173',
@@ -101,6 +101,7 @@ MIDDLEWARE = [
 ]
 
 
+
 ROOT_URLCONF = 'backend.urls'
 
 CORS_ALLOW_CREDENTIALS = True  # Si estás usando cookies o autenticación
@@ -135,9 +136,9 @@ DATABASES = {
         'PASSWORD': config('DATABASE_PWD'),
         'HOST': config('DATABASE_HOST'),
         'PORT': config('DATABASE_PORT', cast=int),
-        # 'OPTIONS': {
-        #     'sslmode': 'require',
-        # },
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
     }
 }
 
