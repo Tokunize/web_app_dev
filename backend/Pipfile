@@ -73,6 +73,7 @@ channels = "*"
 daphne = "*"
 channels-redis = "*"
 celery = {extras = ["redis"], version = "*"}
+git-filter-repo = "*"
 
 [dev-packages]
 

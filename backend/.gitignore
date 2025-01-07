@@ -1,1 +1,60 @@
-.env
+# Python bytecode files
+*.pyc
+*.pyo
+__pycache__/
+
+# Django
+*.log
+*.pot
+*.pyc
+*.mo
+*.db
+*.sqlite3
+*.db-journal
+
+# Django settings
+*.env           # Archivos de entorno, como .env
+local_settings.py  # Si usas un archivo local_settings.py
+
+# Virtual environments
+venv/
+env/
+*.env
+Pipfile
+Pipfile.lock
+*.bak
+*.swp
+
+# Static files and media
+/static/
+/media/
+
+# IDEs and text editors
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# JetBrains
+.idea/
+
+# VS Code
+.vscode/
+
+# Python-specific
+*.coverage
+*.tox/
+*.nox/
+*.coverage.*
+*.hypothesis/
+.cache/
+nosetests.xml
+coverage.xml
+*.hypothesis/
