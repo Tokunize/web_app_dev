@@ -22,7 +22,7 @@ interface FormData {
   goal: number | string;
 }
 
-export const CreatePropertySmartContracts: React.FC<TokenFormProps> = ({ propertyId, onBack }) => {
+export const CreatePropertySmartContracts: React.FC<TokenFormProps> = ({ onBack }) => {
   
   const [formData, setFormData] = useState<FormData>({
     token_code: '',

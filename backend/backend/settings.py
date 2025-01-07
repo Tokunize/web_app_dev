@@ -81,7 +81,7 @@ CORS_ALLOWED_ORIGINS = [
 
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://monkfish-app-o6nz8.ondigitalocean.app",
+    "https://octopus-app-zlell.ondigitalocean.app",
     "http://localhost:5173"
     "https://www.tokunize.com"
 
@@ -99,6 +99,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 
 ROOT_URLCONF = 'backend.urls'
@@ -135,9 +136,9 @@ DATABASES = {
         'PASSWORD': config('DATABASE_PWD'),
         'HOST': config('DATABASE_HOST'),
         'PORT': config('DATABASE_PORT', cast=int),
-        # 'OPTIONS': {
-        #     'sslmode': 'require',
-        # },
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
     }
 }
 

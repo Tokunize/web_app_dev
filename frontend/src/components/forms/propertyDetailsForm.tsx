@@ -1,6 +1,6 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
+// import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageUploader } from '@/components/property/imageUploader';
 import ImageGallery from '@/components/property/imageGallery';
@@ -25,14 +25,14 @@ export const PropertyDetailsForm: React.FC<PropertyDetailsFormProps> = ({
     <form className="w-[70%] mx-auto">
       <h2 className="font-bold">Property Information</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-4">
-        <label>
+        {/* <label>
           <span className="block mb-1">Active</span>
           <Checkbox
             name="active"
             checked={formValues.active}
             onChange={handleChange}
           />
-        </label>
+        </label> */}
         <label>
           <span className="block mb-1">Year Built</span>
           <Input

@@ -18,7 +18,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { formatDistanceToNow } from 'date-fns';
+// import { formatDistanceToNow } from 'date-fns';
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface Notification {
@@ -43,12 +43,12 @@ export const SkeletonDemo: React.FC = () => {
 export const Notifications: React.FC = () => {
   const { getAccessTokenSilently } = useAuth0();
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  // const [loading, setLoading] = useState<boolean>(false);
   const [unreadCount, setUnreadCount] = useState<number>(0);
 
   useEffect(() => {
     const fetchNotifications = async () => {
-      setLoading(true);
+      // setLoading(true);
       try {
         const accessToken = await getAccessTokenSilently();
         const data = await getNotifications(accessToken);
@@ -57,34 +57,34 @@ export const Notifications: React.FC = () => {
       } catch (error) {
         console.error("Error fetching notifications:", error);
       } finally {
-        setLoading(false);
+        // setLoading(false);
       }
     };
 
     fetchNotifications();
   }, [getAccessTokenSilently]);
 
-  const handleMarkAsRead = async (notificationId: number) => {
-    const accessToken = await getAccessTokenSilently();
-    setLoading(true);
-    try {
-      await markNotificationAsRead(notificationId, accessToken);
-      setNotifications(prev =>
-        prev.map(notification =>
-          notification.id === notificationId ? { ...notification, is_read: true } : notification
-        )
-      );
-      setUnreadCount(prevCount => prevCount - 1);
-    } catch (error) {
-      console.error("Error marking notification as read:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const handleMarkAsRead = async (notificationId: number) => {
+  //   const accessToken = await getAccessTokenSilently();
+  //   // setLoading(true);
+  //   try {
+  //     await markNotificationAsRead(notificationId, accessToken);
+  //     setNotifications(prev =>
+  //       prev.map(notification =>
+  //         notification.id === notificationId ? { ...notification, is_read: true } : notification
+  //       )
+  //     );
+  //     setUnreadCount(prevCount => prevCount - 1);
+  //   } catch (error) {
+  //     console.error("Error marking notification as read:", error);
+  //   } finally {
+  //     // setLoading(false);
+  //   }
+  // };
 
   const handleMarkAllAsRead = async () => {
     const accessToken = await getAccessTokenSilently();
-    setLoading(true);
+    // setLoading(true);
     try {
       await Promise.all(
         notifications.map(notification =>
@@ -96,26 +96,26 @@ export const Notifications: React.FC = () => {
     } catch (error) {
       console.error("Error marking all notifications as read:", error);
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
-  const renderNotification = (notification: Notification) => (
-    <div
-      key={notification.id}
-      onClick={() => !notification.is_read && handleMarkAsRead(notification.id)}
-      className={`p-4 rounded-lg cursor-pointer ${notification.is_read ? 'bg-gray-100' : 'bg-white'}`}
-    >
-      <div className="flex justify-between items-center">
-        <div>
-          <p className="text-gray-700 text-sm">{notification.message}</p>
-          <p className="text-xs text-gray-500">
-            {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+  // const renderNotification = (notification: Notification) => (
+  //   <div
+  //     key={notification.id}
+  //     onClick={() => !notification.is_read && handleMarkAsRead(notification.id)}
+  //     className={`p-4 rounded-lg cursor-pointer ${notification.is_read ? 'bg-gray-100' : 'bg-white'}`}
+  //   >
+  //     <div className="flex justify-between items-center">
+  //       <div>
+  //         <p className="text-gray-700 text-sm">{notification.message}</p>
+  //         <p className="text-xs text-gray-500">
+  //           {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
+  //         </p>
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
 
   const notificationss = [
     {

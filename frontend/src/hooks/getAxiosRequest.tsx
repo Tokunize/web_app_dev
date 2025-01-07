@@ -62,3 +62,56 @@ export const useGetAxiosRequest = <T,>(
 
   return { data, loading, error };
 };
+
+
+
+
+
+export const useGetAxiosRequestManual = <T,>(
+  url: string,
+  requiresAuth: boolean = false,  // nuevo parámetro para indicar si requiere autenticación
+  onSuccess?: (data: T) => void,
+  onError?: (error: string) => void,
+): [FetchState<T>, () => Promise<void>] => {
+  const { getAccessTokenSilently } = useAuth0();
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      let config: AxiosRequestConfig = {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
+
+      if (requiresAuth) {
+        // Obtener el token solo si se necesita autenticación
+        const accessToken = await getAccessTokenSilently();
+        config.headers = {  // Aseguramos que headers está inicializado
+          ...config.headers,  // Incluye headers existentes, si los hay
+          Authorization: `Bearer ${accessToken}`,
+        };
+      }
+
+      const response = await axios.get<T>(url, config);
+      setData(response.data);
+      onSuccess?.(response.data);
+    } catch (err) {
+      const errorMessage = axios.isAxiosError(err)
+        ? err.response?.data?.error || 'Error en la respuesta del servidor.'
+        : 'Error inesperado al hacer la solicitud.';
+      setError(errorMessage);
+      onError?.(errorMessage);
+      console.error('Error fetching data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return [{ data, loading, error }, fetchData];  // Regresamos la función `fetchData` junto con el estado
+};

@@ -82,7 +82,7 @@ export const UserNavbar = () => {
           <LogoutButton />
         </DropdownMenuContent>
       </DropdownMenu>
-      <ConnectButton chainStatus="none" showBalance={false} />
+      <ConnectButton  showBalance={false} />
     </div>
   );
 };

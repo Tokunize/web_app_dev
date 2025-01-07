@@ -7,18 +7,28 @@ import { PropertyFinancialData } from '@/types';  // Asegúrate de tener este ti
 import { useGetAxiosRequest } from '@/hooks/getAxiosRequest';
 import { DataAccordion } from '../../components/dataAccordion/DataAccordion';
 import { Property } from '@/types';
+import { TabItem } from '@/types';
 
-// Modificar PropertyAccordionProps para incluir overviewData
 interface PropertyAccordionProps {
   property_id: string;
   overviewData: Property; 
 }
 
+
+
 export const PropertyAccordion = ({ property_id, overviewData }: PropertyAccordionProps) => {
   const [activeIndex, setActiveIndex] = useState<number>(0); // Default to 'Overview' tab
   
-  const tabs = ['Overview', 'Financial', 'Activity', 'Documents'];
-  const viewType = tabs[activeIndex].toLowerCase();  // Map tab name to viewType ('overview', 'financial', etc.)
+  const tabs: TabItem[] = [
+    { type: "text", content: "Overview" },
+    { type: "text", content: "Financial" },
+    { type: "text", content: "Activity" },
+    { type: "text", content: "Documents" },
+  ];
+
+  const viewType = typeof tabs[activeIndex]?.content === 'string'
+  ? tabs[activeIndex].content.toLowerCase()
+  : '';
   const requiresAuth = viewType === 'activity' || viewType === 'documents';
 
   // Obtener datos financieros usando el hook

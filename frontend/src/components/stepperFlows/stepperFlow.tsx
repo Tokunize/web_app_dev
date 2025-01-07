@@ -37,7 +37,7 @@ export const StepperFlow: React.FC<StepperProps> = ({ steps, initialStep = 0 }) 
     <div className="mx-auto ">
       {/* Header del Stepper */}
       <div className="flex justify-between items-center">
-        {steps.map((step, index) => (
+        {steps.map((_, index) => (
           <div
             key={index}
             className={`flex items-center gap-2 cursor-pointer ${

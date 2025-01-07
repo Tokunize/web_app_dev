@@ -12,7 +12,6 @@ import Dashboard from "./dashboard";
 import SignUpController from "../components/singUpFlow.tsx/singUpController";
 import { PropertyManagement } from "@/private/admin/propertyManagment";
 import { TradingPage } from "../private/investor/trading/TradingPage";
-// import { PublicPropertyForm } from "@/private/owner/publicPropertyForm";
 import { SmartContractFunctions } from "@/private/smartContractsManagment/smartContractFuntions";
 import VerifyEmailView from "@/public/login/verifyEmailView";
 import ScrollToTop from "@/components/ScrollToTop";

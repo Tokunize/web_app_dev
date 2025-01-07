@@ -37,7 +37,8 @@ export const tradingSchema = z.object({
   propertyType:z.string(),
   priceChart:z.number(),
   performanceStatus:z.string(),
-  userTokens:z.number().optional()
+  userTokens:z.number().optional(),
+  status:z.string()
   // priority: z.string(),
   
 })
@@ -46,23 +47,39 @@ export type Trading = z.infer<typeof tradingSchema>
 
 
 
+// export const myAssetsSchema = z.object({
+//   id: z.union([z.string(), z.number()]), // Permitir tanto string como number
+//   image: z.string(), // Imagen de la propiedad
+//   title: z.string(), // Título de la propiedad
+//   user_tokens: z.number(), // Tokens asociados al usuario
+//   price: z.string().default(""), // Valor de la propiedad (renombrado de 'net_asset_value')
+//   priceChart: z.number().default(4.7), // Cambio de precio (renombrado de 'price_change')
+//   yield: z.string().default("0"), // Rendimiento de alquiler proyectado (renombrado de 'projected_rental_yield')
+//   capRate: z.number().default(3.5), // Tasa de capitalización (renombrado de 'cap_rate')
+//   occupancyStatus: z.string().optional(), // Estado de ocupación, opcional (renombrado de 'ocupancy_status')
+//   performanceStatus: z.string().optional(), // Estado de rendimiento, opcional (añadido según el código)
+//   propertyType: z.string(), // Tipo de propiedad (añadido según el código)
+//   availableTokens: z.number().default(0).optional(), // Tokens disponibles (renombrado de 'availableTokens')
+//   totalTokens: z.number().default(0), // Tokens totales (renombrado de 'totalTokens')
+//   location: z.string(), // Ubicación de la propiedad
+//   projected_appreciation: z.string().default("1.2"), // Apreciación proyectada
+//   total_rental_income: z.number().default(23343), // Ingreso total por alquiler
+// });
+
 export const myAssetsSchema = z.object({
-  id: z.number(), // ID único de la propiedad
-  image: z.string(), // Imagen de la propiedad
-  title: z.string(), // Título de la propiedad
-  user_tokens: z.number(), // Tokens asociados al usuario
-  price: z.string().default(""), // Valor de la propiedad (renombrado de 'net_asset_value')
-  priceChart: z.number().default(4.7), // Cambio de precio (renombrado de 'price_change')
-  yield: z.string().default("0"), // Rendimiento de alquiler proyectado (renombrado de 'projected_rental_yield')
-  capRate: z.number().default(3.5), // Tasa de capitalización (renombrado de 'cap_rate')
-  occupancyStatus: z.string().optional(), // Estado de ocupación, opcional (renombrado de 'ocupancy_status')
-  performanceStatus: z.string().optional(), // Estado de rendimiento, opcional (añadido según el código)
-  propertyType: z.string(), // Tipo de propiedad (añadido según el código)
-  availableTokens: z.number().default(0).optional(), // Tokens disponibles (renombrado de 'availableTokens')
-  totalTokens: z.number().default(0), // Tokens totales (renombrado de 'totalTokens')
-  location: z.string(), // Ubicación de la propiedad
-  projected_appreciation: z.string().default("1.2"), // Apreciación proyectada
-  total_rental_income: z.number().default(23343), // Ingreso total por alquiler
+  id: z.union([z.string(), z.number()]),
+  image: z.string(),
+  title: z.string(),
+  location: z.string(),
+  user_tokens: z.number(),
+  price: z.number(),
+  priceChart: z.number(),
+  yield: z.number(),
+  capRate: z.number(),
+  occupancyStatus: z.string(),
+  performanceStatus: z.string(),
+  propertyType: z.string(),
+  totalTokens: z.number(),
 });
 
 export type MyAssets = z.infer<typeof myAssetsSchema>

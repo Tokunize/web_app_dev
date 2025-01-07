@@ -1,5 +1,4 @@
 import { FaEnvelope } from "react-icons/fa";
-import { Button } from "@/components/ui/button";
 import backgroundImage from "../../assets/signImage.png";
 import logo from "../../assets/header.png";
 import ResendEmailVerificationForm from "@/components/forms/resendEmailVerification";

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  // DropdownMenuItem,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
@@ -14,7 +14,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ZodType } from "zod"; // Importa Zod para validaciones
-import { useNavigate } from "react-router-dom";
 
 // Definir los tipos de los estados posibles
 interface Status {
@@ -25,30 +24,24 @@ interface Status {
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
-  id: string;
   schema: ZodType<TData>; // Recibimos el esquema como prop para validar diferentes datos
   statuses: Status[]; // Define los posibles estados
 }
 
+
 // Componente genérico de acciones de fila
 export function DataTableRowActionsAdmin<TData>({
   row,
-  id,
   schema,
   statuses,
 }: DataTableRowActionsProps<TData>) {
-  const navigate = useNavigate();
 
   // Validar los datos de la fila con Zod
   const properties = schema.parse(row.original);
 
   // Acceso al estado de la propiedad
-  const statusValue = properties.status;
+  const statusValue = (properties as any).status;  
 
-  // Función para navegar a la página de actualización
-  const navigateUpdate = (id: string) => {
-    navigate(`/dashboard-property/${id}/`);
-  };
 
   return (
     <DropdownMenu>
@@ -62,11 +55,7 @@ export function DataTableRowActionsAdmin<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        {/* Botón para actualizar */}
-        <DropdownMenuItem onClick={() => navigateUpdate(properties.id)}>
-          Update
-        </DropdownMenuItem>
-
+    
         <DropdownMenuSeparator />
 
         {/* Submenú para cambiar el estado de la propiedad */}

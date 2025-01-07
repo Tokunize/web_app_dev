@@ -4,7 +4,7 @@ import { FormatCurrency } from "../currencyConverter";
 import CustomCarousel from "../CustomCarousel";
 
 interface PaymentFirstProps {
-  property_id: number; 
+  property_id: string; 
   propertyData?: {
     title: string;
     location: string;

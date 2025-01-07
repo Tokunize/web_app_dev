@@ -24,7 +24,7 @@ export function DataTableRowActionsInvestorTradingOffermade({
   row,
 }: DataTableRowActionsProps) {
   const { toast } = useToast();
-  const tradingState = useSelector((state: RootState) => state.tadringType);
+  const tradingState = useSelector((state: RootState) => state.tradingType);
   const { offerType } = tradingState;
   const order = orderSchema.parse(row.original);
   

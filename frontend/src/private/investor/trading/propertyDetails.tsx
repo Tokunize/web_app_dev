@@ -1,6 +1,6 @@
 import { Carousel } from "flowbite-react";
 import { Progress } from "flowbite-react";
-import {  useState } from "react";
+import {  useEffect, useState } from "react";
 import { FormatCurrency } from "@/components/currencyConverter";
 
 interface PropertyData {
@@ -19,6 +19,10 @@ interface Props {
 
 export const SinglePropertyDetailOnModal = ({ propertyData }: Props) => {
   const [progressEquity, setProgressEquity] = useState<number>(0);
+
+  useEffect(()=>{
+    setProgressEquity(0)
+  },[])
 
   return (
     <section className="flex flex-col">
