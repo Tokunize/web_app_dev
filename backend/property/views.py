@@ -139,7 +139,6 @@ class PropertyDetailLandingPage(ConditionalPermissionMixin,APIView):
     permission_classes=[AllowAny]
     throttle_classes = [CustomAnonRateThrottle, UserRateThrottle]
 
-    @method_decorator(cache_page(60 * 15), name='dispatch')  # Cachea la respuesta durante 15 minutos
     def get(self, request, reference_number):
         
         try:
