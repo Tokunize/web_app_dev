@@ -1,16 +1,22 @@
 import { DataAccordion } from "@/components/dataAccordion/DataAccordion";
 import OrderBook from "./OrderBook";
-import { useState } from "react";
 import RecentOrders from "./RecentOrders";
+import { TabItem } from "@/types";
 
 export const TradingBooks = () =>{
-    const [activeIndex, setActiveIndex] = useState<number>(0); // Default to 'Overview' tab
 
-    const handleTabChange = (index: number) => {
-        setActiveIndex(index); // Actualizar el índice activoooo
-    };
+   
+    const tabs: TabItem[] = [
+        {
+          type: 'text',  
+          content: "Order Book" 
+        },
+        {
+          type: 'text', 
+          content:"Recent Orders"
+        },
+      ];
 
-    const tabs = ['Order Book', 'Recent Orders']; // Nombres de las pestañas
     const components = [
         <OrderBook key="order_book" />,
         <RecentOrders key="recent_orders" />
@@ -18,7 +24,7 @@ export const TradingBooks = () =>{
 
     return(
         <div>
-        <DataAccordion onTabChange={handleTabChange}  tabs={tabs} components={components} />
+        <DataAccordion   tabs={tabs} components={components} />
         </div>
     )
 }

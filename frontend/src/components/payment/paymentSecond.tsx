@@ -28,7 +28,7 @@ export const PaymentSecond = ({
   // const {address} = useSelector((state: RootState) => state.wallet)
   const { investMethodTitle } = useSelector((state: any) => state.investAsset); // Correct the state slice name
 
-
+  
   const handleFocus = () => {
     if (amount === '0') {
       setAmount('');

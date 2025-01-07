@@ -21,7 +21,7 @@ interface PropertyFinancialProps {
     projected_rental_yield?: string;
     property_management?: string;
     property_taxes?: string;
-    token_price?: string;
+    token_price?: number;
     tokensSold?: number;
     total_investment_value?: string;
     total_tokens?: number;

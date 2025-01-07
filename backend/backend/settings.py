@@ -81,7 +81,7 @@ CORS_ALLOWED_ORIGINS = [
 
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://monkfish-app-o6nz8.ondigitalocean.app",
+    "https://octopus-app-zlell.ondigitalocean.app",
     "http://localhost:5173"
     "https://www.tokunize.com"
 

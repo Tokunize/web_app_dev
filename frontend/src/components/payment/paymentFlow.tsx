@@ -14,11 +14,11 @@ import { LoadingSpinner } from '../loadingSpinner';
 import { useGetAxiosRequest } from '@/hooks/getAxiosRequest';
 import useSmartContract from '@/hooks/useSmartContract';
 import PaymentMyAssets from './paymentMyAssets';
-
+import { RootState } from '@/redux/store';
 
 import { ethers } from 'ethers';
-import propertyInvestmentABI from "../../contracts/property_investment_abi.json";  // Asegúrate de que este ABI esté correctamente configurado
-import usdcAbi from "../../contracts/usdc_abi.json";  
+import tokenToTokenPoolAbi from "../../contracts/tokenToTokenPoolAbi.json";  // Asegúrate de que este ABI esté correctamente configurado
+// import usdcAbi from "../../contracts/usdc_abi.json";  
 import { useSelector } from 'react-redux';
 
 interface Props {
@@ -26,46 +26,52 @@ interface Props {
 }
 
 const PaymentFlow = ({ property_id }:Props) => {
+
+  const fromPool = "0x4A6D81dbe8D9DBb97221971A42b82D102b72D4fA"
   
+  const toAssetPoolAddress ="0xBE46badae1416D0D794A5eF671150DBE8b7F8091"
 
   // 0x95f7D484AbEaf398885D73876Be7FFD3C54c3760
   const navigate = useNavigate();
-  const { investMethodTitle } = useSelector((state: any) => state.investAsset); 
+  const { investMethodTitle } = useSelector(
+    (state: RootState) => state.investAsset
+  );
 
   const { getAccessTokenSilently } = useAuth0(); 
   const [step, setStep] = useState(1);
   const [investmentAmount, setInvestmentAmount] = useState<string>("0"); // New state for amount
   const [investmentAmountUSDC,setInvestmentAmountUSDC] = useState<number>(0)
-  const usdcAddress = "0xdC48A996F3073d4ADAB7f77B42162c284801A6d9"; // Aquí debes poner la dirección del contrato USDC en Sepolia Testnet
+  // const usdcAddress = "0xdC48A996F3073d4ADAB7f77B42162c284801A6d9"; // Aquí debes poner la dirección del contrato USDC en Sepolia Testnet
   const {toast} = useToast()
 
-  const contractAddress="0xCaD0E8DBfFfDf7E53419B5B3d032125FF406E949"
-
-  const contractPropertyInvestment = useSmartContract({
-    contractAddress: contractAddress,
-    contractAbi: propertyInvestmentABI,
-  });
 
   const { data: propertyData, loading, error } = useGetAxiosRequest(
     `${import.meta.env.VITE_APP_BACKEND_URL}property/single/${property_id}/?view=payment`,true);
+
+    const tokenToTokenContract = useSmartContract({
+      contractAddress: fromPool,
+      contractAbi: tokenToTokenPoolAbi,
+    });
+
+    console.log(tokenToTokenContract);
+    
 
   const goNext = () => setStep((prev) => prev + 1);
   const goBack = () => {
     if (step === 5 && investMethodTitle) {
       setStep(2); 
     } else {
-      setStep((prev) => Math.max(prev - 1, 1)); // Ensure we don’t go below step 1
+      setStep((prev) => Math.max(prev - 1, 1)); 
     }
   };
 
   const handlePurchase = async () => {
     try {
       const accessToken = await getAccessTokenSilently(); 
-      const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/transactions/`; 
+      const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}transaction/investment/property/${property_id}/`; 
   
       const data = {
         investmentAmount: investmentAmountUSDC,
-        property_id: property_id
       };
   
       const config = {
@@ -108,54 +114,31 @@ const PaymentFlow = ({ property_id }:Props) => {
    const signer = provider ? provider.getSigner() : null;
  
    // Verificamos si MetaMask está conectado a la red correcta
-   const checkNetwork = async () => {
-     const network = await provider?.getNetwork();
-     if (network?.chainId !== 11155111) {  // Sepolia Testnet ID
-       throw new Error("Por favor, cambia a la red Sepolia Testnet.");
-     }
-   };
+  //  const checkNetwork = async () => {
+  //    const network = await provider?.getNetwork();
+  //    if (network?.chainId !== 11155111) {  // Sepolia Testnet ID
+  //      throw new Error("Por favor, cambia a la red Sepolia Testnet.");
+  //    }
+  //  };
 
-  const approveUSDC = async () => {
-    try {
-      if (!signer) throw new Error('No se puede acceder al firmante de la transacción.');
-      if (!ethers.utils.isAddress(usdcAddress)) {
-        throw new Error('La dirección de USDC no es válida.');
-      }
-  
-      // Convertimos 1 USDC a mUSDC (1 USDC = 10^6 mUSDC)
-      const usdcAmountInWei = ethers.utils.parseUnits("1", 6); // 6 decimales para USDC
-  
-      const usdcContract = new ethers.Contract(usdcAddress, usdcAbi, signer);
-  
-      // Aprobamos el contrato para gastar solo 1 USDC
-      const transaction = await usdcContract.approve(contractAddress, usdcAmountInWei);
-  
-      console.log('Esperando confirmación...');
-      await transaction.wait();
-  
-      toast({
-        title: "Success!",
-        description: "Your approvement was successfully done",
-        variant: "default",
-      });
-    } catch (err) {
-      toast({
-        title: "Failed!",
-        description: "Your approvement was not successfully done",
-        variant: "default",
-      });
-      console.error('Error en la aprobación:', err);
-      throw new Error('Error al aprobar USDC.');
+  const checkNetwork = async () => {
+    const network = await provider?.getNetwork();
+    if (network?.chainId !== 421614) {  // Arbitrum Sepolia Testnet ID
+      throw new Error("Por favor, cambia a la red Arbitrum Sepolia Testnet.");
     }
   };
+  
 
-  const investInContract = async (usdcAmount: number) => {    
+
+  const investInContract = async (usdcAmount: number) => {   
+    
+    
     try {
       if (!usdcAmount || isNaN(Number(usdcAmount)) || Number(usdcAmount) <= 0) {
         throw new Error('Por favor ingresa una cantidad válida de USDC.');
       }
 
-      if (!contractAddress) {
+      if (!propertyData?.property_blockchain_adress) {
         throw new Error('Por favor ingresa una dirección de contrato.');
       }
 
@@ -163,13 +146,20 @@ const PaymentFlow = ({ property_id }:Props) => {
         throw new Error('No se puede acceder a MetaMask. Asegúrate de tenerlo instalado.');
       }
 
-      // Verificamos la red de MetaMask
       await checkNetwork();
-      const usdcAmountInWei = usdcAmount; // Mantén el valor tal cual sin convertir
-      await approveUSDC();
-      const transaction = await contractPropertyInvestment.invest(usdcAmountInWei, {
-        gasLimit: 1000000,  // Ajusta el límite de gas según sea necesario
+      const usdcAmountInWei = usdcAmount;
+
+      console.log("estoy aquiiii", usdcAmount);
+      
+
+      if (!tokenToTokenContract) {
+        throw new Error('Smart contract is not initialized.');
+      }
+      
+      const transaction = await tokenToTokenContract.mintSingleTokenAndNotify(toAssetPoolAddress, 1, {
+        gasLimit: 1000000,
       });
+      
 
       // Esperar a que la transacción sea confirmada
       await transaction.wait();
@@ -187,6 +177,7 @@ const PaymentFlow = ({ property_id }:Props) => {
     
     if (!propertyData) return <div>No property data available.</div>;
 
+    
     switch (step) {
       case 1:
         return <PaymentFirst property_id={property_id} propertyData={propertyData} />;

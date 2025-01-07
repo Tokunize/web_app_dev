@@ -240,30 +240,3 @@ function PasswordStrengthIndicator({ validations }: { validations: any }) {
     </div>
   );
 }
-
-
- // try {
-        //   const response = await axios.post(
-        //     'https://dev-2l2jjwfm5ekzae3u.us.auth0.com/dbconnections/signup', 
-        //     finalData,
-        //     { headers: { 'Content-Type': 'application/json' } }
-        //   );
-    
-        //   toast({
-        //     title: "Registration Successful!",
-        //     description: "You have successfully signed up. Welcome to our community!",
-        //     duration: 5000,
-        //     variant: "default",
-        //   });
-    
-        //   // Llamar al callback `onSignUpSuccess` para avanzar al siguiente paso
-        //   onSignUpSuccess();  // Aquí notificamos al componente padre que el registro fue exitoso
-    
-        // } catch (err) {
-        //   toast({
-        //     title: "Registration Failed",
-        //     description: "There was an error with your registration. Please try again.",
-        //     duration: 5000,
-        //     variant: "destructive",
-        //   });
-        // }

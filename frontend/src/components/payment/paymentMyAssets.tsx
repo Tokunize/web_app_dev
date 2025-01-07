@@ -18,12 +18,16 @@ const PaymentMyAssets = () => {
     const dispatch = useDispatch();
     const { investMethodTitle } = useSelector((state: any) => state.investAsset); 
 
+    console.log(data);
+    
   
     if (loading) return <LoadingSpinner />;
     if (error) {
       console.log(error);
       return <div>Error loading data</div>;
     }
+
+  
   
     const handleAssetSelect = (investMethodTitle: string, assetPoolAddress: string) => {
       dispatch(setInvestMethodTitle(investMethodTitle));

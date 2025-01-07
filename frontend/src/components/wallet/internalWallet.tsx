@@ -13,7 +13,7 @@ interface WalletCardProps {
     className?:string;
 }
 
-const InternalWallet = ({ walletName, balance, address, blockchain, walletType, className }: WalletCardProps) => {
+const InternalWallet = ({ walletName, balance, address, blockchain, className }: WalletCardProps) => {
     const [tourStarted, setTourStarted] = useState(false);
 
 
@@ -91,14 +91,14 @@ const InternalWallet = ({ walletName, balance, address, blockchain, walletType, 
 
     return (
         <div id="tour-wallet-card" className={`${className} text-animated-gradient text-white rounded-xl shadow-lg p-6 w-full max-w-sm `}>
-            {/* {!tourStarted && (
+            {!tourStarted && (
                 <button
                     className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg mb-4"
                     onClick={startTour}
                 >
                     Start Tour
                 </button>
-            )} */}
+            )}
 
             {/* Header */}
             <div className="flex items-center justify-between mb-4">

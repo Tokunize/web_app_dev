@@ -6,7 +6,7 @@ import { OwnerFlowCarousel } from '@/components/singUpFlow.tsx/ownerCarousel';
 import { InvestorFlow } from '@/components/singUpFlow.tsx/investorFlow';
 import axios from "axios";
 import { useToast } from '@/components/ui/use-toast';
-import { useNavigate } from 'react-router-dom'; // Importar useNavigate
+// import { useNavigate } from 'react-router-dom'; // Importar useNavigate
 
 interface SignUpForm {
   email: string;
@@ -18,9 +18,8 @@ interface SignUpForm {
 
 // Componente principal
 export const AccountType = ({ formData }: { formData: SignUpForm }) => {
-  const [selectedRole, setSelectedRole] = useState(""); // Estado para almacenar el rol seleccionado
   const { toast } = useToast();
-  const navigate = useNavigate(); // Inicializar el hook useNavigate
+  // const navigate = useNavigate(); 
 
 
   // Función principal de envío
@@ -33,6 +32,7 @@ export const AccountType = ({ formData }: { formData: SignUpForm }) => {
       name: formData.name,  // Aquí se debe pasar el nombre real del usuario
       user_metadata: {
         lastName: formData.last_name,
+        role: "user"
       },
     };
 
@@ -45,7 +45,6 @@ export const AccountType = ({ formData }: { formData: SignUpForm }) => {
         { headers: { 'Content-Type': 'application/json' } }
       );
 
-      setSelectedRole(""); // Limpia el rol después del éxito
       toast({
         title: "Registration Successful!",
         description: "You have successfully signed up. Welcome to our community!",
@@ -69,7 +68,6 @@ export const AccountType = ({ formData }: { formData: SignUpForm }) => {
   const handleSelectAccountType = (type: 'investor' | 'owner') => {
     setSelectedAccountType(type);
     setCurrentStep(0); // Reinicia el paso cuando se selecciona un nuevo tipo
-    setSelectedRole(type); // Establece el rol al seleccionar el tipo de cuenta
   };
 
   // Función que se llamará cuando el usuario confirme ser "Owner"
@@ -95,7 +93,6 @@ export const AccountType = ({ formData }: { formData: SignUpForm }) => {
   const handleBackToSelection = () => {
     setSelectedAccountType('');
     setCurrentStep(0);
-    setSelectedRole(""); // Limpia el rol al volver a la selección
   };
 
   // Renderizar contenido basado en el tipo de cuenta seleccionado

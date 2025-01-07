@@ -1,15 +1,17 @@
+// Importaciones necesarias
 import { PieGraph } from "@/components/graphs/pieGraph";
 import { LoadingSpinner } from "@/components/loadingSpinner";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
 import { Card } from "@/components/ui/card";
 import { DataAccordion } from "@/components/dataAccordion/DataAccordion";
-import { useState } from "react";
 import { DataTable } from "@/components/dataTable/components/data-table";
 import { MyAssetsColumns } from "@/components/dataTable/components/columns/MyAssetsColumns";
 import { propertyType } from "@/components/dataTable/data/data";
+import { TabItem } from "@/types";
 
+// Definición del tipo de datos de las inversiones
 interface Investment {
-  id:number,
+  id: string;
   first_image: string;
   title: string;
   user_tokens: number;
@@ -21,60 +23,51 @@ interface Investment {
   property_type: string;
   ocupancy_status: string;
   property_types: Array<{ item: string, percentage: number, fill: string }>;
-  performance_status: string,
-  cap_rate: string,
-  price_change:string
+  performance_status: string;
+  cap_rate: string;
+  price_change: string;
+  image: string;
 }
 
 export const Assests = () => {
-
   const filterOptions = [
     { column: "propertyType", title: "Property Type", options: propertyType },
   ];
 
-  const [activeIndex, setActiveIndex] = useState<number>(0); // Default to 'Overview' tab
-  // State to store the investment data
   const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}property/investor-assets/`;
 
-
-  const { data: investments, loading, error } = useGetAxiosRequest<{properties: Investment[];property_types: Array<{ item: string, percentage: number, fill: string }>;}>(apiUrl, true);
+  const { data: investments, loading, error } = useGetAxiosRequest<{
+    properties: Investment[];
+    property_types: Array<{ item: string, percentage: number, fill: string }>;
+  }>(apiUrl, true);
 
   if (loading) return <div><LoadingSpinner /></div>;
-  console.log(investments);
-  
-  if (error) return <p>Error: {error}</p>;
-  
 
-  // Ensure investments is defined and has the expected structure
+  if (error) return <p>Error: {error}</p>;
+
   const properties = investments?.properties || [];
   const propertyTypes = investments?.property_types || [];
-  
+
   const assetsData = properties.map((property) => ({
     id: property.id,
     image: property.first_image,
     location: property.location,
     title: property.title,
     user_tokens: property.user_tokens,
-    price: property.price || 0, // Renombrado a 'price' para coincidir con el accessorKey
-    priceChart: property.price_change || 2, // Renombrado a 'priceChart' para coincidir con el accessorKey
-    yield: property.projected_rental_yield || 0, // Renombrado a 'yield' para coincidir con el accessorKey
-    capRate: property.cap_rate || 3.5, // Renombrado a 'capRate' para coincidir con el accessorKey
-    occupancyStatus: property.ocupancy_status, // Renombrado a 'occupancyStatus' para coincidir con el accessorKey
-    performanceStatus: property.performance_status || "", // Puedes definir un valor por defecto si no lo tienes
-    propertyType: property.property_type, // Puedes agregar esto si tienes un tipo de propiedad
-    totalTokens: property.tokens[0].total_tokens || 0, // Renombrado a 'totalTokens' para coincidir con el accessorKey
+    price: property.price || 0,
+    priceChart: property.price_change || 2,
+    yield: property.projected_rental_yield || 0,
+    capRate: property.cap_rate || 3.5,
+    occupancyStatus: property.ocupancy_status,
+    performanceStatus: property.performance_status || "",
+    propertyType: property.property_type,
+    totalTokens: property.tokens[0].total_tokens || 0,
   }));
-  
 
-  const tabs =["My Assets"]
-
+  const tabs: TabItem[] = [{ type: "text", content: "My Assets" }];
   const tabComponents = [
     <DataTable isDownloadable={true} columns={MyAssetsColumns} filterOptions={filterOptions} data={assetsData} />,
   ];
-
-  const handleTabChange = (index: number) => {
-    setActiveIndex(index); // Actualizar el índice activo
-  };
 
   return (
     <div className="rounded-lg px-4">
@@ -97,8 +90,7 @@ export const Assests = () => {
           />
         )}
       </Card>
-        <DataAccordion tabs={tabs} components={tabComponents} onTabChange={handleTabChange}/>
+      <DataAccordion tabs={tabs} components={tabComponents} />
     </div>
   );
 };
-
