@@ -44,10 +44,11 @@ urlpatterns = [
 
 
     #BLOCKCHAIN
-    path('smart-contract/<str:referenceNumber>/', PropertySmartContract.as_view(), name="property-smart-contract-address"),
+    path('smart-contract/<str:referenceNumber>/', PropertySmartContract.as_view(), name="property-pool-address"),
     #ALL SOLD PROPERTIES FOR BUY TAB ON THE TRADING ACCORDION
     path('sold/', PropertyTradeSellListView.as_view(), name="sold-properties"),
     #PROPERTIES OWNED BY AND INVESTOR , ALL THE INVESTED PROPERTIES
-    path('invested-properties/', InvestorInvestedProperties.as_view(), name="investor-invested-properties")
+    path('invested-properties/', InvestorInvestedProperties.as_view(), name="investor-invested-properties"),
 
-]
+
+]   

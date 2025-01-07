@@ -16,6 +16,7 @@ import requests
 from notifications.models import ActivityLog
 from wallet.models import Wallet
 from property.models import PropertyToken
+from property.models import Property
 
 # Create your views here.
 
@@ -62,80 +63,76 @@ class TransactionListview(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
     
-    def post(self, request):
+    def post(self, request,reference_number):
         # Obtener el monto de la inversión y el id de la propiedad
-        investment_amount = float(request.data["investmentAmount"])
-        property_id = request.data["property_id"]
-
-        # Validar que se haya proporcionado un ID de propiedad
-        if not property_id:
-            return Response({'error': 'Property ID is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Limitar la inversión a un máximo de 10,000
-        if investment_amount > 10000: 
-            return Response({
-                'error': 'You cannot invest more than 10000 units. If you need further information, please contact us, thank you.'
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        # Obtener la instancia de la propiedad
-        property_instance = get_object_or_404("property.Property", id=property_id)
+        invested_tokens_amount = request.data["investmentAmount"]
+        
+        property_instance = Property.objects.get(reference_number=reference_number)
         tokens_property = property_instance.tokens.all()
-
-        # Verificar si la propiedad tiene tokens asociados
         if tokens_property.exists():
             selected_token = tokens_property.first()
         else:
             return Response({'error': 'No tokens found for this property'}, status=status.HTTP_404_NOT_FOUND)
 
+        max_allowed_investment = selected_token.tokens_available * 0.25
+
+        # Verificamos si la cantidad invertida supera el 25% de los tokens disponibles
+        if invested_tokens_amount > max_allowed_investment:
+            return Response({
+                'error': f'You cannot invest more than 25% of the available tokens ({max_allowed_investment} units). If you need further information, please contact us, thank you.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         # Calcular la cantidad de tokens que puede comprar con la inversión
         token_price = selected_token.token_price
-        tokens_amount = investment_amount / token_price
 
         # Verificar si hay suficientes tokens disponibles
-        if selected_token.tokens_available < tokens_amount:
+        if selected_token.tokens_available < invested_tokens_amount:
             return Response({'error': 'Not enough tokens available'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Calcular el precio total de los tokens comprados (sería el mismo investment_amount en este caso)
-        total_token_price = tokens_amount * token_price
+        # Calcular el precio total de los tokens comprados (sería el mismo invested_tokens_amount en este caso)
+        total_token_price = invested_tokens_amount * token_price
    
         # Reducir los tokens disponibles
-        selected_token.tokens_available -= tokens_amount
+        selected_token.tokens_available -= invested_tokens_amount
         selected_token.save()
 
         # Crear la transacción
         transaction = Transaction.objects.create(
             property_id=property_instance,
             transaction_owner_code=request.user,
-            transaction_tokens_amount=tokens_amount,
+            transaction_tokens_amount=invested_tokens_amount,
             transaction_amount=total_token_price,
             token_code=selected_token,
-            event=Transaction.Event.BUY
+            transaction_type=Transaction.TransactionType.BUY
         )
+
+        print(transaction)
 
         # Registrar o actualizar el PropertyToken
         property_token, created = PropertyToken.objects.get_or_create(
             property_code=property_instance,
             token_code=selected_token,
             owner_user_code=request.user,
-            defaults={'number_of_tokens': tokens_amount}
+            defaults={'number_of_tokens': invested_tokens_amount}
         )
 
         # Si el PropertyToken ya existía, actualizar el número de tokens
         if not created:
-            property_token.number_of_tokens += tokens_amount
+            property_token.number_of_tokens += invested_tokens_amount
             property_token.save()
         
-        log_activity(
-            event_type='transaction',
-            involved_address=request.user.email,
-            # contract_address=selected_token.token_contract_address,  # O lo que aplique
-            payload={
-                'transaction_id': transaction.id,
-                'property_id': property_instance.id,
-                'amount_invested': investment_amount,
-                'tokens_purchased': tokens_amount,
-            }
-        )
+        # log_activity(
+        #     event_type='transaction',
+        #     involved_address=request.user.email,
+        #     # contract_address=selected_token.token_contract_address,  # O lo que aplique
+
+        #     payload={
+        #         'transaction_id': transaction.id,
+        #         'property_id': property_instance.id,
+        #         'amount_invested': invested_tokens_amount,
+        #         'tokens_purchased': tokens_amount,
+        #     }
+        # )
 
         return Response({'message': 'Transaction completed successfully'}, status=status.HTTP_201_CREATED)
 

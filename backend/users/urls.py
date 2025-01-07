@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import SyncUserView, UserDetailView, UserListView, UserProfileView,hola_view,ResendEmailVerification
+from .views import SyncUserView, UserDetailView, UserListView, UserProfileView,hola_view,ResendEmailVerification,EmailCheckView
 
 urlpatterns = [
     # Ruta para sincronizar o crear un usuario basado en el JWT
@@ -19,4 +19,8 @@ urlpatterns = [
 
     path('hola/', hola_view, name='hola'), 
  
+
+    #corrected  urls for better optimization
+    path('check/email/<str:email>/', EmailCheckView.as_view(), name='resend_email'),
+
 ]

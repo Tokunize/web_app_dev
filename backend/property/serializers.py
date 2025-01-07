@@ -20,7 +20,7 @@ class PropertySerializerList(serializers.ModelSerializer):
                     'id', 'title', 'status', 'location', 'image', 
                     'active','property_code',"rejection_reason_comment",
                     'projected_annual_return', 'property_type', 'created_at',
-                    'bedrooms', 'bathrooms', 'price', 'size', 'year_built',"ownershipPercentage",
+                    'price', 'size', 'year_built',"ownershipPercentage",
                     'country', 'description','amenities', 'tokens','vacancy_rate', 'tenant_turnover', "rejection_reason", "projected_rental_yield", "investment_category" ,"post_code"
                 ]
         
@@ -49,8 +49,6 @@ class PropertyOverviewSerializer(serializers.ModelSerializer):
             'location', 
             'image', 
             'annual_gross_rents',
-            'bedrooms',
-            'bathrooms',
             'size',
             'description',
             'details',
@@ -94,8 +92,8 @@ class PropertyTokenPaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Property
         fields = [
-                'id', 'title', 'location', 'image', 
-                'property_type',
+                'reference_number', 'title', 'location', 'image', 
+                'property_type','property_blockchain_adress',
                 'price',
                 'country', 'tokens'
         ]
@@ -177,7 +175,7 @@ class AssetToAssetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Property
-        fields = ['title', 'property_scrow_address', 'first_image', 'tokens']
+        fields = ['title', 'property_blockchain_adress', 'first_image', 'tokens']
 
     def get_first_image(self, obj):
         return obj.get_first_image()

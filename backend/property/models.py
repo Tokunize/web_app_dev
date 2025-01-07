@@ -40,12 +40,9 @@ class Property(TimeStampedModel):
     reference_number = models.UUIDField(default=uuid.uuid4, unique=True, blank=True, null=False, help_text="Automatically generated unique identifier for the property.")
 
     property_scrow_address = models.CharField(max_length=42, unique=True, null=True, blank=True)
-    property_code = models.CharField(max_length = 50, unique=True, null=True, blank=True)
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     details = models.JSONField(blank=True, null=True, help_text="Detailed description and specifics of the property.")
-    bedrooms = models.IntegerField(help_text="Number of bedrooms in the property.")
-    bathrooms = models.IntegerField(help_text="Number of bathrooms in the property, supporting whole numbers only.")
     price = models.DecimalField(max_digits=10, decimal_places=2, help_text="The sale or list price of the property.")
     location = models.CharField(max_length=255)
     post_code = models.CharField(max_length=10, null=True, blank=True)
@@ -68,7 +65,6 @@ class Property(TimeStampedModel):
     image = ArrayField(models.URLField(max_length=500), blank=True, null=True, help_text="A list of URLs pointing to images of the property.")
     video_urls = ArrayField(models.URLField(max_length=500), blank=True, null=True, help_text="A list of URLs pointing to videos of the property.")
     amenities = models.JSONField(blank=True, null=True, help_text="JSON formatted list of property amenities such as pool, gym, pet-friendly, etc.")
-    active = models.BooleanField(null=True, blank=True, help_text="A boolean to control if the property is listed or if it's a coming soon property.")
     
     # Financial details
     total_investment_value = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, help_text="Total amount of money invested in the property, including purchase and renovation costs.")

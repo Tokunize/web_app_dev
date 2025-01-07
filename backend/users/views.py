@@ -129,3 +129,16 @@ class ResendEmailVerification(APIView):
 
         except requests.exceptions.RequestException as e:
             return Response({"error": f"Error sending verification email: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
+        
+
+class EmailCheckView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request,email):
+        if not email:
+            return Response({"error": "Email is required"}, status=400)
+        # Verificar si el email ya existe en la base de datos
+        if CustomUser.objects.filter(email=email).exists():
+            return Response({"error": "This email is already in use."}, status=400)
+
+        return Response({"message": "Email is available."}, status=200)
