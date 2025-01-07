@@ -14,7 +14,6 @@ __pycache__/
 
 # Django settings
 *.env           # Archivos de entorno, como .env
-local_settings.py  # Si usas un archivo local_settings.py
 
 # Virtual environments
 venv/
@@ -25,9 +24,6 @@ Pipfile.lock
 *.bak
 *.swp
 
-# Static files and media
-/static/
-/media/
 
 # IDEs and text editors
 .idea/
