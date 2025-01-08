@@ -12,3 +12,16 @@ class WalletSerializer(serializers.ModelSerializer):
         if not Wallet.is_valid_wallet_address(value):
             raise serializers.ValidationError("Invalid Ethereum wallet address.")
         return value
+
+
+class WalletDashboardSerializer(serializers.ModelSerializer):
+    # Campo adicional para balance, utilizando el método 'get_balance' del modelo Wallet
+    balance = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Wallet
+        fields = ['wallet_address', 'balance', 'is_enabled','is_address_allowed']  # Incluir los campos que deseas devolver
+
+    def get_balance(self, obj):
+        # Llamamos al método get_balance() del modelo para obtener el balance actual
+        return obj.get_balance()  # Esto retorna el balance sincronizado o actual

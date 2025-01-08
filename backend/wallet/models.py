@@ -14,18 +14,15 @@ class Wallet(models.Model):
         message="Invalid Ethereum wallet address. It must start with '0x' followed by 40 hexadecimal characters."
     )
     
-    wallet_id = models.CharField(max_length=100, unique=True)  # ID único de la wallet devuelto por Circle
+    wallet_id = models.CharField(max_length=100, unique=True)  
     wallet_address = models.CharField(max_length=42, unique=True,null=True, blank=True,  validators=[wallet_address_validator])
     wallet_user_id = models.OneToOneField("users.customuser", on_delete=models.CASCADE, related_name="wallet")
-    wallet_user = models.CharField(max_length=20, unique=True, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     is_enabled = models.BooleanField(default=False)
     allowed_address = models.CharField( null=True, blank=True,  validators=[wallet_address_validator])
-    last_balance_sync = models.DateTimeField(null=True, blank=True)  # Timestamp de la última sincronización
-
-
+    last_balance_sync = models.DateTimeField(null=True, blank=True)  
     balance = models.DecimalField(max_digits=20, decimal_places=8, null=True, blank=True)  
+    is_address_allowed =  models.BooleanField(default=False)
 
     def __str__(self):
         return f'Wallet {self.wallet_address} (ID: {self.wallet_id}) for user {self.wallet_user_id}'
