@@ -1,15 +1,17 @@
 import { Control, Controller } from "react-hook-form";
 import { Input } from "@/components/ui/input";
+import {FormDescription,} from "@/components/ui/form";
 
 interface Props {
     name: string;
     control: Control<any>;
     label: string;
     type?: string;
+    description?: string;
     error?: string;
 }
 
-const InputForm = ({ name, control, label, error, type = "text" }: Props) => {
+const InputForm = ({ name, control, label, error, description ,type = "text" }: Props) => {
     return (
         <div className="relative z-0 w-full group">
             <Controller
@@ -35,6 +37,7 @@ const InputForm = ({ name, control, label, error, type = "text" }: Props) => {
                     </>
                 )}
             />
+            {description && <FormDescription className="mt-3">{description}</FormDescription>} {/* Descripción opcional */}
             {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
         </div>
     );

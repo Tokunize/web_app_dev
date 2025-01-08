@@ -5,7 +5,14 @@ import { TabItem } from "@/types";
 import RowWalletview from "./rowWalletView";
 import ListWalletView from "./colWalletView";
 
-const WalletTabView = ({ balance }: { balance: number }) => {
+interface Props {
+  balance:number;
+  walletAddress:string;
+  isEnabled:boolean;
+}
+
+const WalletTabView = ({balance,walletAddress,isEnabled}:Props) => {
+  
   
   // Definir las pestañas correctamente
   const tabs: TabItem[] = [
@@ -21,8 +28,8 @@ const WalletTabView = ({ balance }: { balance: number }) => {
 
   // Definir los componentes para cada pestaña
   const components = [
-    <RowWalletview balance={balance}/>,
-    <ListWalletView balance={balance}/>
+    <RowWalletview  isEnabled={isEnabled} walletAddress={walletAddress} balance={balance}/>,
+    <ListWalletView   isEnabled={isEnabled} walletAddress={walletAddress} balance={balance}/>
   ];
 
   return (

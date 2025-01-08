@@ -9,12 +9,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { AddFundsFlow } from "@/components/funds/addFundsFlow";
 
+interface Props {
+  isEnabled:boolean;
+}
 // Componente genérico de acciones de fila
-export function RowActionaWallet() {
+export function RowActionaWallet({isEnabled}:Props) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger disabled={!isEnabled} asChild>
         <Button
           variant="ghost"
           className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"

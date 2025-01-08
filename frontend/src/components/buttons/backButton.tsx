@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import { FaArrowLeft } from 'react-icons/fa';
 
-export const BackButton: React.FC = () =>{
+export const BackButton  = () =>{
     const navigate = useNavigate()
     return(
         <div className="flex items-center space-x-2">

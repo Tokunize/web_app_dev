@@ -3,6 +3,8 @@ import logo from "../../assets/header.png";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LoginButton } from "../buttons/loginButton";
+import axios, { AxiosError } from "axios";
+import { useToast } from '../ui/use-toast';
 
 interface SingUpEmailFormProps {
   onEmailSubmit: (email: string) => void;
@@ -12,26 +14,43 @@ const SingUpEmailForm = ({ onEmailSubmit }: SingUpEmailFormProps) => {
   const [email, setEmail] = useState('');
   const [isDisabled, setIsDisabled] = useState(true);
   const [emailError, setEmailError] = useState('');
+  const {toast} = useToast()
   
 
   // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
-    setEmailError(''); 
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Email validation pattern
-
-    if (!emailPattern.test(email)) {
-        setEmailError('Please enter a valid email address');
-        setIsDisabled(true); // Disable the button if the email is not valid
-      } else {
-        setEmailError('');
-        setIsDisabled(false); // Enable the button if the email is valid
-      }
   };
 
+  const handleOnBlur = () =>{    
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Email validation pattern
+    if (!emailPattern.test(email)) {
+      setEmailError('Please enter a valid email address');
+      setIsDisabled(true); // Disable the button if the email is not valid
+    } else {
+      setEmailError('');
+      setIsDisabled(false); // Enable the button if the email is valid
+    }
+  }
 
-  const handleContinue = () => {
-    onEmailSubmit(email)
+
+  const handleContinue = async () => {  
+    try {
+      // Hacer la petición GET
+      const response = await axios.get(`${import.meta.env.VITE_APP_BACKEND_URL}users/check/email/${email}/`);
+      if(response.status === 200){
+        onEmailSubmit(email)
+      }
+    } catch (error) {
+      if (error instanceof AxiosError && error.response) {
+        toast({
+          variant: "destructive",
+          description: error.response.data.error,
+        });
+      } else {
+        console.error('Error:', error);
+      }
+    }
   };
 
   return (
@@ -49,10 +68,13 @@ const SingUpEmailForm = ({ onEmailSubmit }: SingUpEmailFormProps) => {
           id="email"
           placeholder="Enter a valid email address"
           value={email}
-          onChange={handleInputChange} 
-          className={`mb-4 ${emailError ? 'border-red-500' : 'border-gray-300'}`}
+          onBlur={handleOnBlur}
+          onChange={handleInputChange}
+          className={`mb-2 ${emailError ? 'border-red-500' : 'border-gray-300'}`}
         />
-        {emailError && <span className="text-red-500 mb-2">{emailError}</span>}
+        <div className="min-h-[15px] mb-3">
+          {emailError && <span className="text-red-500 text-sm ">{emailError}</span>}
+        </div>
 
         <Button
           onClick={handleContinue}

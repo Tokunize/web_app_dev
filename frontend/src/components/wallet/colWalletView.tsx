@@ -3,9 +3,11 @@ import InternalWallet from "./internalWallet";
 import ExternalWallet from "./externalWallet";
 interface Props {
   balance: number;
+  walletAddress:string;
+  isEnabled:boolean;
 }
 
-const ListWalletView = ({ balance }: Props) => {
+const ListWalletView = ({ balance ,walletAddress,isEnabled}: Props) => {
   // Estado para controlar qué tarjeta está al frente
   const [isTokunizeFront, setIsTokunizeFront] = useState(true);
 
@@ -18,7 +20,7 @@ const ListWalletView = ({ balance }: Props) => {
     <div className="relative w-full h-[350px]">
       {/* Primera WalletCard */}
       <div onClick={handleClick}  className={`absolute cursor-pointer transition-all w-full duration-300 ${isTokunizeFront ? "top-[0px] z-10" : "top-[60px] z-20" }`} >
-        <InternalWallet walletName="Tokunize Wallet" walletType="tokunize"  address="0x1234...abcd" blockchain="Arbitrum" balance={balance}/>
+        <InternalWallet address={walletAddress} isEnabled={isEnabled} walletName="Tokunize Wallet" walletType="tokunize"  blockchain="Arbitrum" balance={balance}/>
       </div>
 
       {/* Segunda WalletCard */}

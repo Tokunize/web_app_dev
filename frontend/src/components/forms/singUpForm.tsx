@@ -16,45 +16,30 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input"; // Importa tu componente Input aquí
-import { Button } from "@/components/ui/button"; // 
+import { Input } from "@/components/ui/input"; 
+import { Button } from "@/components/ui/button"; 
+import InputForm from './inputForm';
+import { signUpFormSchema,SingUpFormValues } from './schemas/signUpFormSchema';
 
-const FormSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-  lastName: z.string().min(1, {
-    message: "Last name is required.",
-  }),
-  email: z.string().email({
-    message: "Invalid email address.",
-  }),
-  password: z.string().min(8, {
-    message: "Password must be at least 8 characters long.",
-  })
-    .regex(/[A-Z]/, {
-      message: "Password must contain at least one uppercase letter.",
-    })
-    .regex(/[0-9]/, {
-      message: "Password must contain at least one number.",
-    })
-    .regex(/[\W_]/, {
-      message: "Password must contain at least one special character.",
-    }),
-});
 
-export function SignUpForm({
-  email,
-  setIsEmailSubmitted,
-  onSignUpSuccess,
-}: {
-  email: string;
-  setIsEmailSubmitted: React.Dispatch<React.SetStateAction<number>>; // Cambiado a number
-  onSignUpSuccess: (data: any) => void; // Cambiado a recibir un argumento
-}) {
+interface Props {
+  email:string;
+  setIsEmailSubmitted:  React.Dispatch<React.SetStateAction<number>>;
+  onSignUpSuccess : (data: any) => void
+}
+
+export function SignUpForm({email,setIsEmailSubmitted,onSignUpSuccess}: Props) {
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
-  const [isPasswordEntered, setIsPasswordEntered] = useState(false); // Nuevo estado para controlar si se ha escrito algo
+  const [isPasswordEntered, setIsPasswordEntered] = useState(false);
+
+  const { control, handleSubmit, formState: { errors }, reset } = useForm<SingUpFormValues>({
+    resolver: zodResolver(signUpFormSchema),
+    defaultValues: {
+      email, // Si el valor del email es proporcionado
+    },
+  });
+
   const [validations, setValidations] = useState({
     length: false,
     uppercase: false,
@@ -62,8 +47,8 @@ export function SignUpForm({
     special: false,
   });
 
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+  const form = useForm<z.infer<typeof signUpFormSchema>>({
+    resolver: zodResolver(signUpFormSchema),
     defaultValues: {
       username: "",
       lastName: "",
@@ -72,7 +57,7 @@ export function SignUpForm({
     },
   });
 
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
+  async function onSubmit(data: z.infer<typeof signUpFormSchema>) {
     const { email, password, username, lastName } = data;
 
     const formData = {
@@ -116,7 +101,7 @@ export function SignUpForm({
       <form onSubmit={form.handleSubmit(onSubmit)} className="rounded-lg p-5 h-auto bg-white space-y-6 shadow-lg">
         <button
           type="button"
-          className="flex items-center text-blue-500 hover:underline"
+          className="flex items-center text-xl text-blue-500 hover:underline"
           onClick={() => {
             setIsEmailSubmitted(1); // Cambiar a 1 para ir al paso anterior
             form.reset({ email: '' }); // Restablecer el formulario si es necesario
@@ -128,58 +113,12 @@ export function SignUpForm({
         <img alt='logo' src={logo} className="h-16 mx-auto mb-5" />
 
         {/* Campo de Email */}
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input type="email" placeholder="Enter a valid email address" {...field} />
-              </FormControl>
-              <FormDescription>
-                You will use this email to interact with Tokunize.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <InputForm name="email" control={control} label="Email" type="email" error={errors.email?.message}   description="You will use this email to interact with Tokunize."/>
 
         {/* Campos para el nombre y apellido */}
         <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="username"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>First Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter your first name" {...field} />
-                </FormControl>
-                <FormDescription>
-                  This is your public display name.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="lastName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Last Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter your last name" {...field} />
-                </FormControl>
-                <FormDescription>
-                  Please enter your last name.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <InputForm name="username" control={control} label="First Name" type="text" error={errors.username?.message}/>
+          <InputForm name="lastName" control={control} label="Last Name" type="text" error={errors.lastName?.message}/>
         </div>
 
         {/* Campo de contraseña */}
@@ -221,7 +160,6 @@ export function SignUpForm({
   );
 }
 
-// Componente para mostrar las validaciones de la contraseña
 function PasswordStrengthIndicator({ validations }: { validations: any }) {
   return (
     <div className="flex flex-col mt-2 space-y-1">

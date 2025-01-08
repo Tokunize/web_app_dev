@@ -16,44 +16,47 @@ import {
 import { LoadingSpinner } from "@/components/loadingSpinner";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
 import { DownloadCSV } from "@/components/downloads/DownloadCSV";
+import { TransactionAsset,Wallet } from "@/types";
 
-type Transaction = {
-  id: number;
-  event: string;
-  transaction_amount: string;
-  transaction_tokens_amount: string;
-  transaction_owner: string;
-  transaction_date: string;
-  created_at: string;
+type ApiResponse = {
+  results: {
+    transactions: TransactionAsset[];
+    wallet: Wallet;
+  };
 };
-
 
 export const Transaction = () => {
   const [position, setPosition] = useState("all");
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [transactions, setTransactions] = useState<TransactionAsset[]>([]);
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [balance, setBalance] = useState<number>(0);
-  
+  const [walletAddress, setWalletAddress] = useState<string>("XCS...SDD5");  
+  const [isEnabled, setIsEnabled] = useState<boolean>(false);
+  const [isAddressAllowed, setIsAddressAllowed] =  useState<boolean>(false)
 
   // Use the custom hook to fetch transactions
   const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}transaction/user/all/`;
-  
-  const { loading, error } = useGetAxiosRequest<{
-    transactions: Transaction[];
-    balance: { data: { tokenBalances: { amount: string }[] } };
-  }>(apiUrl,true, (data) => {       
-    console.log(data);
-     
-    setTransactions(data.transactions);
-    const balanceAmount = data.balance?.data?.tokenBalances[0]?.amount;
-    setBalance(balanceAmount ? parseFloat(balanceAmount) : 0);
-  }, (error) => {
-    console.error("Failed to fetch transactions:", error);
-  });
+
+  const { loading, error } = useGetAxiosRequest<ApiResponse>(
+    apiUrl,
+    true,
+    (data) => {
+      console.log(data.results); 
+      setTransactions(data.results.transactions); 
+      setBalance(data.results.wallet.balance); 
+      setWalletAddress(data.results.wallet.wallet_address)
+      setIsEnabled(data.results.wallet.is_enabled)
+      setIsAddressAllowed(data.results.wallet.is_address_allowed)
+    },
+    (error) => {
+      console.error("Failed to fetch transactions:", error);
+    }
+  );
+
 
   const filteredTransactions = transactions.filter((transaction) => {
-    const transactionDate = new Date(transaction.created_at);
+    const transactionDate = new Date(transaction.transaction_date);
     const isDateInRange =
       (!startDate || transactionDate >= startDate) &&
       (!endDate || transactionDate <= endDate);
@@ -73,7 +76,7 @@ export const Transaction = () => {
 
   return (
     <div className="p-4">
-      <WalletTabView balance={balance}/>
+      <WalletTabView walletAddress={walletAddress} isEnabled={isEnabled} balance={balance}/>
       <Button 
           onClick={handleDownload}>
           Download CSV

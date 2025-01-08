@@ -47,7 +47,7 @@ export const AccountType = ({ formData }: { formData: SignUpForm }) => {
 
       toast({
         title: "Registration Successful!",
-        description: "You have successfully signed up. Welcome to our community!",
+        description: "You have successfully signed up. Welcome to Tokunize!",
         duration: 5000,
         variant: "default",
       });
