@@ -84,7 +84,6 @@ CSRF_TRUSTED_ORIGINS = [
     "https://octopus-app-zlell.ondigitalocean.app",
     "http://localhost:5173"
     "https://www.tokunize.com"
-
 ]
 
 
@@ -136,9 +135,9 @@ DATABASES = {
         'PASSWORD': config('DATABASE_PWD'),
         'HOST': config('DATABASE_HOST'),
         'PORT': config('DATABASE_PORT', cast=int),
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
+        # 'OPTIONS': {
+        #     'sslmode': 'require',
+        # },
     }
 }
 
@@ -200,7 +199,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10, 
+    'PAGE_SIZE': 5, 
 
     'DEFAULT_THROTTLE_CLASSES': [
         'throttling.CustomAnonRateThrottle',  # Sin espacios extra

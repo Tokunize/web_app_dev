@@ -1,5 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.exceptions import NotFound
+
 from django.shortcuts import get_object_or_404
 from throttling import CustomAnonRateThrottle  # Asegúrate de que la ruta sea correcta
 from rest_framework.throttling import UserRateThrottle
@@ -15,6 +17,7 @@ from wallet.serializers import WalletSerializer
 import requests
 from notifications.models import ActivityLog
 from wallet.models import Wallet
+from wallet.serializers import WalletDashboardSerializer
 from property.models import PropertyToken
 from property.models import Property
 
@@ -36,36 +39,52 @@ def log_activity(event_type, involved_address, contract_address=None, payload=No
         payload=payload
     )
 
+
 class TransactionListview(APIView):
     authentication_classes = [Auth0JWTAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = TransactionSerializer
+    pagination_class = PageNumberPagination  # Paginación automática
 
     def get(self, request):
         user_id = request.user.id
         
         # Obtener las transacciones del usuario
-        transactions = Transaction.objects.filter(transaction_owner_code=user_id)
+        transactions = Transaction.objects.filter(transaction_owner_code=user_id).select_related('transaction_owner_code')
 
-        # Serializar las transacciones con paginación automática aplicada por DRF
-        transaction_serializer = TransactionSerializer(transactions, many=True)
+        # Aplicar la paginación
+        paginator = self.pagination_class()
+        paginated_transactions = paginator.paginate_queryset(transactions, request)
+        transaction_serializer = TransactionSerializer(paginated_transactions, many=True)
 
-        # Obtener el balance de la wallet
-        wallet = request.user.wallet
-        balance_data = wallet.get_balance()
-        
-        # Construir la respuesta con los datos
+        # Verificar si el usuario tiene un wallet asociado
+        wallet_data = None
+        try:
+            wallet = request.user.wallet  # Esto lanzará un error si no tiene wallet
+        except Wallet.DoesNotExist:
+            # Si no existe un wallet, devolver un mensaje de error personalizado
+            raise NotFound(detail="No se ha encontrado un wallet para este usuario. Por favor, contacte con la plataforma para solucionarlo.")
+
+        # Solo calcular el balance y la dirección si es la primera página
+        if request.query_params.get('page') in [None, '1']:  # Si estamos en la primera página o no se especifica la página
+            # Usar el serializer de Wallet, pasando 'include_balance' en el contexto para decidir si incluir el balance
+            wallet_serializer = WalletDashboardSerializer(wallet, context={'include_balance': True})
+            wallet_data = wallet_serializer.data
+
+        # Construir la respuesta con las transacciones, y wallet si es la primera página
         response_data = {
             "transactions": transaction_serializer.data,
-            "balance": balance_data  
         }
 
-        return Response(response_data, status=status.HTTP_200_OK)
+        if wallet_data:
+            response_data["wallet"] = wallet_data  # Agregar la data del wallet solo si se pidió
 
+        # Responder con la paginación estándar de DRF
+        return paginator.get_paginated_response(response_data)
     
     def post(self, request,reference_number):
         # Obtener el monto de la inversión y el id de la propiedad
-        invested_tokens_amount = request.data["investmentAmount"]
+        invested_tokens_amount =  1
         
         property_instance = Property.objects.get(reference_number=reference_number)
         tokens_property = property_instance.tokens.all()
