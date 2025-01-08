@@ -3,13 +3,15 @@ import ExternalWallet from "./externalWallet";
 
 interface Props {
     balance: number;
+    walletAddress:string;
+    isEnabled:boolean;
 }
 
-const RowWalletview = ({balance}: Props) =>{
+const RowWalletview = ({balance, walletAddress, isEnabled }: Props) =>{
     
     return(
-        <div className="flex space-x-5 ">
-            <InternalWallet walletName="Tokunize Wallet" walletType="tokunize"  address="0x1234...abcd" blockchain="Arbitrum" balance={balance}/>
+        <div className="flex w-full flex-col lg:flex-row space-y-5 lg:space-y-0 lg:space-x-5 space-x-0  justify-between ">
+            <InternalWallet   isEnabled={isEnabled} walletName="Tokunize Wallet" walletType="tokunize"  address={walletAddress} blockchain="Arbitrum" balance={balance}/>
             <ExternalWallet/>
         </div>
     )

@@ -15,7 +15,6 @@ import { useGetAxiosRequest } from '@/hooks/getAxiosRequest';
 import useSmartContract from '@/hooks/useSmartContract';
 import PaymentMyAssets from './paymentMyAssets';
 import { RootState } from '@/redux/store';
-
 import { ethers } from 'ethers';
 import tokenToTokenPoolAbi from "../../contracts/tokenToTokenPoolAbi.json";  // Asegúrate de que este ABI esté correctamente configurado
 // import usdcAbi from "../../contracts/usdc_abi.json";  
@@ -109,17 +108,10 @@ const PaymentFlow = ({ property_id }:Props) => {
     }
   }
 
+  
    // Suponiendo que MetaMask está disponible en el navegador
-   const provider = window.ethereum ? new ethers.providers.Web3Provider(window.ethereum) : null;
-   const signer = provider ? provider.getSigner() : null;
- 
-   // Verificamos si MetaMask está conectado a la red correcta
-  //  const checkNetwork = async () => {
-  //    const network = await provider?.getNetwork();
-  //    if (network?.chainId !== 11155111) {  // Sepolia Testnet ID
-  //      throw new Error("Por favor, cambia a la red Sepolia Testnet.");
-  //    }
-  //  };
+   const provider = window.ethereum ? new ethers.BrowserProvider(window.ethereum) : null;
+    const signer = provider ? provider.getSigner() : null;
 
   const checkNetwork = async () => {
     const network = await provider?.getNetwork();
@@ -149,9 +141,7 @@ const PaymentFlow = ({ property_id }:Props) => {
       await checkNetwork();
       const usdcAmountInWei = usdcAmount;
 
-      console.log("estoy aquiiii", usdcAmount);
-      
-
+    
       if (!tokenToTokenContract) {
         throw new Error('Smart contract is not initialized.');
       }

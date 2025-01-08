@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { FaBath, FaBed, FaRulerCombined } from 'react-icons/fa';
+import {  FaBed, FaRulerCombined } from 'react-icons/fa';
 import { Progress } from '../../components/ui/progress';
 import { HistoricalPrice } from '../../components/graphs/historicalGraph';
 import { FaHouse } from "react-icons/fa6";
@@ -75,14 +75,10 @@ export const Overview = ({overviewData}:PropertyData) => {
         <div className="mt-6 space-y-6  bg-[#F4FAE2] rounded-lg p-4 ">
         <div className="flex items-center space-x-5">
             <FaBed className="text-xl" />
-            <span className="text-xl">{overviewData.bedrooms || '0'} Apartments</span>
+            <span className="text-xl">{overviewData.bedrooms || '5'} Apartments</span>
           </div>
 
-          <div className="flex items-center space-x-5">
-            <FaBath className="text-xl" />
-            <span className="text-xl">{overviewData.bathrooms || '0'} Bath</span>
-          </div>
-  
+      
           <div className="flex items-center space-x-5">
             <FaRulerCombined className=" text-xl" />
             <span className="text-xl">{overviewData.size || '0'} sq ft</span>

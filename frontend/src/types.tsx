@@ -91,7 +91,6 @@ export   interface PropertyToken {
 
 export interface Transaction{
   id: number;
-  event?: string;
   transaction_amount?: string;
   transaction_tokens_amount?: string;
   transaction_owner?: string;
@@ -111,4 +110,25 @@ export interface Transaction{
 export interface TabItem {
   type: "icon" | "text";  // Tipo de contenido (icono o texto)
   content: string | React.ReactNode;  // El contenido puede ser texto o un icono
+}
+
+
+
+export type TransactionAsset = {
+  id: number;
+  event: string;
+  transaction_amount: string;
+  transaction_tokens_amount: string;
+  transaction_owner: string;
+  transaction_date: string;
+  created_at: string;
+};
+
+
+export type Wallet = {
+  wallet_address:string;
+  balance:number;
+  is_enabled:boolean;
+  is_address_allowed:boolean;
+
 }

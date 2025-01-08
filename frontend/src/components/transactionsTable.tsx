@@ -48,7 +48,6 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({ transactions
         } else if (event === "BUY") {
           eventColor = "text-[#C8E870]";
         }
-
         return <div className={eventColor}>{event}</div>;
       },
     });
@@ -264,7 +263,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({ transactions
     enableSorting: true,
     initialState: {
       pagination: {
-        pageSize: 3, 
+        pageSize: 10, 
       },
     },
      

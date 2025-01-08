@@ -10,17 +10,19 @@ interface WalletCardProps {
     address: string;
     blockchain: string;
     walletType: 'personal' | 'tokunize';
-    className?:string;
+    className?: string;
+    isEnabled: boolean;
 }
 
-const InternalWallet = ({ walletName, balance, address, blockchain, className }: WalletCardProps) => {
+const InternalWallet = ({ walletName, balance, address, blockchain, className, isEnabled }: WalletCardProps) => {
     const [tourStarted, setTourStarted] = useState(false);
-
 
     const handleButtonClick = (e: React.MouseEvent) => {
         // Evitar que el clic en el botón se propague al contenedor padre
         e.stopPropagation();
-      };
+
+        console.log("holaa")
+    };
 
     // Initialize the driver.js steps
     const startTour = () => {
@@ -90,8 +92,26 @@ const InternalWallet = ({ walletName, balance, address, blockchain, className }:
     };
 
     return (
-        <div id="tour-wallet-card" className={`${className} text-animated-gradient text-white rounded-xl shadow-lg p-6 w-full max-w-sm `}>
-            {!tourStarted && (
+        <div
+            id="tour-wallet-card"
+            className={`${className} text-animated-gradient text-white rounded-xl shadow-lg p-6 w-full max-w-md relative`}
+        >
+            {/* Capa de congelamiento (bloquea las interacciones) */}
+            {!isEnabled && (
+                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-blue-800 to-blue-400 opacity-60 z-10 pointer-events-auto">
+                    {/* Efecto de hielo con textura */}
+                    <div 
+                        className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/asfalt.png')] opacity-100" 
+                        style={{ backgroundColor: 'rgba(0, 0, 0, 0.15)', backdropFilter: 'blur(45px)' }}
+                    ></div>
+                    {/* Bloqueo de interacciones */}
+                    <div className="absolute top-0 left-0 w-full h-full bg-white opacity-50 z-20 pointer-events-none"></div>
+                </div>
+            )}
+
+
+            {/* Botón de inicio del tour, solo visible si no ha comenzado */}
+            {!tourStarted && isEnabled && (
                 <button
                     className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg mb-4"
                     onClick={startTour}
@@ -105,7 +125,7 @@ const InternalWallet = ({ walletName, balance, address, blockchain, className }:
                 <h3 id="tour-wallet-name" className="text-2xl font-bold">{walletName}</h3>
                 <div className="flex flex-col items-center">
                     <span className="text-sm text-gray-400 uppercase">{blockchain}</span>
-                     <img loading="lazy" src="https://www.tokunize.com/assets/logo_only_black-DlYer6eb.png" className="h-8" alt="Tokunize logo" />
+                    <img loading="lazy" src="https://www.tokunize.com/assets/logo_only_black-DlYer6eb.png" className="h-8" alt="Tokunize logo" />
                 </div>
             </div>
 
@@ -113,22 +133,27 @@ const InternalWallet = ({ walletName, balance, address, blockchain, className }:
             <div className="mb-4">
                 <p className="text-sm text-gray-500">Wallet Address</p>
                 <p id="tour-wallet-address" className="text-sm font-mono text-gray-200 truncate">
-                {address ? `${address.slice(0, 4)}...${address.slice(-4)}` : ''}
-                </p>            
+                    {address}
+                </p>
             </div>
 
             {/* Balance */}
             <div id="tour-wallet-balance" className="mb-6">
                 <p className="text-sm text-gray-500">Balance</p>
-                <CurrencyConverter amountInUSD={balance}/>
+                <CurrencyConverter amountInUSD={balance} />
             </div>
 
-            <div  onClick={handleButtonClick} className="flex z-30 justify-between">
-                <button   id="tour-send-button" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+            {/* Botones de acción */}
+            <div onClick={handleButtonClick} className="flex z-30 justify-between">
+                <button
+                    id="tour-send-button"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+                    disabled={!isEnabled} // Deshabilitar botón si no está habilitado
+                >
                     Send
                 </button>
-                <div  onClick={handleButtonClick}>
-                    <RowActionaWallet/>
+                <div onClick={handleButtonClick}>
+                    <RowActionaWallet isEnabled={isEnabled} /> {/* Deshabilitar RowActionaWallet si no está habilitado */}
                 </div>
             </div>
         </div>

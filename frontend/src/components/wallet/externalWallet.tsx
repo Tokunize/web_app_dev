@@ -34,13 +34,16 @@ const ExternalWallet = ({ className }: Props) => {
     if (isLoading) return <div>Loading...</div>;
     if (isError) return <div>Error fetching balance</div>;
 
+    console.log(ethPrice);
+    
+
     // Convertir balance de ETH a USD
     const balanceInUSD = data ? parseFloat(data.formatted) * ethPrice : 0;
 
     return (
         <div
             id="tour-wallet-card"
-            className={`${className} text-animated-gradient text-white rounded-xl shadow-lg p-6 w-full max-w-sm `}
+            className={`${className} text-animated-gradient text-white rounded-xl shadow-lg p-6 w-full max-w-md `}
         >
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
@@ -61,8 +64,9 @@ const ExternalWallet = ({ className }: Props) => {
                 </div>
 
                 <div id="tour-wallet-balance" className="mb-6">
-                    <p className="text-sm text-gray-500">Balance</p>                
-                    <CurrencyConverter amountInUSD={balanceInUSD} />
+                    <p className="text-sm text-gray-500">Balance</p>    
+                    {balanceInUSD}            
+                    {/* <CurrencyConverter amountInUSD={balanceInUSD} /> */}
                 </div>
                 </>
             ):(
