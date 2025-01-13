@@ -3,7 +3,7 @@ import { FormatCurrency } from "@/components/currencyConverter";  // Asegúrate 
 
 interface Props {
     title: string,
-    value: number | JSX.Element, // Cambiar a número o JSX.Element
+    value: number 
     isCurrency?: boolean,  // Propiedad opcional para determinar si es un valor en dinero
 }
 

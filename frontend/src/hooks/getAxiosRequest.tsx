@@ -66,13 +66,20 @@ export const useGetAxiosRequest = <T,>(
 
 
 
+interface FetchStateTwo<T> {
+  data: T | null;
+  loading: boolean;
+  error: string | null;
+  fetchData: () => Promise<void>;  // Agregamos fetchData aquí
+}
+
 
 export const useGetAxiosRequestManual = <T,>(
   url: string,
   requiresAuth: boolean = false,  // nuevo parámetro para indicar si requiere autenticación
   onSuccess?: (data: T) => void,
   onError?: (error: string) => void,
-): [FetchState<T>, () => Promise<void>] => {
+): FetchStateTwo<T> => {
   const { getAccessTokenSilently } = useAuth0();
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -103,7 +110,7 @@ export const useGetAxiosRequestManual = <T,>(
       onSuccess?.(response.data);
     } catch (err) {
       const errorMessage = axios.isAxiosError(err)
-        ? err.response?.data?.error || 'Error en la respuesta del servidor.'
+        ? err.response?.data?.message || 'Error en la respuesta del servidor.'
         : 'Error inesperado al hacer la solicitud.';
       setError(errorMessage);
       onError?.(errorMessage);
@@ -113,5 +120,6 @@ export const useGetAxiosRequestManual = <T,>(
     }
   };
 
-  return [{ data, loading, error }, fetchData];  // Regresamos la función `fetchData` junto con el estado
+  // Aquí ya no usamos useEffect, así que la llamada a fetchData dependerá de cuando se ejecute en el componente.
+  return { data, loading, error, fetchData };
 };

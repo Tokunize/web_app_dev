@@ -9,7 +9,7 @@ interface UseSmartContractProps {
 
 const useSmartContract = ({ contractAddress, contractAbi }: UseSmartContractProps) => {
   const [contract, setContract] = useState<ethers.Contract | null>(null);
-  const {toast} = useToast()
+  const { toast } = useToast();
 
   useEffect(() => {
     const initContract = async () => {
@@ -20,24 +20,30 @@ const useSmartContract = ({ contractAddress, contractAbi }: UseSmartContractProp
             title: "Invalid",
             description: "MetaMask is not installed",
             variant: "destructive",
-        });
+          });
           return;
         }
 
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        // Usar BrowserProvider en lugar de Web3Provider
+        const provider = new ethers.BrowserProvider(window.ethereum); // Correcto en ethers v6
         await provider.send("eth_requestAccounts", []); // Solicitar acceso a la cuenta
-        const signer = provider.getSigner();
+        const signer = await provider.getSigner(); // Asegúrate de esperar la promesa de getSigner()
 
-        // Crear instancia del contrato
+        // Crear instancia del contrato con signer
         const contractInstance = new ethers.Contract(contractAddress, contractAbi, signer);
         setContract(contractInstance);
       } catch (error) {
         console.error("Error initializing contract:", error);
+        toast({
+          title: "Error",
+          description: "There was an error while initializing the contract.",
+          variant: "destructive",
+        });
       }
     };
 
     initContract();
-  }, [contractAddress, contractAbi]);
+  }, [contractAddress, contractAbi, toast]);
 
   return contract;
 };

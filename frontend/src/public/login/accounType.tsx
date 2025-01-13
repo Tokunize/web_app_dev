@@ -36,21 +36,20 @@ export const AccountType = ({ formData }: { formData: SignUpForm }) => {
       },
     };
 
-    console.log('Final data before request:', finalData);
-
     try {
-      await axios.post(
+      const response = await axios.post(
         'https://dev-2l2jjwfm5ekzae3u.us.auth0.com/dbconnections/signup',
         finalData,
         { headers: { 'Content-Type': 'application/json' } }
       );
-
-      toast({
-        title: "Registration Successful!",
-        description: "You have successfully signed up. Welcome to Tokunize!",
-        duration: 5000,
-        variant: "default",
-      });
+      if(response.status === 200){
+        toast({
+          title: "Registration Successful!",
+          description: "You have successfully signed up. Welcome to Tokunize!",
+          duration: 5000,
+          variant: "default",
+        });
+      }    
     } catch (err) {
       toast({
         title: "Registration Failed",
@@ -70,14 +69,10 @@ export const AccountType = ({ formData }: { formData: SignUpForm }) => {
     setCurrentStep(0); // Reinicia el paso cuando se selecciona un nuevo tipo
   };
 
-  // Función que se llamará cuando el usuario confirme ser "Owner"
-  const handleOwnerConfirm = () => {
-    SubmitForm(); // Se envía el formulario con los datos
+  const handleConfirmAccount = () => {
+    SubmitForm(); 
   };
 
-  const handleInvestorConfirm = () => {
-    SubmitForm(); // Se envía el formulario con los datos
-  };
 
   // Función para ir al siguiente paso
   const handleNextStep = () => {
@@ -104,15 +99,15 @@ export const AccountType = ({ formData }: { formData: SignUpForm }) => {
           handleNextStep={handleNextStep}
           handlePrevStep={handlePrevStep}
           handleBackToSelection={handleBackToSelection}
-          onInvestorConfirm={handleInvestorConfirm} // Pasamos la función para confirmar el rol de "Investor"
+          onInvestorConfirm={handleConfirmAccount} // Pasamos la función para confirmar el rol de "Investor"
         />
       );
     } else if (selectedAccountType === 'owner') {
       return (
-        <div className="p-4 rounded-lg w-[550px] mx-auto">
+        <div>
           <FaArrowCircleLeft className="text-[#C8E870] mb-3 cursor-pointer" onClick={handleBackToSelection} />
           <h3 className="font-semibold text-xl mb-[40px]">As a commercial real estate owner,</h3>
-          <OwnerFlowCarousel onConfirm={handleOwnerConfirm} /> {/* Pasamos la prop onConfirm */}
+          <OwnerFlowCarousel onConfirm={handleConfirmAccount} /> {/* Pasamos la prop onConfirm */}
         </div>
       );
     }
@@ -121,10 +116,10 @@ export const AccountType = ({ formData }: { formData: SignUpForm }) => {
 
   return (
     <section className="flex flex-col items-center rounded-lg" id="accountTypeSection">
-      <div className="mt-[70px] items-center flex flex-col ">
+      <div className="items-center justify-center flex min-h-screen flex-col">
         {/* Mostrar el flujo según el tipo de cuenta seleccionado */}
         {selectedAccountType ? (
-          <div className="rounded-lg w-[70%] p-0">
+          <div className="rounded-lg  lg:w-[70%] py-5 ">
             {renderContent()}
           </div>
         ) : (

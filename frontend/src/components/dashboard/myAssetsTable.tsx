@@ -25,7 +25,7 @@ import { formatDistanceToNow, parseISO } from 'date-fns'; // Import necessary fu
 interface Asset {
   image?: string;
   title?: string;
-  id?:number;
+  id?: number;
   user_tokens?: number;
   projected_rental_yield?: number;
   net_asset_value?: number;
@@ -33,7 +33,7 @@ interface Asset {
   total_tokens?: number;
   status?: string;
   property_status?: string;
-  ocupancy_status?:string;
+  ocupancy_status?: string;
   projected_appreciation?: string;
   total_rental_income?: number;
   price_change?: number;
@@ -54,7 +54,6 @@ const formatStatus = (status: string): string => {
     .join(' '); // Join the words back into a string
 };
 
-
 // The main functional component
 export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData }) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -68,213 +67,206 @@ export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData })
   // Define columns based on the available data
   const columns: ColumnDef<Asset>[] = [];
 
-  // Use useMemo to optimize asset data processing
-  const memoizedAssetsData = React.useMemo(() => {
-    if (Array.isArray(assetsData) && assetsData.length > 0) {
-      const asset = assetsData[0];
+  if (Array.isArray(assetsData) && assetsData.length > 0) {
+    const asset = assetsData[0];
 
-      // Add columns dynamically based on the asset data
-      if (asset.image && asset.title) {
-        columns.push({
-          accessorKey: "title",
-          header: "Property Info",
-          cell: ({ row }) => (
-            <div className="flex items-center w-[175px]">
-              <img src={row.original.image} alt={row.original.title} className="w-12 h-12 mr-4 rounded-full" />
-              <div>
-                <div className="font-bold">{row.original.title}</div>
-                <div className="text-sm text-gray-500">{row.original.location}</div>
-              </div>
+    // Add columns dynamically based on the asset data
+    if (asset.image && asset.title) {
+      columns.push({
+        accessorKey: "title",
+        header: "Property Info",
+        cell: ({ row }) => (
+          <div className="flex items-center w-[175px]">
+            <img src={row.original.image} alt={row.original.title} className="w-12 h-12 mr-4 rounded-full" />
+            <div>
+              <div className="font-bold">{row.original.title}</div>
+              <div className="text-sm text-gray-500">{row.original.location}</div>
             </div>
-          ),
-        });
-      }
-
-      asset.ownershipPercentage && columns.push({
-        accessorKey: "ownershipPercentage",
-        header: () => (
-            <span>Ownership (%)</span>
-        ),
-        cell: ({ row }) => {
-          const value = toNumber(row.getValue("ownershipPercentage"));
-          return <div>{value.toFixed(2)}%</div>;
-        },
-      });
-
-
-
-      asset.projected_rental_yield != null && columns.push({
-        accessorKey: "projected_rental_yield",
-        header: () => (
-          <div className="flex items-center min-w-[150px]">
-            <span>Projected Rental Yield (%)</span>
-            <button
-              onClick={() => setSorting([{ id: 'projected_rental_yield', desc: !sorting[0]?.desc }])}
-              className="ml-2 text-gray-500 hover:text-gray-700"
-            >
-              {sorting[0]?.desc ? "↑" : "↓"}
-            </button>
           </div>
         ),
-        cell: ({ row }) => {
-          const value = toNumber(row.getValue("projected_rental_yield"));
-          const textColor = value > 0 ? "text-[#0FB86A]" : "text-red-500";
-          return <div className={`${textColor}`}>{value.toFixed(2)}%</div>;
-        },
-      });
-
-      asset.user_tokens != null &&  columns.push({
-        accessorKey: "user_tokens",
-        header: "Liquidity",
-        cell : ({row}) =>{
-          const user_tokens = row.getValue("user_tokens") as number || 0
-          const totalTokens = row.original.total_tokens || 0; // Accedemos directamente al valor
-          const ownerPercentage = (user_tokens*100)/ totalTokens
-          return <div className="flex flex-col min-w-[100px]">
-              <span className="text-[#82A621] font-bold">{ownerPercentage.toFixed(2)}%</span>
-              <span>{user_tokens} of {totalTokens}</span>
-          </div>
-        }
-      })
-
-      // Listing price column
-      asset.listing_price != null && columns.push({
-        accessorKey: "listing_price",
-        header: "Listing Price",
-        cell: ({ row }) => {
-          const value = toNumber(row.getValue("listing_price"));
-          return <div className="font-medium">{new Intl.NumberFormat("en-UK", {
-            style: "currency",
-            currency: "GBP",
-          }).format(value)}</div>;
-        },
-      });
-
-      // Reuse the pattern for other columns dynamically
-      const addNumberColumn = (key: keyof Asset, label: string, currency?: boolean) => {
-        asset[key] != null && columns.push({
-          accessorKey: key,
-          header: label,
-          cell: ({ row }) => {
-            const value = toNumber(row.getValue(key));
-            const formatted = currency
-              ? new Intl.NumberFormat("en-UK", { style: "currency", currency: "GBP" }).format(value)
-              : `${value.toFixed(2)}%`;
-            return <div className="font-medium">{formatted}</div>;
-          },
-        });
-      };
-
-      asset.price_change != null && columns.push({
-        accessorKey: "price_change",
-        header: "Price Change",
-        cell: ({ row }) => {
-          const value = toNumber(row.getValue("price_change"));
-          const textColor = value > 0 ? "text-[#0FB86A]" : "text-red-500";
-          
-          return (
-            <div className={`${textColor} font-medium flex items-center w-[100px]`}>
-              {value.toFixed(2)}%
-              {value > 0 && <img src={PositiveNumber} alt="Positive Change" className="ml-2 w-16 h-16" />} {/* SVG al lado */}
-            </div>
-          );
-        },
-      });
-
-      addNumberColumn("upcoming_rent_amount", "Amount", true);
-      addNumberColumn("projected_appreciation", "Projected Appreciation");
-      addNumberColumn("total_rental_income", "Total Rental Income", true);
-      addNumberColumn("net_asset_value", "Net Assets Value", true);
-      addNumberColumn("cap_rate", "Cap Rate");
-
-      // Property Status column with color coding
-      asset.property_status && columns.push({
-        accessorKey: "property_status",
-        header: "Status",
-        cell: ({ row }) => {
-          const value = row.getValue("property_status") as string;
-          const statusClasses = {
-            "published": ["text-green-600", "bg-green-600"],
-            "under_review": ["text-red-400", "bg-yellow-300"],
-            "coming_soon": ["text-gray-600", "bg-gray-600"],
-            "sold": ["text-red-800", "bg-red-800"],
-            "default": ["text-gray-500", "bg-gray-500"],
-          };
-          const [textColor, dotColor] = statusClasses[value as keyof typeof statusClasses] || statusClasses.default;
-          
-          return (
-            <div className={`flex items-center w-[140px] ${textColor}`}>
-              <div className={`w-2 h-2 rounded-full mr-2 ${dotColor}`}></div>
-              <span className="font-medium">{formatStatus(value)}</span> {/* Use formatStatus here */}
-            </div>
-          );
-        },
-      });
-
-      asset.ocupancy_status && columns.push({
-        accessorKey: "ocupancy_status",
-        header: "Status",
-        cell: ({ row }) => {
-          const value = row.getValue("ocupancy_status") as string;          
-          return (
-            <div>{formatStatus(value)}</div>
-          );
-        },
-      });
-
-      asset.listing_date && columns.push({
-        accessorKey: "listing_date",
-        header: "Listing Date ",
-        cell: ({ row }) => {
-          const dateValue = row.getValue("listing_date") as string;
-          const formattedDate = formatDistanceToNow(parseISO(dateValue), {
-            addSuffix: true, // Add 'ago' suffix
-          });
-          return <div className="font-medium w-[150px]">{formattedDate}</div>;
-        },
-      });
-
-      // Date columns
-      const addDateColumn = (key: keyof Asset, label: string) => {
-        asset[key] && columns.push({
-          accessorKey: key,
-          header: label,
-          cell: ({ row }) => {
-            const dateValue = row.getValue(key) as string;
-            return <div className="font-medium">{dateValue}</div>;
-          },
-        });
-      };
-
-      addDateColumn("upcoming_date_rent", "Date");
-
-      // Equity Listed column with sorting toggle
-      asset.equity_listed != null && columns.push({
-        accessorKey: "equity_listed",
-        header: () => (
-          <div className="flex items-center w-[150px]">
-            <span>Equity Listed (%)</span>
-            <button
-              onClick={() => setSorting([{ id: 'equity_listed', desc: !sorting[0]?.desc }])}
-              className="ml-2 text-gray-500 hover:text-gray-700"
-            >
-              {sorting[0]?.desc ? "↑" : "↓"}
-            </button>
-          </div>
-        ),
-        cell: ({ row }) => {
-          const value = toNumber(row.getValue("equity_listed"));
-          return <div>{value.toFixed(2)}%</div>;
-        },
       });
     }
-    return columns; // Returning the memoized columns
-  }, [assetsData]); // Depend on assetsData
+
+    asset.ownershipPercentage && columns.push({
+      accessorKey: "ownershipPercentage",
+      header: () => (
+        <span>Ownership (%)</span>
+      ),
+      cell: ({ row }) => {
+        const value = toNumber(row.getValue("ownershipPercentage"));
+        return <div>{value.toFixed(2)}%</div>;
+      },
+    });
+
+    asset.projected_rental_yield != null && columns.push({
+      accessorKey: "projected_rental_yield",
+      header: () => (
+        <div className="flex items-center min-w-[150px]">
+          <span>Projected Rental Yield (%)</span>
+          <button
+            onClick={() => setSorting([{ id: 'projected_rental_yield', desc: !sorting[0]?.desc }])}
+            className="ml-2 text-gray-500 hover:text-gray-700"
+          >
+            {sorting[0]?.desc ? "↑" : "↓"}
+          </button>
+        </div>
+      ),
+      cell: ({ row }) => {
+        const value = toNumber(row.getValue("projected_rental_yield"));
+        const textColor = value > 0 ? "text-[#0FB86A]" : "text-red-500";
+        return <div className={`${textColor}`}>{value.toFixed(2)}%</div>;
+      },
+    });
+
+    asset.user_tokens != null && columns.push({
+      accessorKey: "user_tokens",
+      header: "Liquidity",
+      cell: ({ row }) => {
+        const user_tokens = row.getValue("user_tokens") as number || 0;
+        const totalTokens = row.original.total_tokens || 0; // Accedemos directamente al valor
+        const ownerPercentage = (user_tokens * 100) / totalTokens;
+        return <div className="flex flex-col min-w-[100px]">
+          <span className="text-[#82A621] font-bold">{ownerPercentage.toFixed(2)}%</span>
+          <span>{user_tokens} of {totalTokens}</span>
+        </div>
+      }
+    });
+
+    // Listing price column
+    asset.listing_price != null && columns.push({
+      accessorKey: "listing_price",
+      header: "Listing Price",
+      cell: ({ row }) => {
+        const value = toNumber(row.getValue("listing_price"));
+        return <div className="font-medium">{new Intl.NumberFormat("en-UK", {
+          style: "currency",
+          currency: "GBP",
+        }).format(value)}</div>;
+      },
+    });
+
+    // Reuse the pattern for other columns dynamically
+    const addNumberColumn = (key: keyof Asset, label: string, currency?: boolean) => {
+      asset[key] != null && columns.push({
+        accessorKey: key,
+        header: label,
+        cell: ({ row }) => {
+          const value = toNumber(row.getValue(key));
+          const formatted = currency
+            ? new Intl.NumberFormat("en-UK", { style: "currency", currency: "GBP" }).format(value)
+            : `${value.toFixed(2)}%`;
+          return <div className="font-medium">{formatted}</div>;
+        },
+      });
+    };
+
+    asset.price_change != null && columns.push({
+      accessorKey: "price_change",
+      header: "Price Change",
+      cell: ({ row }) => {
+        const value = toNumber(row.getValue("price_change"));
+        const textColor = value > 0 ? "text-[#0FB86A]" : "text-red-500";
+        return (
+          <div className={`${textColor} font-medium flex items-center w-[100px]`}>
+            {value.toFixed(2)}%
+            {value > 0 && <img src={PositiveNumber} alt="Positive Change" className="ml-2 w-16 h-16" />} {/* SVG al lado */}
+          </div>
+        );
+      },
+    });
+
+    addNumberColumn("upcoming_rent_amount", "Amount", true);
+    addNumberColumn("projected_appreciation", "Projected Appreciation");
+    addNumberColumn("total_rental_income", "Total Rental Income", true);
+    addNumberColumn("net_asset_value", "Net Assets Value", true);
+    addNumberColumn("cap_rate", "Cap Rate");
+
+    // Property Status column with color coding
+    asset.property_status && columns.push({
+      accessorKey: "property_status",
+      header: "Status",
+      cell: ({ row }) => {
+        const value = row.getValue("property_status") as string;
+        const statusClasses = {
+          "published": ["text-green-600", "bg-green-600"],
+          "under_review": ["text-red-400", "bg-yellow-300"],
+          "coming_soon": ["text-gray-600", "bg-gray-600"],
+          "sold": ["text-red-800", "bg-red-800"],
+          "default": ["text-gray-500", "bg-gray-500"],
+        };
+        const [textColor, dotColor] = statusClasses[value as keyof typeof statusClasses] || statusClasses.default;
+
+        return (
+          <div className={`flex items-center w-[140px] ${textColor}`}>
+            <div className={`w-2 h-2 rounded-full mr-2 ${dotColor}`}></div>
+            <span className="font-medium">{formatStatus(value)}</span> {/* Use formatStatus here */}
+          </div>
+        );
+      },
+    });
+
+    asset.ocupancy_status && columns.push({
+      accessorKey: "ocupancy_status",
+      header: "Status",
+      cell: ({ row }) => {
+        const value = row.getValue("ocupancy_status") as string;
+        return (
+          <div>{formatStatus(value)}</div>
+        );
+      },
+    });
+
+    asset.listing_date && columns.push({
+      accessorKey: "listing_date",
+      header: "Listing Date ",
+      cell: ({ row }) => {
+        const dateValue = row.getValue("listing_date") as string;
+        const formattedDate = formatDistanceToNow(parseISO(dateValue), {
+          addSuffix: true, // Add 'ago' suffix
+        });
+        return <div className="font-medium w-[150px]">{formattedDate}</div>;
+      },
+    });
+
+    // Date columns
+    const addDateColumn = (key: keyof Asset, label: string) => {
+      asset[key] && columns.push({
+        accessorKey: key,
+        header: label,
+        cell: ({ row }) => {
+          const dateValue = row.getValue(key) as string;
+          return <div className="font-medium">{dateValue}</div>;
+        },
+      });
+    };
+
+    addDateColumn("upcoming_date_rent", "Date");
+
+    // Equity Listed column with sorting toggle
+    asset.equity_listed != null && columns.push({
+      accessorKey: "equity_listed",
+      header: () => (
+        <div className="flex items-center w-[150px]">
+          <span>Equity Listed (%)</span>
+          <button
+            onClick={() => setSorting([{ id: 'equity_listed', desc: !sorting[0]?.desc }])}
+            className="ml-2 text-gray-500 hover:text-gray-700"
+          >
+            {sorting[0]?.desc ? "↑" : "↓"}
+          </button>
+        </div>
+      ),
+      cell: ({ row }) => {
+        const value = toNumber(row.getValue("equity_listed"));
+        return <div>{value.toFixed(2)}%</div>;
+      },
+    });
+  }
 
   // Set up the React Table instance
   const table = useReactTable({
     data: assetsData,
-    columns: memoizedAssetsData,
+    columns,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -289,7 +281,7 @@ export const MyAssetsTable: React.FC<{ assetsData: Asset[] }> = ({ assetsData })
   return (
     <div className="w-full">
       <div className="border-t">
-        <Table >
+        <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

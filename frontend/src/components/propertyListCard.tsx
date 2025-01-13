@@ -42,7 +42,7 @@ export const PropertyListCard = ({
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(now.getDate() - 7); // Cambiado a 7 días para una semana
 
-    // Calcular los tokens vendidos
+    // Calcular los tokennnnns vendidos
     const soldTokens = totalTokens ? totalTokens - tokens_available : 0; // Asegúrate de que totalTokens no sea undefined
     const soldPercentage = totalTokens > 0 ? (soldTokens / totalTokens) * 100 : 0; // Evita división por cero
 

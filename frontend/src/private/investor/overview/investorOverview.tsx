@@ -3,8 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PropertyValueGraph } from "@/components/graphs/propertyValueGraph";
 import { PieGraph } from "@/components/graphs/pieGraph";
-import { RiskOverview } from "@/components/graphs/riskGraph";
-// import { PerformanceGraph } from "@/components/graphs/performanceGraph";
 import { MyAssetsTable } from "@/components/dashboard/myAssetsTable";
 import { LoadingSpinner } from "@/components/loadingSpinner";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";  
@@ -48,12 +46,15 @@ export const InvestorOverview = () => {
     "3.3", "4.2", "3.6", "-0.5", "4.1" ,"1.5"
   ]
 
+  console.log(investments);
+  
+
   // Transformamos los datos recibidos para pasarlos a las gráficas y tablas
   const yieldData = investments?.properties.map((property,index) => ({
     image: property.yield_data.image,
     title: property.yield_data.title,
     projected_rental_yield: property.yield_data.projected_rental_yield,
-    projected_appreciation: dummyAppreciation[index],
+    projected_appreciation:dummyAppreciation[index],
     location: property.location,
   }));
 
@@ -119,13 +120,6 @@ export const InvestorOverview = () => {
             />
           </Card>
         </Card>
-
-      <div className="flex gap-4 px-4 pb-4">
-        <Card className="shadow-none  w-1/2 border-0">
-          <RiskOverview />
-        </Card>
-       
-      </div>
     </section>
   );
 };

@@ -10,8 +10,8 @@ interface PaymentSecondProps {
   goNext: () => void;
   tokenPrice: number;
   totalTokens: number;
-  investmentAmount: number;
-  setInvestmentAmount: (amount: number) => void;
+  investmentAmount: string;
+  setInvestmentAmount: (amount: string) => void;
   setTotalAmountInUSDC: (amount: number) => void; 
 }
 

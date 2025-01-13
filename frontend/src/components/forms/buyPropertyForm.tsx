@@ -39,8 +39,8 @@ const PurchaseForm = ({
         </div>
 
         {isAuthenticated ? (
-          <Suspense fallback={<LoadingSpinner/>}>
-              <PaymentFlow property_id={property_id} />
+          <Suspense fallback={<LoadingSpinner />}>
+            <PaymentFlow property_id={property_id} />
           </Suspense>
         ) : (
           // Si no ha iniciado sesión, mostrar Popover
