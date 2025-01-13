@@ -16,8 +16,7 @@ import PaymentMyAssets from './paymentMyAssets';
 import { RootState } from '@/redux/store';
 import { ethers } from 'ethers';
 import tokenToTokenPoolAbi from "../../contracts/tokenToTokenPoolAbi.json";  // Asegúrate de que este ABI esté correctamente configurado
-// import usdcAbi from "../../contracts/usdc_abi.json";  import { GlobalModal } from "../../globalModal2";
-import { GlobalModal } from '../globalModal2';
+import { GlobalModal } from '../customModal';
 
 import { useSelector } from 'react-redux';
 

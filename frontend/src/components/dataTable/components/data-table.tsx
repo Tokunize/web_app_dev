@@ -26,7 +26,7 @@ import {
 
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
-import { GlobalModal } from "../../globalModal2";
+import { GlobalModal } from "../../customModal";
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { TradingBuyFlow } from "@/components/stepperFlows/tradingBuyFlow";

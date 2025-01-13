@@ -2,7 +2,7 @@ import { LoadingSpinner } from "@/components/loadingSpinner";
 import { TransactionTable } from "@/components/transactionsTable";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
 
-const RecentOrders = () => {
+export const RecentOrders = () => {
   const { data, loading, error } = useGetAxiosRequest(
     `${import.meta.env.VITE_APP_BACKEND_URL}orderbooks/trades/`,
     true
@@ -27,4 +27,3 @@ const RecentOrders = () => {
   );
 };
 
-export default RecentOrders;
