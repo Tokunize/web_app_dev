@@ -12,7 +12,7 @@ interface Data {
   sellOrders: Order[];
 }
 
-const OrderBook = () => {
+export const OrderBook = () => {
   const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}orderbooks/order/`;
   const { data, loading, error } = useGetAxiosRequest<Data>(apiUrl, true);
 
@@ -45,4 +45,3 @@ const OrderBook = () => {
   );
 };
 
-export default OrderBook;
