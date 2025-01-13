@@ -29,16 +29,7 @@ export const SinglePropertyDetailOnModal = ({ propertyData }: Props) => {
       <div className="flex flex-row space-x-3">
         {/* Property details and image carousel */}
         <aside className="w-1/2 flex flex-col text-left">
-          {/* <Carousel indicators={true} slide={false} className="h-[50%]">
-            {propertyData.image.map((img, index) => (
-              <img
-                key={index}
-                src={img}
-                alt={`${propertyData.title} image ${index + 1}`}
-                className="w-full h-full object-cover"
-              />
-            ))}
-          </Carousel> */}
+       
 
           <header className="mt-3">
             <h1 className="font-semibold">{propertyData.title}</h1>
@@ -77,11 +68,11 @@ export const SinglePropertyDetailOnModal = ({ propertyData }: Props) => {
               <li className="flex text-sm justify-between">
                 Equity Listed <span> <FormatCurrency amount={propertyData.price}/></span>
               </li>
-              {/* <Progress progress={30} />
-              <li className="flex   text-sm justify-between">
+              {/* For demonstration, using a static 30% for the first progress bar */}
+              {/* <li className="flex   text-sm justify-between">
                 Equity Sold <span>{progressEquity.toFixed(2)} %</span>
-              </li>
-              <Progress progress={progressEquity} /> */}
+              </li> */}
+              {/* The second progress bar reflects the actual equity sold */}
             </ul>
           </div>
         </article>

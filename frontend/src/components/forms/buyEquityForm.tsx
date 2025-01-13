@@ -23,10 +23,10 @@ interface PostDataResponse {
 }
 
 // const usdcAddress = "0xdC48A996F3073d4ADAB7f77B42162c284801A6d9";
+// const usdcAddress = "0xdC48A996F3073d4ADAB7f77B42162c284801A6d9";
 
 export const BuyEquityForm = ({ onSubmitSuccess, propertyScrowAddress }: BuyEquityForm) => {
   const { itemId } = useSelector((state: RootState) => state.tableActionItem);
-  // const { toast } = useToast();
 
   const { control, handleSubmit, formState: { errors } } = useForm<makeOfferTraddingValues>({
     resolver: zodResolver(makeOfferTradding),
@@ -39,58 +39,11 @@ export const BuyEquityForm = ({ onSubmitSuccess, propertyScrowAddress }: BuyEqui
     contractAbi: propertyScrowAbi,
   });
 
+
   console.log(propertyScrow);
   
-
-  // const checkBalance = async (requiredAmount: string) => {
-  //   if (!window.ethereum) {
-  //     toast({
-  //       title: "MetaMask not found",
-  //       description: "Please install MetaMask to interact with the contract.",
-  //       variant: "destructive",
-  //     });
-  //     return false;
-  //   }
-
-  //   try {
-  //     const provider = new ethers.BrowserProvider(window.ethereum);
-  //     const signer = await provider.getSigner();
-  //     const userAddress = await signer.getAddress();
-
-  //     const usdcContract = new ethers.Contract(usdcAddress, [
-  //       "function balanceOf(address account) public view returns (uint256)"
-  //     ], provider);
-
-  //     const balance = await usdcContract.balanceOf(userAddress);
-  //     const balanceInUSDC = formatUnits(balance, 6); // ✅ Solución
-
-  //     if (parseFloat(balanceInUSDC) >= parseFloat(requiredAmount)) {
-  //       toast({
-  //         title: "Sufficient Balance",
-  //         description: `You have ${balanceInUSDC} USDC, which is sufficient.`,
-  //         variant: "default",
-  //       });
-  //       return true;
-  //     } else {
-  //       toast({
-  //         title: "Insufficient Balance",
-  //         description: `You only have ${balanceInUSDC} USDC. You need ${requiredAmount} USDC.`,
-  //         variant: "destructive",
-  //       });
-  //       return false;
-  //     }
-  //   } catch (error) {
-  //     console.error("Error checking balance:", error);
-  //     toast({
-  //       title: "Balance check failed",
-  //       description: "An error occurred while checking your balance.",
-  //       variant: "destructive",
-  //     });
-  //     return false;
-  //   }
-  // };
-
-
+  
+ 
   
   const [{ loading, error }] = usePostAxiosRequest<PostDataResponse, makeOfferTraddingValues>(
     `${import.meta.env.VITE_APP_BACKEND_URL}orderbooks/order/property/${itemId}/`,
@@ -103,6 +56,9 @@ export const BuyEquityForm = ({ onSubmitSuccess, propertyScrowAddress }: BuyEqui
   );
   
   const onSubmit: SubmitHandler<makeOfferTraddingValues> = (data) => {
+    console.log(data);
+    onSubmitSuccess()
+    
     console.log(data);
     onSubmitSuccess()
     
