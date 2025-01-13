@@ -2,12 +2,10 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { visualizer } from 'rollup-plugin-visualizer';
-import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 export default defineConfig({
   plugins: [
     react(),
-    nodePolyfills(), // Sin propiedades como crypto, stream, etc.
     visualizer({
       filename: './stats.html', // Archivo donde se genera el análisis
       open: true, // Abre el reporte automáticamente al generar el bundle
