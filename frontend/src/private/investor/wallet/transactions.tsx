@@ -83,6 +83,8 @@ export const Transaction = () => {
           <Download className="ml-4" />
       </Button>
 
+      {isAddressAllowed}
+
 
       <div className="flex justify-between mt-4 mb-4">
         <DatePickerWithRange

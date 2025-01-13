@@ -20,33 +20,11 @@ import tokenToTokenPoolAbi from "../../contracts/tokenToTokenPoolAbi.json";  // 
 import { useSelector } from 'react-redux';
 import { GlobalModal } from '../globalModal2';
 import { useModalContext } from "@/context/modalContext";
+import { PropertyDataPayment } from '@/types';
 
 interface Props {
   property_id: string;
 }
-
-interface PropertyData {
-  property_id: string;
-  propertyData: {
-    title: string;
-    location: string;
-    country: string;
-    property_type: string;
-    image: string[];
-    price: number;
-    property_blockchain_adress: string;  // Asegúrate de que esté aquí
-    projected_annual_yield: number;
-    projected_rental_yield: number;
-    tokens: {
-      total_tokens: number;
-      tokens_available: number;
-      tokens_sold: number;
-      token_price: number;
-    }[];
-  };
-}
-
-
 
 const PaymentFlow = ({ property_id }:Props) => {
 
@@ -77,7 +55,7 @@ const PaymentFlow = ({ property_id }:Props) => {
   const {toast} = useToast()
 
 
-  const { data: propertyData, loading, error } = useGetAxiosRequest<PropertyData>(
+  const { data: propertyData, loading, error } = useGetAxiosRequest<PropertyDataPayment>(
     investDataLoaded ? `${import.meta.env.VITE_APP_BACKEND_URL}property/single/${property_id}/?view=payment` : "",
     true
   );
@@ -168,7 +146,7 @@ const PaymentFlow = ({ property_id }:Props) => {
         throw new Error('Por favor ingresa una cantidad válida de USDC.');
       }
 
-      if (!propertyData?.propertyData?.property_blockchain_adress) {
+      if (!propertyData?.property_blockchain_adress) {
         throw new Error('Por favor ingresa una dirección de contrato.');
       }
 
@@ -208,14 +186,13 @@ const PaymentFlow = ({ property_id }:Props) => {
     
     switch (step) {
       case 1:
-        return <PaymentFirst property_id={property_id} propertyData={propertyData} />;
+        return <PaymentFirst propertyData={propertyData} />;
       case 2:
         return (
           <PaymentSecond 
             goNext={() => setStep(3)} 
-            // Correctly access tokens from propertyData.propertyData
-            tokenPrice={propertyData.propertyData.tokens[0].token_price}  
-            totalTokens={propertyData.propertyData.tokens[0].total_tokens}  
+            tokenPrice={propertyData.tokens[0].token_price}  
+            totalTokens={propertyData.tokens[0].total_tokens}  
             investmentAmount={investmentAmount} 
             setInvestmentAmount={setInvestmentAmount} 
             setTotalAmountInUSDC={setInvestmentAmountUSDC}
@@ -229,7 +206,7 @@ const PaymentFlow = ({ property_id }:Props) => {
 
       case 5:
         return <PaymentOrderView 
-                  tokenPrice={propertyData.propertyData.tokens[0].token_price}
+                  tokenPrice={propertyData.tokens[0].token_price}
                   selectedPaymentMethod={investMethodTitle} 
                   investmentAmount={investmentAmountUSDC}
                   />

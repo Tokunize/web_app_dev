@@ -2,26 +2,10 @@ import { Progress } from "../ui/progress";
 import { useEffect, useState } from "react";
 import { FormatCurrency } from "../currencyConverter";
 import CustomCarousel from "../CustomCarousel";
+import { PropertyDataPayment } from "@/types";
 
 interface PropertyData {
-  property_id: string;
-  propertyData: {
-    title: string;
-    location: string;
-    country: string;
-    property_type: string;
-    image: string[];
-    price: number;
-    property_blockchain_adress: string;  // Asegúrate de que esté aquí
-    projected_annual_yield: number;
-    projected_rental_yield: number;
-    tokens: {
-      total_tokens: number;
-      tokens_available: number;
-      tokens_sold: number;
-      token_price: number;
-    }[];
-  };
+  propertyData : PropertyDataPayment
 }
 
 
@@ -74,7 +58,7 @@ export const PaymentFirst = ({ propertyData }: PropertyData) => {
               </li>
               <li className="flex flex-col text-sm text-gray-500">
                 Current Value
-                <span className="text-black text-lg "><FormatCurrency  amount={propertyData.price}/></span>
+                <span className="text-black text-lg "><FormatCurrency amount={parseFloat(propertyData.price)}/> </span>
               </li>
             </ul>
           </div>
@@ -85,7 +69,7 @@ export const PaymentFirst = ({ propertyData }: PropertyData) => {
             </header>
             <ul className="space-y-2 ">
               <li className="flex justify-between">
-                Equity Listed <span> <FormatCurrency amount={propertyData.price}/> </span>
+                Equity Listed <span> <FormatCurrency amount={parseFloat(propertyData.price)}/> </span>
               </li>
               <Progress value={progressEquity}/>
               <li className="flex justify-between">

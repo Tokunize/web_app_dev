@@ -9,7 +9,6 @@ import { DataTable } from "@/components/dataTable/components/data-table";
 import { AdminOverviewColumns } from "@/components/dataTable/components/columns/overviewAdminColum";
 const ActivityLog  = lazy(()=> import("../admin/activityLog"))
 import { statuses } from "@/components/dataTable/data/data";
-import { FormatCurrency } from "@/components/currencyConverter";
 
 // Define the structure for property data
 interface Property {
@@ -21,7 +20,8 @@ interface Property {
     status: string;
     id: string;
     created_at:string;
-    propertyType:string
+    propertyType:string;
+    referenceNumber:string;
 }
 
 interface PropertyChart {
@@ -68,15 +68,14 @@ export const AdminOverview = () => {
         ownershipPercentage: property.ownershipPercentage,
         listingPrice: property.price.toString(),  // Asegura que `listingPrice` es un string
         id: property.id.toString(),
-        status: property.status
+        status: property.status,
+        referenceNumber: property.referenceNumber
     }));
     
 
-    // Define overview details only after data is loaded
-    const formattedValue = <FormatCurrency amount={233332} />
     
     const adminOverviewDetails = [
-        { title: "Total Market Tokenized", value: formattedValue },
+        { title: "Total Market Tokenized", value: 12866880 },
         { title: "Under Review", value: underReviewProperties.length },
         { title: "Active Properties", value: publishedProperties },
         { title: "Sold Out Properties", value: 20 }

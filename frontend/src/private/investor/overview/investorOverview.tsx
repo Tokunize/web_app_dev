@@ -7,7 +7,6 @@ import { MyAssetsTable } from "@/components/dashboard/myAssetsTable";
 import { LoadingSpinner } from "@/components/loadingSpinner";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";  
 import { DashboardDetailCard } from "@/components/dashboard/dashboardDetailCard";
-import { FormatCurrency } from "@/components/currencyConverter";
 
 
 interface Investment {
@@ -67,8 +66,8 @@ export const InvestorOverview = () => {
 
 
   const inverstorOverview = [
-    {title:"Current Rent Balance" , value:<FormatCurrency amount={323243} /> },
-    {title:"Total Rental Income" , value:<FormatCurrency amount={23243}/> }
+    {title:"Current Rent Balance" , value: 12323434 },
+    {title:"Total Rental Income" , value: 343435 }
   ]
 
   return (
