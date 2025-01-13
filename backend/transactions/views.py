@@ -1,6 +1,8 @@
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import NotFound
+from django.db import transaction
+from django.db import models
 
 from django.shortcuts import get_object_or_404
 from throttling import CustomAnonRateThrottle  # Asegúrate de que la ruta sea correcta
@@ -20,8 +22,13 @@ from wallet.models import Wallet
 from wallet.serializers import WalletDashboardSerializer
 from property.models import PropertyToken
 from property.models import Property
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
+
+
+
+
 
 def log_activity(event_type, involved_address, contract_address=None, payload=None):
     """
@@ -44,7 +51,7 @@ class TransactionListview(APIView):
     authentication_classes = [Auth0JWTAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = TransactionSerializer
-    pagination_class = PageNumberPagination  # Paginación automática
+    pagination_class = PageNumberPagination  
 
     def get(self, request):
         user_id = request.user.id
@@ -82,42 +89,69 @@ class TransactionListview(APIView):
         # Responder con la paginación estándar de DRF
         return paginator.get_paginated_response(response_data)
     
-    def post(self, request,reference_number):
-        # Obtener el monto de la inversión y el id de la propiedad
-        invested_tokens_amount =  1
-        
-        property_instance = Property.objects.get(reference_number=reference_number)
-        tokens_property = property_instance.tokens.all()
-        if tokens_property.exists():
-            selected_token = tokens_property.first()
-        else:
+    @transaction.atomic
+    def post(self, request, reference_number):
+        # Obtener el asset que se desea usar como colateral
+        collateralized_asset_ref = request.data.get("collateralizedAsset")
+        try:
+            collateralized_asset_instance = Property.objects.select_related('property_owner__wallet').get(reference_number=collateralized_asset_ref)
+        except Property.DoesNotExist:
+            return Response({'error': 'Collateralized asset not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Verificar que el usuario es el propietario del asset colateralizado
+        if collateralized_asset_instance.property_owner != request.user:
+            return Response({"error": "Only the owners can use the asset as collateral."}, status=status.HTTP_403_FORBIDDEN)
+
+        # Obtener la propiedad en la que se desea invertir
+        try:
+            invested_property_instance = Property.objects.select_related('property_owner__wallet').prefetch_related('tokens').get(reference_number=reference_number)
+        except Property.DoesNotExist:
+            return Response({'error': 'Invested property not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Verificar que la wallet del propietario sea diferente
+        if invested_property_instance.property_owner.wallet.wallet_address == collateralized_asset_instance.property_owner.wallet.wallet_address:
+            return Response({"error": "You can't collateralize into your own asset."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Obtener la cantidad de tokens que el usuario quiere invertir
+        invested_tokens_amount = request.data.get("tokensAmount")
+        if not invested_tokens_amount or invested_tokens_amount <= 0:
+            return Response({"error": "Invalid token amount."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Obtener el token asociado a la propiedad
+        selected_token = invested_property_instance.tokens.first()
+        if not selected_token:
             return Response({'error': 'No tokens found for this property'}, status=status.HTTP_404_NOT_FOUND)
 
-        max_allowed_investment = selected_token.tokens_available * 0.25
+        # Calcular el límite máximo de inversión permitido (25% del suministro inicial)
+        max_allowed_investment = selected_token.initial_supply * 0.25
 
-        # Verificamos si la cantidad invertida supera el 25% de los tokens disponibles
-        if invested_tokens_amount > max_allowed_investment:
+        # Obtener la cantidad de tokens que el usuario ya posee
+        already_owned_tokens = PropertyToken.objects.filter(
+            property_code=invested_property_instance,
+            owner_user_code=request.user
+        ).aggregate(total_tokens=models.Sum('number_of_tokens'))['total_tokens'] or 0
+
+        # Verificar si la cantidad total de tokens supera el límite permitido
+        total_added_tokens = already_owned_tokens + invested_tokens_amount
+        if total_added_tokens > max_allowed_investment:
             return Response({
-                'error': f'You cannot invest more than 25% of the available tokens ({max_allowed_investment} units). If you need further information, please contact us, thank you.'
+                "error": f"You cannot invest more than 25% of the initial supply tokens ({selected_token.initial_supply} units)."
             }, status=status.HTTP_400_BAD_REQUEST)
-
-        # Calcular la cantidad de tokens que puede comprar con la inversión
-        token_price = selected_token.token_price
 
         # Verificar si hay suficientes tokens disponibles
         if selected_token.tokens_available < invested_tokens_amount:
             return Response({'error': 'Not enough tokens available'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Calcular el precio total de los tokens comprados (sería el mismo invested_tokens_amount en este caso)
-        total_token_price = invested_tokens_amount * token_price
-   
-        # Reducir los tokens disponibles
-        selected_token.tokens_available -= invested_tokens_amount
+        # Calcular el precio total de los tokens
+        total_token_price = invested_tokens_amount * selected_token.token_price
+
+        # Bloquear los tokens seleccionados y guardarlos
+        selected_token.lock_Tokens(invested_tokens_amount)
         selected_token.save()
 
-        # Crear la transacción
-        transaction = Transaction.objects.create(
-            property_id=property_instance,
+        # Crear la transacción de compra
+        Transaction.objects.create(
+            property_id=invested_property_instance,
             transaction_owner_code=request.user,
             transaction_tokens_amount=invested_tokens_amount,
             transaction_amount=total_token_price,
@@ -125,35 +159,17 @@ class TransactionListview(APIView):
             transaction_type=Transaction.TransactionType.BUY
         )
 
-        print(transaction)
-
         # Registrar o actualizar el PropertyToken
-        property_token, created = PropertyToken.objects.get_or_create(
-            property_code=property_instance,
+        PropertyToken.objects.update_or_create(
+            property_code=invested_property_instance,
             token_code=selected_token,
             owner_user_code=request.user,
-            defaults={'number_of_tokens': invested_tokens_amount}
+            defaults={'number_of_tokens': already_owned_tokens + invested_tokens_amount}
         )
 
-        # Si el PropertyToken ya existía, actualizar el número de tokens
-        if not created:
-            property_token.number_of_tokens += invested_tokens_amount
-            property_token.save()
-        
-        # log_activity(
-        #     event_type='transaction',
-        #     involved_address=request.user.email,
-        #     # contract_address=selected_token.token_contract_address,  # O lo que aplique
-
-        #     payload={
-        #         'transaction_id': transaction.id,
-        #         'property_id': property_instance.id,
-        #         'amount_invested': invested_tokens_amount,
-        #         'tokens_purchased': tokens_amount,
-        #     }
-        # )
-
         return Response({'message': 'Transaction completed successfully'}, status=status.HTTP_201_CREATED)
+
+
 
 
 
@@ -169,3 +185,18 @@ class TransactionMarketplaceProperty(APIView):
         serializer = self.serializer_class(transactions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
+
+
+
+ # log_activity(
+                #     event_type='transaction',
+                #     involved_address=request.user.email,
+                #     # contract_address=selected_token.token_contract_address,  # O lo que aplique
+
+                #     payload={
+                #         'transaction_id': transaction.id,
+                #         'property_id': property_instance.id,
+                #         'amount_invested': invested_tokens_amount,
+                #         'tokens_purchased': tokens_amount,
+                #     }
+                # )

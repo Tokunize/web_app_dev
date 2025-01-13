@@ -19,4 +19,6 @@ app.conf.broker_connection_retry_on_startup = True
 
 
 # Autodiscover las tareas en todos los archivos tasks.py de las aplicaciones
-app.autodiscover_tasks(['wallet'])
+# app.autodiscover_tasks(['wallet'])
+app.autodiscover_tasks()
+

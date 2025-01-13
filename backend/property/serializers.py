@@ -2,7 +2,7 @@ from rest_framework import serializers
 from property.models import(Property,PropertyToken,PropertyUpdates)
 from blockchain.models import Token
 from transactions.models import Transaction
-from blockchain.serializers import TokenSerializer
+from blockchain.serializers import TokenSerializer,TokenSerializerPayment
 #SERIALZERS FOR TOKENS 
 
 class PropertySerializer(serializers.ModelSerializer):
@@ -87,16 +87,15 @@ class PropertyFinancialsSerializer(serializers.ModelSerializer):
 
 
 class PropertyTokenPaymentSerializer(serializers.ModelSerializer):
-    tokens = TokenSerializer(many=True, read_only=True)
-
+    tokens = TokenSerializerPayment(many=True, read_only=True)
     class Meta:
         model = Property
         fields = [
                 'reference_number', 'title', 'location', 'image', 
-                'property_type','property_blockchain_adress',
-                'price',
-                'country', 'tokens'
+                'property_type','property_blockchain_adress','projected_annual_yield','projected_rental_yield',
+                'price','country', 'tokens'
         ]
+    
 
 #SERIALIZER TO CREATE A PROPERTY, TWO STEPS, OWNER FILL BASIC DATA AND ADMIN FILL THE FINANCTIAL DATA
 class CreatePropertySerializer(serializers.ModelSerializer):
@@ -244,7 +243,7 @@ class InvestmentOverviewSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Property
-        fields = ['title', 'tokens','location', 'property_type','yield_data']
+        fields = [ 'tokens','yield_data']
 
     def get_yield_data(self, obj):
         first_image = obj.image[0] if obj.image and len(obj.image) > 0 else None

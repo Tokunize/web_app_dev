@@ -3,7 +3,7 @@ import uuid
 
 class Token(models.Model):
 
-    # Definimos las opciones para el tipo de token utilizando TextChoices
+    # Definimos las opciones para el tipo de token utilizando TextChoicesssss
     class TokenType(models.TextChoices):
         PROPERTY_TOKEN = 'PropertyToken', 'Property Token'
         UTILITY_TOKEN = 'Utility Token', 'Utility Token'
@@ -12,11 +12,37 @@ class Token(models.Model):
     token_code = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)  # UUID generado automáticamente y único
     property_code = models.ForeignKey("property.Property", on_delete=models.CASCADE, related_name='tokens')  # Renombrado para claridad
     total_tokens = models.PositiveIntegerField()
+    locked_tokens = models.PositiveBigIntegerField(null=True, blank=True)
     tokens_available = models.PositiveIntegerField()
     token_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # Mejor para precios
     token_type = models.CharField(max_length=20, choices=TokenType.choices, default=TokenType.PROPERTY_TOKEN)  # Tipo de token
     created_at = models.DateTimeField(auto_now_add=True)  # Se establece solo cuando se crea el token.
 
+    def tokens_sold_percentage(self):
+        """
+        Calcula el porcentaje de tokens vendidos.
+        El porcentaje de tokens vendidos se calcula como:
+        (tokens vendidos / tokens totales) * 100
+        """
+        if self.total_tokens == 0:  # Previene la división por cero
+            return 0
+        tokens_sold = self.total_tokens - self.tokens_available
+        return (tokens_sold / self.total_tokens) * 100
+    
+    def lock_Tokens(self,invested_tokens_amount):
+        """
+        Lock the tokens that the user wants to collaterlize in order 
+        to invest using asset to asset process
+        """
+        self.locked_tokens += invested_tokens_amount
+    
+    def get_user_available_tokens(self):
+        """
+        Get the available tokens for a user 
+        subtracting the locked tokens
+        """
+
+        return self.tokens_available - self.locked_tokens
 
     def __str__(self):
         return str(self.token_code)

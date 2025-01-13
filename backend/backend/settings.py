@@ -64,6 +64,8 @@ INSTALLED_APPS = [
     'channels',
     'blockchain',
     'transactions',
+    'django_celery_results',
+    'event_listener'
 ]
 
 
@@ -122,7 +124,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
