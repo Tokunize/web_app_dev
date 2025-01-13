@@ -19,7 +19,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "@/components/*": ["./src/components/*"],  // Si deseas tener un alias específico para "components"
+    "@/private/*": ["./src/private/*"]  // 
   },
   "files": [],
   "references": [
