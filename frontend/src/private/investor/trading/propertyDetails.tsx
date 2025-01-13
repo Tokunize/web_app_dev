@@ -1,6 +1,6 @@
-import { Carousel } from "flowbite-react";
-import { Progress } from "flowbite-react";
-import {  useEffect, useState } from "react";
+// import { Carousel } from "flowbite-react";
+// import { Progress } from "flowbite-react";
+// import {  useEffect, useState } from "react";
 import { FormatCurrency } from "@/components/currencyConverter";
 
 interface PropertyData {
@@ -18,18 +18,18 @@ interface Props {
 }
 
 export const SinglePropertyDetailOnModal = ({ propertyData }: Props) => {
-  const [progressEquity, setProgressEquity] = useState<number>(0);
+  // const [progressEquity, setProgressEquity] = useState<number>(0);
 
-  useEffect(()=>{
-    setProgressEquity(0)
-  },[])
+  // useEffect(()=>{
+  //   setProgressEquity(0)
+  // },[])
 
   return (
     <section className="flex flex-col">
       <div className="flex flex-row space-x-3">
         {/* Property details and image carousel */}
         <aside className="w-1/2 flex flex-col text-left">
-          <Carousel indicators={true} slide={false} className="h-[50%]">
+          {/* <Carousel indicators={true} slide={false} className="h-[50%]">
             {propertyData.image.map((img, index) => (
               <img
                 key={index}
@@ -38,7 +38,7 @@ export const SinglePropertyDetailOnModal = ({ propertyData }: Props) => {
                 className="w-full h-full object-cover"
               />
             ))}
-          </Carousel>
+          </Carousel> */}
 
           <header className="mt-3">
             <h1 className="font-semibold">{propertyData.title}</h1>
@@ -77,13 +77,11 @@ export const SinglePropertyDetailOnModal = ({ propertyData }: Props) => {
               <li className="flex text-sm justify-between">
                 Equity Listed <span> <FormatCurrency amount={propertyData.price}/></span>
               </li>
-              {/* For demonstration, using a static 30% for the first progress bar */}
-              <Progress progress={30} />
+              {/* <Progress progress={30} />
               <li className="flex   text-sm justify-between">
                 Equity Sold <span>{progressEquity.toFixed(2)} %</span>
               </li>
-              {/* The second progress bar reflects the actual equity sold */}
-              <Progress progress={progressEquity} />
+              <Progress progress={progressEquity} /> */}
             </ul>
           </div>
         </article>
