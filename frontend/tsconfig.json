@@ -1,27 +1,13 @@
-// {
-//   "files": [],
-//   "references": [
-//     { "path": "./tsconfig.app.json" },
-//     { "path": "./tsconfig.node.json" }
-//   ],
-//   "compilerOptions": {
-//     "baseUrl": ".",
-//     "paths": {
-//       "@/*": ["./src/*"]
-//     }
-//   }
-// }
-
 {
   "compilerOptions": {
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
-    },
-    "@/components/*": ["./src/components/*"],  // Si deseas tener un alias específico para "components"
-    "@/private/*": ["./src/private/*"]  // 
+      "@/*": ["./src/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/private/*": ["./src/private/*"]
+    }
   },
   "files": [],
   "references": [
