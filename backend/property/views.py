@@ -160,10 +160,8 @@ class PropertyDetailLandingPage(ConditionalPermissionMixin,APIView):
             serializer = PropertyFinancialsSerializer(property)
         elif view_type == 'payment':
             property_serializer = PropertyTokenPaymentSerializer(property)
-            financials_serializer = PropertyFinancialsSerializer(property)
             
             data = property_serializer.data
-            data['financials_details'] = financials_serializer.data
 
             return Response(data)
         else:

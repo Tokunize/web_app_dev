@@ -14,6 +14,8 @@ else:
     print("Error al conectar a la red Ethereum")
     exit()
 
+    
+
 # Dirección del contrato
 contract_address = "0x2ed4441cFA236455056EeA1D904Dc1bddd55f648"
 

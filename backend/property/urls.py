@@ -32,7 +32,6 @@ urlpatterns = [
     path('all/list/', AssetToAssetProperties.as_view(), name='asset-to-asset-details'),
 
 
-
     #DASHBOARD ADMIN URLS 
     path("property-managment/",PropertyManagmentListView.as_view(), name="property-managment-admin" ),
     path("overview-dashboard-admin/",AdminOverviewListView.as_view(), name="overview-dashboard-admin" ),
