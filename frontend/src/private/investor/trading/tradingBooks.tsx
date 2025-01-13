@@ -1,6 +1,6 @@
 import { DataAccordion } from "@/components/dataAccordion/DataAccordion";
-import { OrderBook } from "./OrderBook";
-import {RecentOrders} from "./RecentOrders";
+import { OrderBook } from "./orderBook";
+import { RecentOrders } from "./recentOrders";
 import { TabItem } from "@/types";
 
 export const TradingBooks = () =>{
