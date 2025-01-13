@@ -3,73 +3,73 @@ import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 interface CurrencyConverterProps {
-    amountInUSD: number;
+  amountInUSD: number | string; // Aceptar también cadenas por seguridad
 }
 
 export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({ amountInUSD }) => {
-    const [exchangeRate, setExchangeRate] = useState<number | null>(null);
-    const [amountInGBP, setAmountInGBP] = useState<number | null>(null);
-    const [isVisible, setIsVisible] = useState<boolean>(true);
+  const [exchangeRate, setExchangeRate] = useState<number | null>(null);
+  const [amountInGBP, setAmountInGBP] = useState<number | null>(null);
+  const [isVisible, setIsVisible] = useState<boolean>(true);
 
-    const getExchangeRate = async () => {
-        const apiUrl = "https://api.exchangerate-api.com/v4/latest/USD";
-        try {
-            const response = await axios.get(apiUrl);
-            const rate = response.data.rates.GBP;
-            setExchangeRate(rate);
-        } catch (error) {
-            console.error("Error fetching exchange rate:", error);
-        }
-    };
+  // Convertir `amountInUSD` a número de forma segura
+  const usdAmount = typeof amountInUSD === "number" ? amountInUSD : parseFloat(amountInUSD);
 
-    useEffect(() => {
-        getExchangeRate();
-    }, []);
+  const getExchangeRate = async () => {
+    try {
+      const response = await axios.get("https://api.exchangerate-api.com/v4/latest/USD");
+      const rate = response.data.rates.GBP;
+      setExchangeRate(rate);
+    } catch (error) {
+      console.error("Error fetching exchange rate:", error);
+    }
+  };
 
-    useEffect(() => {
-        if (exchangeRate !== null) {
-            setAmountInGBP(amountInUSD * exchangeRate);
-        } else {
-            setAmountInGBP(0);
-        }
-    }, [exchangeRate, amountInUSD]);
+  useEffect(() => {
+    getExchangeRate();
+  }, []);
 
-    const toggleVisibility = (e: React.MouseEvent) => {
-        setIsVisible(!isVisible);
-        e.stopPropagation();
-    };
+  useEffect(() => {
+    if (exchangeRate !== null && !isNaN(usdAmount)) {
+      setAmountInGBP(usdAmount * exchangeRate);
+    } else {
+      setAmountInGBP(null);
+    }
+  }, [exchangeRate, usdAmount]);
 
-    return (
+  const toggleVisibility = (e: React.MouseEvent) => {
+    setIsVisible(!isVisible);
+    e.stopPropagation();
+  };
+
+  return (
+    <div>
+      <div className="flex items-center justify-between">
         <div>
-            <div className="flex  items-center justify-between">
-                <div >
-                    {amountInGBP !== null ? (
-                        isVisible ? (
-                            <p className="font-semibold text-lg">
-                                $ {amountInUSD.toFixed(2)} USD
-                                <span className="text-sm text-muted-foreground">
-                                     =  £ {amountInGBP.toFixed(2)} GBP
-                                </span>
-                            </p>
-                        ) : (
-                            <p className="font-semibold text-lg">
-                                ********
-                            </p>
-                        )
-                    ) : (
-                        <p className="text-muted-foreground">Loading...</p>
-                    )}
-                </div>
-                <button
-                    className="ml-4 text-gray-500 hover:text-gray-700"
-                    onClick={toggleVisibility}
-                    aria-label={isVisible ? "Hide amounts" : "Show amounts"}
-                >
-                    {isVisible ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
-                </button>
-            </div>
+          {amountInGBP !== null ? (
+            isVisible ? (
+              <p className="font-semibold text-lg">
+                ${usdAmount.toFixed(2)} USD
+                <span className="text-sm text-muted-foreground">
+                  = £{amountInGBP.toFixed(2)} GBP
+                </span>
+              </p>
+            ) : (
+              <p className="font-semibold text-lg">********</p>
+            )
+          ) : (
+            <p className="text-muted-foreground">Loading...</p>
+          )}
         </div>
-    );
+        <button
+          className="ml-4 text-gray-500 hover:text-gray-700"
+          onClick={toggleVisibility}
+          aria-label={isVisible ? "Hide amounts" : "Show amounts"}
+        >
+          {isVisible ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+        </button>
+      </div>
+    </div>
+  );
 };
 
 

@@ -5,7 +5,7 @@ import { MyAssets } from "../../data/schema"
 import { DataTableColumnHeader } from "../tasdata-table-column-header"
 import positiveNumber from "../../../../assets/postiveNumber.svg"
 import negativeNumber from "../../../../assets/negativeNumber.svg"
-import { DataTableRowActionsInvestorAssets } from "../rows/row-actions-investor-assets"
+// import { DataTableRowActionsInvestorAssets } from "../rows/row-actions-investor-assets"
 
 
 // Función para convertir el valor a número

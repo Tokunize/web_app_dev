@@ -7,7 +7,9 @@ import { usePostAxiosRequest } from "@/hooks/postAxiosRequest";
 import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
 import { useToast } from "@/components/ui/use-toast";
-import { ethers } from "ethers";
+import { ethers,formatUnits} from "ethers";
+
+
 import useSmartContract from "@/hooks/useSmartContract";
 import propertyScrowAbi from "../../contracts/property-scrow-contract-abi.json";
 
@@ -46,15 +48,16 @@ export const BuyEquityForm = ({ onSubmitSuccess, propertyScrowAddress }: BuyEqui
     }
 
     try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum as any);
-      const signer = provider.getSigner();
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const userAddress = await signer.getAddress();
+
       const usdcContract = new ethers.Contract(usdcAddress, [
         "function balanceOf(address account) public view returns (uint256)"
       ], provider);
 
-      const userAddress = await signer.getAddress();
       const balance = await usdcContract.balanceOf(userAddress);
-      const balanceInUSDC = ethers.utils.formatUnits(balance, 6);
+      const balanceInUSDC = formatUnits(balance, 6); // ✅ Solución
 
       if (parseFloat(balanceInUSDC) >= parseFloat(requiredAmount)) {
         toast({
@@ -93,13 +96,13 @@ export const BuyEquityForm = ({ onSubmitSuccess, propertyScrowAddress }: BuyEqui
     }
 
     try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum as any);
-      const signer = provider.getSigner();
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
       const usdcContract = new ethers.Contract(usdcAddress, [
         "function approve(address spender, uint256 amount) public returns (bool)"
       ], signer);
 
-      const amountToApprove = ethers.utils.parseUnits(requiredAmount, 6);
+      const amountToApprove = formatUnits(requiredAmount,6)
 
       const tx = await usdcContract.approve(propertyScrowAddress, amountToApprove);
       await tx.wait();
@@ -160,15 +163,17 @@ export const BuyEquityForm = ({ onSubmitSuccess, propertyScrowAddress }: BuyEqui
   
         const receipt = await tx.wait();
   
-        const event = receipt.logs.find((log: ethers.providers.Log) =>
-          log.topics[0] === ethers.utils.id("BuyOfferCreated(uint256,address,uint256,uint256)")
+        const event = receipt.logs.find((log) =>
+          log.topics[0] === ethers.keccak256(ethers.toUtf8Bytes("BuyOfferCreated(uint256,address,uint256,uint256)"))
         );
+        
   
         if (event) {
           const offerListingId = ethers.BigNumber.from(event.topics[1]).toString();
           const buyerAddress = ethers.utils.defaultAbiCoder.decode(["address"], event.topics[2])[0];
-          console.log(`Buy Offer Created for Listing ID: ${offerListingId} by Buyer: ${buyerAddress}`)
-  
+          console.log(`Buy Offer Created for Listing ID: ${offerListingId} by Buyer: ${buyerAddress}`);
+
+
           toast({
             title: "Buy offer created",
             description: "Your offer has been successfully created.",

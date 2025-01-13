@@ -65,8 +65,7 @@ const ExternalWallet = ({ className }: Props) => {
 
                 <div id="tour-wallet-balance" className="mb-6">
                     <p className="text-sm text-gray-500">Balance</p>    
-                    {balanceInUSD}            
-                    {/* <CurrencyConverter amountInUSD={balanceInUSD} /> */}
+                    <CurrencyConverter amountInUSD={balanceInUSD} />
                 </div>
                 </>
             ):(

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import "../../styles/singUp.css"; // Asegúrate de que esta ruta sea correcta
+import "../../styles/singUp.css"; 
 import { SignUpForm } from '../forms/singUpForm';
 import { AccountType } from '@/public/login/accounType';
 import SingUpEmailForm from '../forms/singUpEmailForm';
@@ -19,13 +19,8 @@ const SignUpPage = () => {
 
   const handleFormSubmit = (formValues: any) => {
     setFormData(formValues);
-    setLoading(true);
-
-    // Simulación de retraso para mostrar el spinner
-    setTimeout(() => {
-      setCurrentStep(3);
-      setLoading(false);
-    }, 3000);
+    setCurrentStep(3);
+    setLoading(false);
   };
 
   return (
@@ -45,7 +40,7 @@ const SignUpPage = () => {
         )}
 
       {/* Paso 3: Selección de Tipo de Cuenta */}
-      {currentStep === 3 && (
+      {currentStep === 3 && formData && (
         <AccountType formData={formData} />
       )}
     </section>

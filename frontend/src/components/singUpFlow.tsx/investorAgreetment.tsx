@@ -14,7 +14,7 @@ export const InvestorAgreement: React.FC<{ onCheckedChange: (isChecked: boolean)
     };
   
     return (
-      <article className="w-[50%] mx-auto bg-white p-6 ">
+      <article className="mx-auto bg-white rounded-lg p-6 ">
         <FaArrowCircleLeft
           className="text-[#C8E870] mb-3 cursor-pointer"
           onClick={handleBackToSelection}
@@ -36,7 +36,7 @@ export const InvestorAgreement: React.FC<{ onCheckedChange: (isChecked: boolean)
             <p className="text-gray-500 font-bold">2. Legal Entities and Unincorporated Bodies:</p>
             <p>
               a) Trusteeship: The investor is a trustee of a high-value trust, i.e., a trust where the aggregate value of the cash and investments that form part of the trust's assets (before deducting the amount of its liabilities) is at least £10 million; or has been at least £10 million at any time during the immediately preceding year. <br />
-              b) Unincorporated Association or Partnership: If the investor has net assets of at least £500,000; has over 20 members; o es una subsidiaria que tenga más de 20 miembros; o al menos £5 millones.
+              b) Unincorporated Association or Partnership: If the investor has net assets of at least £500,000; has over 20 members.
             </p>
           </li>
         </ul>

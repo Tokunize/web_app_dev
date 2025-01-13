@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FaArrowCircleLeft } from "react-icons/fa";
 
+
 interface InvestorFlowProps {
     currentStep: number;
     handleNextStep: () => void;
@@ -16,7 +17,7 @@ interface InvestorFlowProps {
     onInvestorConfirm: () => void; // Nuevo prop para confirmar el rol de "Investor"
 }
 
-export const InvestorFlow: React.FC<InvestorFlowProps> = ({ currentStep, handleNextStep, handlePrevStep, handleBackToSelection, onInvestorConfirm }) => {
+export const InvestorFlow= ({ currentStep, handleNextStep, handlePrevStep, handleBackToSelection, onInvestorConfirm }:InvestorFlowProps) => {
     const [isAgreementChecked, setIsAgreementChecked] = useState<boolean>(false); // Paso 1
     const [isNonResidentialChecked, setIsNonResidentialChecked] = useState<boolean>(false); // Paso 2
     const navigate = useNavigate(); // Hook para la navegación

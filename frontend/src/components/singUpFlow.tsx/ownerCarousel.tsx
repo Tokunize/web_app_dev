@@ -1,14 +1,14 @@
-import { Carousel } from 'flowbite-react';
 import { Button } from '@/components/ui/button';
 import singUpOwner3 from "../../assets/singUpOwner3.png";
 import singUpOwner2 from "../../assets/singUpOwner2.png";
 import singUpOwner1 from "../../assets/singUpOwner1.png";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 interface OwnerFlowCarouselProps {
-    onConfirm: () => void; // Especificar el tipo de onConfirm como una función que no toma argumentos y no retorna nada
+    onConfirm: () => void;
 }
 
-export const OwnerFlowCarousel: React.FC<OwnerFlowCarouselProps> = ({ onConfirm }) => {
+export const OwnerFlowCarousel = ({ onConfirm }: OwnerFlowCarouselProps) => {
     const slides = [
         {
             title: 'List Your Property Effortlessly!',
@@ -17,7 +17,7 @@ export const OwnerFlowCarousel: React.FC<OwnerFlowCarouselProps> = ({ onConfirm 
         },
         {
             title: 'Simplify Your Management.',
-            description: 'Handle everything in one place. We manage the legal paperwork, tax implications, and payment processing for you.',
+            description: 'Everything in one place. We manage the legal paperwork, tax implications, and payment processing.',
             imageUrl: singUpOwner2
         },
         {
@@ -27,29 +27,34 @@ export const OwnerFlowCarousel: React.FC<OwnerFlowCarouselProps> = ({ onConfirm 
         },
     ];
 
-
     const handleConfirm = () => {
         onConfirm(); // Llama a la función onConfirm pasada como prop
     };
 
     return (
-        <article className="w-full p-6 flex flex-col custom-landing-carousel">
-            <Carousel slideInterval={5000} className="w-full investorCarousel h-[480px] mb-[80px]">
-                {slides.map((slide, index) => (
-                    <div key={index} className="flex flex-col justify-center items-center text-center h-full p-6">
-                        <h2 className="text-2xl font-semibold mb-2">{slide.title}</h2>
-                        <p className="text-gray-600 mb-6">{slide.description}</p>
-                        <div className="flex justify-center">
-                            <img
-                                src={slide.imageUrl}
-                                alt={slide.title}
-                                className="max-h-full max-w-full object-contain rounded-lg"
-                            />
-                        </div>
-                    </div>
-                ))}
+        <article className="w-full space-y-5 flex flex-col">
+            <Carousel  className="overflow-hidden"> {/* overflow-hidden para evitar desbordes */}
+                <CarouselContent>
+                    {slides.map((slide, index) => (
+                        <CarouselItem key={index}>
+                            <div className='text-center'>
+                                <h2 className="text-2xl font-semibold mb-2">{slide.title}</h2>
+                                <p className="text-gray-600 mb-6">{slide.description}</p>
+                                <div className="flex h-[450px] w-[80%] mx-auto justify-center">
+                                    <img
+                                        src={slide.imageUrl}
+                                        alt={slide.title}
+                                        className="object-cover h-[100%] rounded-lg"  // Asegurando que la imagen se ajuste correctamente
+                                    />
+                                </div>
+                            </div>
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
             </Carousel>
-            <Button onClick={handleConfirm}>Confirm</Button> {/* Llamamos a handleConfirm para manejar el redireccionamiento */}
+            <Button onClick={handleConfirm}>Confirm</Button>
         </article>
     );
 };

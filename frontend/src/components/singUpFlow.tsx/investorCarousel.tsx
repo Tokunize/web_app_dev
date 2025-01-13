@@ -2,7 +2,8 @@ import React from 'react';
 import investor1 from "../../assets/investor1.png"
 import investor2 from "../../assets/investor2.png"
 import investor3 from "../../assets/investor3.svg"
-import { Carousel } from 'flowbite-react';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+
 
 
 export const InvestorCarousel: React.FC = () => {
@@ -27,21 +28,27 @@ export const InvestorCarousel: React.FC = () => {
     return (
       <article className="p-6 min-w-[800px] flex flex-col w-full custom-landing-carousel">
         <h4 className="font-bold text-2xl mb-[40px] text-left">I am an accredited investor,</h4>
-        <Carousel slideInterval={5000} className="w-[500px] investorCarousel  h-[480px] mb-[80px]">
-          {slides.map((slide, index) => (
-            <div key={index} className="flex flex-col justify-center items-center text-center h-full p-6">
-              <h2 className="text-2xl font-semibold mb-4">{slide.title}</h2>
-              <p className="text-gray-600 mb-6">{slide.description}</p>
-              <div className="flex justify-center items-center w-full h-[300px]">
-                <img
-                  src={slide.imageUrl}
-                  alt={slide.title}
-                  className="max-h-full max-w-full object-contain rounded-lg"
-                />
-              </div>
-            </div>
-          ))}
-        </Carousel>
+        <Carousel  className="overflow-hidden"> {/* overflow-hidden para evitar desbordes */}
+                <CarouselContent>
+                    {slides.map((slide, index) => (
+                        <CarouselItem key={index}>
+                            <div className='text-center'>
+                                <h2 className="text-2xl font-semibold mb-2">{slide.title}</h2>
+                                <p className="text-gray-600 mb-6">{slide.description}</p>
+                                <div className="flex h-[450px] w-[80%] mx-auto justify-center">
+                                    <img
+                                        src={slide.imageUrl}
+                                        alt={slide.title}
+                                        className="object-cover h-[100%] rounded-lg"  // Asegurando que la imagen se ajuste correctamente
+                                    />
+                                </div>
+                            </div>
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+            </Carousel>
       </article>
     );
   };

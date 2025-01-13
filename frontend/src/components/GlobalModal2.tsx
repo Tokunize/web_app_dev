@@ -38,7 +38,7 @@ export const GlobalModal = ({children}:Props) =>{
     return createPortal(
         <div className="overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300">
             <div
-                className="w-auto min-w-[65%] max-w-3xl flex flex-col space-y-5 bg-white p-4 rounded-lg shadow-lg transform text-black transition-transform duration-300 scale-95"
+                className="w-auto min-w-[55%] max-w-3xl flex flex-col space-y-5 bg-white p-4 rounded-lg shadow-lg transform text-black transition-transform duration-300 scale-95"
                 onClick={handleContentClick}
                 ref={modalRef}
             >
@@ -49,10 +49,8 @@ export const GlobalModal = ({children}:Props) =>{
                 >
                 <CgClose className="w-6 h-6" />
                 </button>
-
-                {/* Contenido del modal */}
                 <div>
-                {children}
+                    {children}
                 </div>
             </div>
         </div>,

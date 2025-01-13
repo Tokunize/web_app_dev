@@ -1,5 +1,4 @@
 import  { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { PaymentFirst } from './paymentFirst';
 import { PaymentSecond } from './paymentSecond';
@@ -19,15 +18,49 @@ import { ethers } from 'ethers';
 import tokenToTokenPoolAbi from "../../contracts/tokenToTokenPoolAbi.json";  // Asegúrate de que este ABI esté correctamente configurado
 // import usdcAbi from "../../contracts/usdc_abi.json";  
 import { useSelector } from 'react-redux';
+import { GlobalModal } from '../globalModal2';
+import { useModalContext } from "@/context/modalContext";
 
 interface Props {
   property_id: string;
 }
 
+interface PropertyData {
+  property_id: string;
+  propertyData: {
+    title: string;
+    location: string;
+    country: string;
+    property_type: string;
+    image: string[];
+    price: number;
+    property_blockchain_adress: string;  // Asegúrate de que esté aquí
+    projected_annual_yield: number;
+    projected_rental_yield: number;
+    tokens: {
+      total_tokens: number;
+      tokens_available: number;
+      tokens_sold: number;
+      token_price: number;
+    }[];
+  };
+}
+
+
+
 const PaymentFlow = ({ property_id }:Props) => {
 
-  const fromPool = "0x4A6D81dbe8D9DBb97221971A42b82D102b72D4fA"
+    const { setState } = useModalContext(); // Obtén la función setState del contexto para abrir el modal
+    const [investDataLoaded, setInvestDataLoaded] = useState(false);
+
+    const openModal = () => {
+
+      setState(true); // Abre el modal cuando se hace clic en el botón
+      setInvestDataLoaded(true)
+  };
   
+
+  const fromPool = "0x4A6D81dbe8D9DBb97221971A42b82D102b72D4fA"
   const toAssetPoolAddress ="0xBE46badae1416D0D794A5eF671150DBE8b7F8091"
 
   // 0x95f7D484AbEaf398885D73876Be7FFD3C54c3760
@@ -44,15 +77,16 @@ const PaymentFlow = ({ property_id }:Props) => {
   const {toast} = useToast()
 
 
-  const { data: propertyData, loading, error } = useGetAxiosRequest(
-    `${import.meta.env.VITE_APP_BACKEND_URL}property/single/${property_id}/?view=payment`,true);
+  const { data: propertyData, loading, error } = useGetAxiosRequest<PropertyData>(
+    investDataLoaded ? `${import.meta.env.VITE_APP_BACKEND_URL}property/single/${property_id}/?view=payment` : "",
+    true
+  );
 
-    const tokenToTokenContract = useSmartContract({
+  const tokenToTokenContract = useSmartContract({
       contractAddress: fromPool,
       contractAbi: tokenToTokenPoolAbi,
     });
 
-    console.log(tokenToTokenContract);
     
 
   const goNext = () => setStep((prev) => prev + 1);
@@ -65,6 +99,7 @@ const PaymentFlow = ({ property_id }:Props) => {
   };
 
   const handlePurchase = async () => {
+    
     try {
       const accessToken = await getAccessTokenSilently(); 
       const apiUrl = `${import.meta.env.VITE_APP_BACKEND_URL}transaction/investment/property/${property_id}/`; 
@@ -80,14 +115,15 @@ const PaymentFlow = ({ property_id }:Props) => {
         },
       };
   
-      await axios.post(apiUrl, data, config);
-      setStep(5); // Move to the summary step (or the next appropriate step)
-      toast({
-        title: "Transaction successful!",
-        description: "Congratulations on your investment.",
-        variant: "default",
-      });
-      
+      const response = await axios.post(apiUrl, data, config);
+      if(response.status === 201){
+        setStep(5); 
+        toast({
+          title: "Transaction successful!",
+          description: "Congratulations on your investment.",
+          variant: "default",
+        });
+      }
     } catch (error) {
       // Type guard to check if error is of type Error
       if (error instanceof Error) {
@@ -111,26 +147,28 @@ const PaymentFlow = ({ property_id }:Props) => {
   
    // Suponiendo que MetaMask está disponible en el navegador
    const provider = window.ethereum ? new ethers.BrowserProvider(window.ethereum) : null;
-    const signer = provider ? provider.getSigner() : null;
+   const signer = provider ? provider.getSigner() : null;
 
-  const checkNetwork = async () => {
-    const network = await provider?.getNetwork();
-    if (network?.chainId !== 421614) {  // Arbitrum Sepolia Testnet ID
-      throw new Error("Por favor, cambia a la red Arbitrum Sepolia Testnet.");
+   const checkNetwork = async () => {
+    if (provider) {
+      const network = await provider.getNetwork();
+      if (Number(network.chainId) !== 421614) {  // Arbitrum Sepolia Testnet ID
+        throw new Error("Por favor, cambia a la red Arbitrum Sepolia Testnet.");
+      }
+    } else {
+      console.error("Provider is not available.");
     }
   };
+  ;
   
-
-
   const investInContract = async (usdcAmount: number) => {   
-    
     
     try {
       if (!usdcAmount || isNaN(Number(usdcAmount)) || Number(usdcAmount) <= 0) {
         throw new Error('Por favor ingresa una cantidad válida de USDC.');
       }
 
-      if (!propertyData?.property_blockchain_adress) {
+      if (!propertyData?.propertyData?.property_blockchain_adress) {
         throw new Error('Por favor ingresa una dirección de contrato.');
       }
 
@@ -139,7 +177,7 @@ const PaymentFlow = ({ property_id }:Props) => {
       }
 
       await checkNetwork();
-      const usdcAmountInWei = usdcAmount;
+      // const usdcAmountInWei = usdcAmount;
 
     
       if (!tokenToTokenContract) {
@@ -175,8 +213,9 @@ const PaymentFlow = ({ property_id }:Props) => {
         return (
           <PaymentSecond 
             goNext={() => setStep(3)} 
-            tokenPrice={propertyData?.tokens[0]?.token_price}
-            totalTokens={propertyData?.tokens[0]?.total_tokens}
+            // Correctly access tokens from propertyData.propertyData
+            tokenPrice={propertyData.propertyData.tokens[0].token_price}  
+            totalTokens={propertyData.propertyData.tokens[0].total_tokens}  
             investmentAmount={investmentAmount} 
             setInvestmentAmount={setInvestmentAmount} 
             setTotalAmountInUSDC={setInvestmentAmountUSDC}
@@ -190,7 +229,7 @@ const PaymentFlow = ({ property_id }:Props) => {
 
       case 5:
         return <PaymentOrderView 
-                  tokenPrice={propertyData?.tokens[0]?.token_price}
+                  tokenPrice={propertyData.propertyData.tokens[0].token_price}
                   selectedPaymentMethod={investMethodTitle} 
                   investmentAmount={investmentAmountUSDC}
                   />
@@ -202,55 +241,47 @@ const PaymentFlow = ({ property_id }:Props) => {
   };
 
   return (
-    <Dialog>
-      <DialogTrigger  asChild>
-        <Button className="w-full">Buy</Button>
-      </DialogTrigger>
+    <>
+      <GlobalModal>
+            {renderStep()}
+            <div className="flex space-x-5 mt-5">
+              {step > 1 && step < 6 && (
+                <Button variant="outline" onClick={goBack}>
+                  Back
+                </Button>
+              )}
+              {step === 1 && (
+                <Button className="w-full" onClick={goNext}>
+                  Continue
+                </Button>
+              )}
+              {step === 2 && (
+                <Button 
+                  className="w-full" 
+                  onClick={() => investMethodTitle && setStep(5)} 
+                  disabled={!investMethodTitle}
+                >
+                  Overview
+                </Button>
+              )}
+              {step === 5 && (
+                <Button onClick={() => investInContract(investmentAmountUSDC)} disabled={!investmentAmountUSDC}>
+                Invest
+              </Button>
+              )}
+              {step === 6 && (
+                <Button className="w-full" onClick={() =>{navigate("/transactions/")}}>
+                  Check My Wallet
+                </Button>
+              )}
+            </div>
+      </GlobalModal>
+      <Button className="w-full" onClick={openModal}>Invest</Button>
+    </>
 
-      <DialogContent className="min-w-[45vw]">
-        <DialogHeader>
-          <DialogTitle className="hidden">Payment Flow</DialogTitle>
-          <DialogDescription>
-            Please follow the steps to complete your investment process.
-          </DialogDescription>
-        </DialogHeader>
-        {renderStep()}
-
-        <DialogFooter>
-          {step > 1 && step < 6 && (
-            <Button variant="outline" onClick={goBack}>
-              Back
-            </Button>
-          )}
-          {step === 1 && (
-            <Button className="w-full" onClick={goNext}>
-              Continue
-            </Button>
-          )}
-          {step === 2 && (
-            <Button 
-              className="w-full" 
-              onClick={() => investMethodTitle && setStep(5)} 
-              disabled={!investMethodTitle}
-            >
-              Overview
-            </Button>
-          )}
-          {step === 5 && (
-             <Button onClick={() => investInContract(investmentAmountUSDC)} disabled={!investmentAmountUSDC}>
-             Invest
-           </Button>
-          )}
-          {step === 6 && (
-            <Button className="w-full" onClick={() =>{navigate("/transactions/")}}>
-              Check My Wallet
-            </Button>
-          )}
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   );
 };
 
 
 export default PaymentFlow;
+

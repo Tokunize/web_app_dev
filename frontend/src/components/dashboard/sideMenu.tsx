@@ -5,7 +5,7 @@ import { LogoutButton } from '../buttons/logoutBtn';
 interface MenuItem {
   name: string;
   link?: string;
-  icon: JSX.Element;
+  icon: React.ReactNode;
 }
 
 interface SideMenuProps {
