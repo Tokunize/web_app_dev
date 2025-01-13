@@ -5,7 +5,7 @@ import { SingleProperty } from "../public/marketplace/singleProperty";
 import ProtectedRoute from "./protectedRoutes";
 import DashboardLayout from "./dashboardLayout";
 import MainLayout from "./mainLayout"; 
-import { Assests } from "@/private/investor/assets/assets";
+import { Assets } from "@/private/investor/assets/assets";
 import { Transaction } from "@/private/investor/wallet/transactions";
 import { Toaster } from "../components/ui/toaster";
 import Dashboard from "./dashboard";
@@ -56,7 +56,7 @@ const Layout = () => {
               <Route
                 path="investments/"
                 element={
-                  <ProtectedRoute roleRequired="user" element={<Assests/>} />
+                  <ProtectedRoute roleRequired="user" element={<Assets/>} />
                 }
               />
               <Route

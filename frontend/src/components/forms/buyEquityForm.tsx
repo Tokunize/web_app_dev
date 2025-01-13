@@ -6,6 +6,8 @@ import { makeOfferTraddingValues, makeOfferTradding } from "./schemas/makeOfferF
 import { usePostAxiosRequest } from "@/hooks/postAxiosRequest";
 import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
+// import { useToast } from "@/components/ui/use-toast";
+// import { ethers,formatUnits} from "ethers";
 
 
 import useSmartContract from "@/hooks/useSmartContract";
@@ -21,6 +23,7 @@ interface PostDataResponse {
 }
 
 // const usdcAddress = "0xdC48A996F3073d4ADAB7f77B42162c284801A6d9";
+// const usdcAddress = "0xdC48A996F3073d4ADAB7f77B42162c284801A6d9";
 
 export const BuyEquityForm = ({ onSubmitSuccess, propertyScrowAddress }: BuyEquityForm) => {
   const { itemId } = useSelector((state: RootState) => state.tableActionItem);
@@ -28,6 +31,8 @@ export const BuyEquityForm = ({ onSubmitSuccess, propertyScrowAddress }: BuyEqui
   const { control, handleSubmit, formState: { errors } } = useForm<makeOfferTraddingValues>({
     resolver: zodResolver(makeOfferTradding),
   });
+
+
 
   const propertyScrow = useSmartContract({
     contractAddress: propertyScrowAddress,
@@ -51,6 +56,9 @@ export const BuyEquityForm = ({ onSubmitSuccess, propertyScrowAddress }: BuyEqui
   );
   
   const onSubmit: SubmitHandler<makeOfferTraddingValues> = (data) => {
+    console.log(data);
+    onSubmitSuccess()
+    
     console.log(data);
     onSubmitSuccess()
     

@@ -1,6 +1,6 @@
 // import { Carousel } from "flowbite-react";
 // import { Progress } from "flowbite-react";
-import {  useEffect, useState } from "react";
+// import {  useEffect, useState } from "react";
 import { FormatCurrency } from "@/components/currencyConverter";
 
 interface PropertyData {
@@ -18,11 +18,11 @@ interface Props {
 }
 
 export const SinglePropertyDetailOnModal = ({ propertyData }: Props) => {
-  const [progressEquity, setProgressEquity] = useState<number>(0);
+  // const [progressEquity, setProgressEquity] = useState<number>(0);
 
-  useEffect(()=>{
-    setProgressEquity(0)
-  },[])
+  // useEffect(()=>{
+  //   setProgressEquity(0)
+  // },[])
 
   return (
     <section className="flex flex-col">
@@ -69,9 +69,9 @@ export const SinglePropertyDetailOnModal = ({ propertyData }: Props) => {
                 Equity Listed <span> <FormatCurrency amount={propertyData.price}/></span>
               </li>
               {/* For demonstration, using a static 30% for the first progress bar */}
-              <li className="flex   text-sm justify-between">
+              {/* <li className="flex   text-sm justify-between">
                 Equity Sold <span>{progressEquity.toFixed(2)} %</span>
-              </li>
+              </li> */}
               {/* The second progress bar reflects the actual equity sold */}
             </ul>
           </div>

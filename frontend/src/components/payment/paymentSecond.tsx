@@ -8,7 +8,7 @@ import { FaArrowRightLong } from "react-icons/fa6";
 
 interface PaymentSecondProps {
   goNext: () => void;
-  tokenPrice: number;
+  tokenPrice: string;
   totalTokens: number;
   investmentAmount: string;
   setInvestmentAmount: (amount: string) => void;
@@ -38,25 +38,24 @@ export const PaymentSecond = ({
   const handleBlur = () => {
     if (amount === '') {
       setAmount('0');
-      setInvestmentAmount(0); // Update parent state
+      setInvestmentAmount("0"); // Update parent state
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (/^\d*$/.test(value)) { // Allow only digits
+    if (/^\d*$/.test(value)) { 
       setAmount(value);
-      const valueInTokens = Number(value); // Get the amount in tokens
-      setInvestmentAmount(valueInTokens); // Update parent state with tokens
+      setInvestmentAmount(value); 
     }
   };
 
   // Calcular el valor total en USDC y el porcentaje de equity
-  const usdcAmount = Number(amount) * tokenPrice;
+  const usdcAmount = parseInt(amount) *   parseInt(tokenPrice);
   const equityPercentage = totalTokens > 0 ? (Number(amount) / totalTokens) * 100 : 0;
 
   // Formatear el monto en USDC para su visualización
-  const formattedUSDCAmount = usdcAmount.toLocaleString('en-UK', {
+  const formattedUSDCAmount = usdcAmount.toLocaleString('en-US', {
     style: 'currency',
     currency: 'USD',
   });

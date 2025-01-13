@@ -3,7 +3,7 @@ import { FormatCurrency } from '../currencyConverter';
 
 interface PaymentOrderViewProps {
   investmentAmount: number; 
-  tokenPrice: number;
+  tokenPrice: string;
   selectedPaymentMethod: string | null;
 }
 

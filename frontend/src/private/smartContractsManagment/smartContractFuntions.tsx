@@ -59,10 +59,10 @@ const { data, loading } = useGetAxiosRequest<SmartContractData>(
           });
           return;
         }
+        const provider = new ethers.BrowserProvider(window.ethereum);
 
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
-        const signer = provider.getSigner();
+        const signer = await provider.getSigner();
 
         if (data?.chain_address) {
           const contractInstance = new ethers.Contract(
