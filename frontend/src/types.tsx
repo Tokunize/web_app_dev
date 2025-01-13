@@ -104,6 +104,8 @@ export interface Transaction{
   trade_price?: string;
   trade_quantity?: string;
   executed_at?: string;
+  event?: "SELL" | "CANCELLATION" | "BUY";  // Aquí añadimos la propiedad 'event'
+
 };
 
 
@@ -116,12 +118,13 @@ export interface TabItem {
 
 export type TransactionAsset = {
   id: number;
-  event: string;
   transaction_amount: string;
   transaction_tokens_amount: string;
   transaction_owner: string;
   transaction_date: string;
   created_at: string;
+  event: "SELL" | "CANCELLATION" | "BUY";  // Aquí añadimos la propiedad 'event'
+
 };
 
 
@@ -131,4 +134,31 @@ export type Wallet = {
   is_enabled:boolean;
   is_address_allowed:boolean;
 
+}
+
+
+
+// NEW INTERFACES FOR BETTER CODE
+
+
+export interface Token {
+  token_price: string; 
+  tokens_available: number;
+  total_tokens: number;
+  tokens_sold: number;
+}
+
+
+export interface PropertyDataPayment {
+  reference_number: string; 
+  title: string;
+  location: string;
+  image: string[];  
+  property_type: string;  
+  property_blockchain_adress: string;
+  projected_annual_yield: string; 
+  projected_rental_yield: string; 
+  price: string;
+  country: string;
+  tokens: Token[];
 }

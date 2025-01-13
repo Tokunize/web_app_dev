@@ -33,7 +33,6 @@ export default defineConfig({
       'stream-browserify',
       'util',
       'events',
-      // Agrega otras dependencias si es necesario
     ],
   },
 });

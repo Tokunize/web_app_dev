@@ -17,7 +17,7 @@ import {
     value: string;
     title: string;
     description: string;
-    content: JSX.Element; // Use JSX.Element for dynamic content
+    content: React.ReactNode
   }
   
   interface TabsComponentProps {
