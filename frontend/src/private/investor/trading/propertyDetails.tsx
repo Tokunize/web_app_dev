@@ -1,5 +1,5 @@
-import { Carousel } from "flowbite-react";
-import { Progress } from "flowbite-react";
+// import { Carousel } from "flowbite-react";
+// import { Progress } from "flowbite-react";
 import {  useEffect, useState } from "react";
 import { FormatCurrency } from "@/components/currencyConverter";
 
@@ -29,16 +29,7 @@ export const SinglePropertyDetailOnModal = ({ propertyData }: Props) => {
       <div className="flex flex-row space-x-3">
         {/* Property details and image carousel */}
         <aside className="w-1/2 flex flex-col text-left">
-          <Carousel indicators={true} slide={false} className="h-[50%]">
-            {propertyData.image.map((img, index) => (
-              <img
-                key={index}
-                src={img}
-                alt={`${propertyData.title} image ${index + 1}`}
-                className="w-full h-full object-cover"
-              />
-            ))}
-          </Carousel>
+       
 
           <header className="mt-3">
             <h1 className="font-semibold">{propertyData.title}</h1>
@@ -78,12 +69,10 @@ export const SinglePropertyDetailOnModal = ({ propertyData }: Props) => {
                 Equity Listed <span> <FormatCurrency amount={propertyData.price}/></span>
               </li>
               {/* For demonstration, using a static 30% for the first progress bar */}
-              <Progress progress={30} />
               <li className="flex   text-sm justify-between">
                 Equity Sold <span>{progressEquity.toFixed(2)} %</span>
               </li>
               {/* The second progress bar reflects the actual equity sold */}
-              <Progress progress={progressEquity} />
             </ul>
           </div>
         </article>
