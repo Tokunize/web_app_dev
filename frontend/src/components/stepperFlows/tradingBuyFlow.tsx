@@ -1,6 +1,6 @@
 import { StepperFlow } from "./stepperFlow";
 import { SinglePropertyDetailOnModal } from "@/private/investor/trading/propertyDetails";
-import { TradingBooks } from "@/private/investor/trading/TradingBooks";
+import { TradingBooks } from "@/private/investor/trading/tradingBooks";
 import { useGetAxiosRequest } from "@/hooks/getAxiosRequest";
 import { LoadingSpinner } from "../loadingSpinner";
 import checkBoxSuccesIcon from "../../assets/bigCheckBox.svg";
